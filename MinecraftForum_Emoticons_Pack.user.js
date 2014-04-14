@@ -3,6 +3,7 @@
 // @description Adds emoticons from MinecraftForum
 // @namespace   userstyles
 // @version     1.1
+// @icon        http://static.minecraftforum.net//public/style_emoticons/default/mobcreeper.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js

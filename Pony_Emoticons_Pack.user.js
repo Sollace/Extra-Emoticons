@@ -3,6 +3,7 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @namespace   userstyles
 // @version     1.11
+// @icon        http://fc00.deviantart.net/fs70/f/2014/013/0/2/nerdgasm_by_comeha-d72140i.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js

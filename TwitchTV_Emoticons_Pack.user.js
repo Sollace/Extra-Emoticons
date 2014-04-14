@@ -5,6 +5,7 @@
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @version     1.1
+// @icon        http://www.twitch.tv/favicon.ico
 // @grant       none
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // ==/UserScript==

@@ -3,6 +3,7 @@
 // @description Adds DeviantArt emoticons
 // @namespace   userstyles
 // @version     1.6
+// @icon        http://s.deviantart.net/emoticons/d/dalogo1.gif
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
