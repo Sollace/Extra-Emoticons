@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Kaomaji Emoticons Pack
+// @name        Kaomoji Emoticons Pack
 // @description Adds all japanese smilies as emoticons
 // @namespace   userstyles
 // @version     1.2
