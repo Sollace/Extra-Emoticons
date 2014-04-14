@@ -962,14 +962,13 @@ function UnspoilerEmoticons() {
     var comments = $('.comment .data .comment_data');
     if (comments.length == 0) return false;
     unspoilerSiblings();
-    for (var i = 0; i < comments.length; i++) {
-        $(comments[i]).find('img[title=""]:not([alt=""])').each(function() {
-            var tit = $(this).attr('alt');
-            if ($(this).attr('title') != tit) {
-                $(this).attr('title', tit);
-            }
-        });
-    }
+    comments.find('img:not(.done)').each(function() {
+        var tit = $(this).attr('alt');
+        if ($(this).attr('title') != tit) {
+            $(this).attr('title', tit);
+        }
+        $(this).addClass('done');
+    });
     
     logger.Log("unspoiler: complete");
     return true;
