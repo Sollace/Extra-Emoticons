@@ -2,10 +2,10 @@
 // @name        DeviantArt Emoticons Pack
 // @description Adds DeviantArt emoticons
 // @namespace   userstyles
-// @version     1.5.1
+// @version     1.6
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @require     http://userscripts.org/scripts/source/181425.user.js
+// @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
 // ==/UserScript==
 

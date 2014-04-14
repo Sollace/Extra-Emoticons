@@ -2,10 +2,10 @@
 // @name        Kaomaji Emoticons Pack
 // @description Adds all japanese smilies as emoticons
 // @namespace   userstyles
-// @version     1.1.2
+// @version     1.2
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @require     http://userscripts.org/scripts/source/181425.user.js
+// @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
 // @nocompat    Chrome
 // ==/UserScript==

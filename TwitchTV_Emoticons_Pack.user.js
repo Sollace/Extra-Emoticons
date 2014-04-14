@@ -4,9 +4,9 @@
 // @namespace   fimfiction
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.0.1
+// @version     1.1
 // @grant       none
-// @require     http://userscripts.org/scripts/source/181425.user.js
+// @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // ==/UserScript==
 
 addEmoticons("tt", "Twitch", "Twitch", ([
