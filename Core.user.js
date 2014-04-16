@@ -4,7 +4,7 @@
 // @description Allows additional emoticons to be added to FimFiction.net
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     4.4.1
+// @version     4.4.2
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -368,7 +368,7 @@ ExtraEmoticons.prototype.addRawToPanel = function(holder, item) {
         var splitten = SplitTitle(item);
         if (splitten[1] != '') {
             item = splitten[0];
-            title = item + '\n ' + splitten[1]
+            title = item + '\n ' + splitten[1];
         } else if (splitten[0] != '') {
             title = splitten[0];
         }
@@ -455,7 +455,7 @@ ExtraEmoticons.prototype.findMatchingEmotes = function(name) {
              for (var t = 0; t < terms.length; t++) {
                  if (contains((group.length > 0 && !panels[i].IsRaw ? panels[i].Emotes[k] : panels[i].EmoteTitles[k]).toLowerCase(), terms[t].toLowerCase())) {
                      if (panels[i].IsRaw) {
-                         results.push('RAW,url=' + panels[i].EmoteTitles[k].split('\n ').join('|'));
+                         results.push('RAW,url=' + panels[i].Emotes[k] + '|' + panels[i].EmoteTitles[k]);
                      } else {
                          results.push(panels[i].Emotes[k] + '|' + (panels[i].Id == null ? '' : panels[i].Id) + panels[i].EmoteTitles[k]);
                      }
@@ -912,7 +912,7 @@ function VirtualEmotePanel(panel) {
     this.Emotes = [];
     this.EmoteTitles = [];
     
-    panel = $(panel).html().split('\n');
+    panel = $(panel)[0].textContent.split('\n');
     for (var k = 0; k < panel.length; k++) {
         if (contains(panel[k], '|')) {
             var item = panel[k].split('|');
@@ -925,7 +925,11 @@ function VirtualEmotePanel(panel) {
         } else {
             this.Emotes.push(panel[k]);
         }
-        this.EmoteTitles.push(getTitle(panel[k]));
+        if (this.IsRaw) {
+            this.EmoteTitles.push(SplitTitle(panel[k])[1]);
+        } else {
+            this.EmoteTitles.push(getTitle(panel[k]));
+        }
     }
 }
 
