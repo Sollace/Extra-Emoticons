@@ -5,6 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
+// @require     https://github.com/Sollace/FimFiction-UserScripts/raw/Dev/Internal/SpecialTitles.user.js
 // @version     4.4.3
 // @grant       none
 // ==/UserScript==
@@ -750,11 +751,6 @@ function addEmoticons(id, name, title, emotes, normalize) {
     }
 }
 
-function setUpSpecialTitles() {
-    setSpecialTitle([138711, 10539, 27165],"FimFiction Modder");
-    setSpecialTitle([129122],"Emote Contributor");
-}
-
 function restoreFromRecord(hook) {
     var store = $('div#extraemoticons_loaded')[0];
     for (var i = 0; i < store.children.length; i++) {
@@ -1128,7 +1124,7 @@ function refreshEmotePanels() {
 
 function refreshComments() {
     if (UnspoilerEmoticons()) {
-        setUpSpecialTitles();
+        SpecialTitles.setUpSpecialTitles();
         var editComments = getEditCommentButtons();
         if (editComments.length > 0) {
             logger.Log('refreshComments: adding comment editing...');
@@ -1242,18 +1238,6 @@ function getSiteFavicon(domain) {
         text = 'www.' + text
     }
     return 'http://' + text.replace('*', '') + '/favicon.ico';
-}
-
-//==API FUNCTION==//
-function setSpecialTitle(userIds, title) {
-    for (var  i = 0; i < userIds.length; i++) {
-        $(".author > .avatar > img[src^='//www.fimfiction-static.net/images/avatars/" + userIds[i] + "']").each(function(item) {
-            var prev = this.parentNode.previousSibling;
-            if (prev != null && prev != undefined && prev.innerHTML != title) {
-                $(this.parentNode).before("<div class=\"author-badge\" >" + title + "</div>");
-            }
-        });
-    }
 }
 
 //==API FUNCTION==//
