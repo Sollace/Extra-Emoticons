@@ -4,7 +4,7 @@
 // @description Allows additional emoticons to be added to FimFiction.net
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     4.4.2
+// @version     4.4.3
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -1091,6 +1091,7 @@ function finalInit() {
                         overflow: auto;\
                         font-size: 0.8em;\
                         font-weight: bold;\
+                        text-align: center;\
                         height: auto !important;\
                         min-height: 285px !important;\
                         padding-top: 15px !important;\
