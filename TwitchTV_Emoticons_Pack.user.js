@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name        TwitchTV Emoticons Pack
 // @description Adds all emoticons from Twitch.tv to FimFiction.net
-// @namespace   fimfiction
+// @author      Sollace
+// @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @version     1.1

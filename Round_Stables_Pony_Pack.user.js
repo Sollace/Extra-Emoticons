@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name        Round Stables Pony Pack
 // @description Adds Pony themed emoticons to FimFiction.net.
-// @namespace   userstyles
+// @author      Sollace
+// @namespace   fimfiction-sollace
 // @version     1.1
 // @icon        http://www.roundstable.com/forums/images/smilies/DashEmote2.png
 // @include     http://www.fimfiction.net/*

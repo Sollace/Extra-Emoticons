@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name        Pony Emoticons Pack
 // @description Adds Pony themed emoticons to FimFiction.net.
-// @namespace   userstyles
+// @author      Sollace
+// @namespace   fimfiction-sollace
 // @version     1.11.1
 // @icon        http://fc00.deviantart.net/fs70/f/2014/013/0/2/nerdgasm_by_comeha-d72140i.png
 // @include     http://www.fimfiction.net/*

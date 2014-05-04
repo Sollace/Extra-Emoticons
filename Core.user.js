@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name        FimFiction Extra Emoticons Core
-// @namespace   fimfiction
 // @description Allows additional emoticons to be added to FimFiction.net
+// @author      Sollace
+// @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @version     4.4.3

@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name        MinecraftForum Emoticons Pack
 // @description Adds emoticons from MinecraftForum
-// @namespace   userstyles
+// @author      Sollace
+// @namespace   fimfiction-sollace
 // @version     1.1
 // @icon        http://static.minecraftforum.net//public/style_emoticons/default/mobcreeper.png
 // @include     http://www.fimfiction.net/*

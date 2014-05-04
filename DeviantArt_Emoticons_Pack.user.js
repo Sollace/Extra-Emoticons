@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name        DeviantArt Emoticons Pack
 // @description Adds DeviantArt emoticons
-// @namespace   userstyles
+// @author      Sollace
+// @namespace   fimfiction-sollace
 // @version     1.6
 // @icon        http://s.deviantart.net/emoticons/d/dalogo1.gif
 // @include     http://www.fimfiction.net/*
