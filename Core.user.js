@@ -5,12 +5,17 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @require     https://github.com/Sollace/FimFiction-UserScripts/raw/Dev/Internal/SpecialTitles.user.js
 // @version     4.4.3
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
 if (isJQuery())
+
+$.ajaxSetup({
+    catch: true
+});
+$.getScript("https://github.com/Sollace/FimFiction-UserScripts/raw/Dev/Internal/SpecialTitles.user.js");
+
 //==================================================================================================
 var logger = new Logger('Extra Emoticons', 1);
 //==================================================================================================
