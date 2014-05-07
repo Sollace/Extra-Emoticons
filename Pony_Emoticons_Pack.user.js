@@ -3,7 +3,7 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.11.1
+// @version     2
 // @icon        http://fc00.deviantart.net/fs70/f/2014/013/0/2/nerdgasm_by_comeha-d72140i.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -11,7 +11,7 @@
 // @grant       none
 // ==/UserScript==
 
-addEmoticons("x", "Dropbox", "Extra", ([
+ExtraEmotes.addEmoticons("x", "Dropbox", "Extra", ([
 "http://fc00.deviantart.net/fs70/f/2014/013/0/2/nerdgasm_by_comeha-d72140i.png",
 "http://fc05.deviantart.net/fs70/f/2014/013/8/1/twieww_by_comeha-d72140f.png",
 "http://fc09.deviantart.net/fs70/f/2014/014/c/3/fitwi_by_comeha-d7252jt.png",
@@ -125,7 +125,7 @@ addEmoticons("x", "Dropbox", "Extra", ([
 "http://fc04.deviantart.net/fs70/f/2014/011/1/6/molestia_by_comeha-d71qbk9.png"
 ]).reverse());
 
-addEmoticons("c", "Clap", "Clap", [
+ExtraEmotes.addEmoticons("c", "Clap", "Clap", [
 "http://fc06.deviantart.net/fs71/f/2013/354/a/c/clapping_pony_icon___sollace_by_comeha-d6ymjq8.gif",
 "http://fc07.deviantart.net/fs71/f/2013/354/6/4/clapping_pony_icon___twiscepter_by_comeha-d6ymjpx.gif",
 "http://fc00.deviantart.net/fs71/f/2014/047/c/2/clapping_pony_icon___applejewel_by_comeha-d76qgay.gif",
@@ -169,7 +169,7 @@ addEmoticons("c", "Clap", "Clap", [
 "http://fc03.deviantart.net/fs70/f/2012/363/1/e/clapping_pony_icon___twilight_sparkle_by_taritoons-d5pkpl8.gif"
 ], false);
 
-addEmoticons("s", "Sexy", "Sexy Pony", [
+ExtraEmotes.addEmoticons("s", "Sexy", "Sexy Pony", [
 "http://i453.photobucket.com/albums/qq260/spacewings/EmoteTwilightWet_zps61ffef2a.png|twilight",
 "http://i453.photobucket.com/albums/qq260/spacewings/EmotePinkieWet_zps32fea050.png|pinkie_pie",
 "http://i453.photobucket.com/albums/qq260/spacewings/EmoteFluttershyWet_zpsea1c8bcc.png|fluttershy",

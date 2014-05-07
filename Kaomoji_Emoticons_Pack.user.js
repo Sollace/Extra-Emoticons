@@ -3,7 +3,7 @@
 // @description Adds all japanese smilies as emoticons
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.2.1
+// @version     2
 // @icon        http://www.chatslang.com/images/main/kaomoji.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -12,7 +12,7 @@
 // @nocompat    Chrome
 // ==/UserScript==
 
-addRaw("jp", "Japan", "Kaomoji", ([
+ExtraEmotes.addRaw("jp", "Japan", "Kaomoji", ([
 "O(<>\'<>)O|Aang",
 "-_-+|Angry1",
 "(((p(>o<)q)))|Angry",

@@ -3,7 +3,7 @@
 // @description Adds emoticons from MinecraftForum
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.1
+// @version     2
 // @icon        http://static.minecraftforum.net//public/style_emoticons/default/mobcreeper.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -11,7 +11,7 @@
 // @grant       none
 // ==/UserScript==
 
-addEmoticons("mc", "MinecraftForum", "MinecraftForum", [
+ExtraEmotes.addEmoticons("mc", "MinecraftForum", "MinecraftForum", [
 "http://static.minecraftforum.net//public/style_emoticons/default/diamond.png",
 "http://static.minecraftforum.net//public/style_emoticons/default/bow.png",
 "http://static.minecraftforum.net//public/style_emoticons/default/bootsleather.png",

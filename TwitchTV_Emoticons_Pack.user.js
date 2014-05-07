@@ -5,13 +5,13 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.1
+// @version     2
 // @icon        http://www.twitch.tv/favicon.ico
 // @grant       none
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // ==/UserScript==
 
-addEmoticons("tt", "Twitch", "Twitch", ([
+ExtraEmotes.addEmoticons("tt", "Twitch", "Twitch", ([
 "http://www.twitch.tv/favicon.ico|twitchlogo",
 
 //Twitch

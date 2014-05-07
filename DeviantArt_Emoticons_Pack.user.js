@@ -3,7 +3,7 @@
 // @description Adds DeviantArt emoticons
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.6
+// @version     3
 // @icon        http://s.deviantart.net/emoticons/d/dalogo1.gif
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -11,7 +11,7 @@
 // @grant       none
 // ==/UserScript==
 
-addEmoticons("da", "DeviantArt", "DeviantArt Official", [
+ExtraEmotes.addEmoticons("da", "DeviantArt", "DeviantArt Official", [
 "http://s.deviantart.net/emoticons/l/leetcrab.gif",
 "http://s.deviantart.net/emoticons/e/eat_worm_by_devlant-d3yzszv.gif",
 "http://s.deviantart.net/emoticons/h/hooray.gif",
@@ -506,7 +506,7 @@ addEmoticons("da", "DeviantArt", "DeviantArt Official", [
 "http://s.deviantart.net/emoticons/c/cries.gif",
 "http://s.deviantart.net/emoticons/d/dalogo1.gif"
 ]);
-addEmoticons("dc", "Deviant Community", "DeviantArt Community", [
+ExtraEmotes.addEmoticons("dc", "Deviant Community", "DeviantArt Community", [
 "http://fc07.deviantart.net/fs36/f/2008/249/3/c/_balloon__by_NerdXV.gif|balloon-0",
 "http://fc05.deviantart.net/fs71/f/2010/025/9/3/931ab944fe07de5d338210fd1b5751a8.gif|balloon-1",
 "http://fc06.deviantart.net/fs20/f/2007/228/9/7/Heart_Balloon_Emote_by_artsyfartsymarcy.gif|balloon-2",

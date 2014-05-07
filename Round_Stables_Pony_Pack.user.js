@@ -3,7 +3,7 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.1
+// @version     2
 // @icon        http://www.roundstable.com/forums/images/smilies/DashEmote2.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -11,7 +11,7 @@
 // @grant       none
 // ==/UserScript==
 
-addEmoticons("rs", "RoundStable", "Round Stable", ([
+ExtraEmotes.addEmoticons("rs", "RoundStable", "Round Stable", ([
 "http://www.roundstable.com/forums/images/smilies/DashEmote2.png",
 "http://www.roundstable.com/forums/images/smilies/excellent.gif",
 "http://www.roundstable.com/forums/images/smilies/ajskeptic2.png",
