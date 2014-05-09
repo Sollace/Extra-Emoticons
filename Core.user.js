@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     4.5
+// @version     4.5.1
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -26,29 +26,30 @@ function startsWith(me, it) { return me.indexOf(it) == 0 }
 function endsWith(me, it) { return startsWith(reverse(me), reverse(it)) }
 
 var logger = new Logger('Extra Emoticons', 0);
+var mapping = {
+    'Imgur': 'imgur.com',
+    'Google': 'google.com',
+    'Twitter': 'twitter.com',
+    'Facebook': 'facebook.com',
+    'FimFiction': 'fimfiction-static.net',
+    'FanFiction': 'fanfiction.net',
+    'DeviantArt': 'deviantart.com',
+    'Tumblr': 'tumblr.com',
+    'MyLittleFaceWhen': 'mylittlefacewhen.com',
+    'Amazon': 'amazon.com',
+    'Amazonaws': 'amazon.com',
+    'PhotoBucket': 'photobucket.com',
+    'Disqus': 'disqus.com',
+    'MySpace': '*x.myspacecdn.com/new/common/images/favicons',
+    'Blogger': 'blogger.com',
+    'Pinterist': 'pinterest.com',
+    'Reddit': 'reddit.com'
+};
+var socialMapping = ['fav', 'thumb', 'twitter', 'facebook', 'youtube', 'google', 'linkedin', 'intensedebate', 'wordpress', 'tumblr', 'disqus', 'myspace', 'blogger', 'pinterest', 'reddit'];
+
 
 try {
     (function (win) {
-        var mapping = {
-            'Imgur': 'imgur.com',
-            'Google': 'google.com',
-            'Twitter': 'twitter.com',
-            'Facebook': 'facebook.com',
-            'FimFiction': 'fimfiction-static.net',
-            'FanFiction': 'fanfiction.net',
-            'DeviantArt': 'deviantart.com',
-            'Tumblr': 'tumblr.com',
-            'MyLittleFaceWhen': 'mylittlefacewhen.com',
-            'Amazon': 'amazon.com',
-            'Amazonaws': 'amazon.com',
-            'PhotoBucket': 'photobucket.com',
-            'Disqus': 'disqus.com',
-            'MySpace': '*x.myspacecdn.com/new/common/images/favicons',
-            'Blogger': 'blogger.com',
-            'Pinterist': 'pinterest.com',
-            'Reddit': 'reddit.com'};
-        var socialMapping = ['fav','thumb','twitter','facebook','youtube','google','linkedin','intensedebate','wordpress','tumblr','disqus','myspace','blogger','pinterest','reddit'];
-
         if (typeof (win.ExtraEmotes) === 'undefined') {
             //--------------------------------------------------------------------------------------------------
             //---------------------------------EXTRA EMOTICONS MODULE-------------------------------------------
