@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     4.5.1
+// @version     4.5.2
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -189,9 +189,11 @@ try {
                     var newItem = $("<div class='extra_emote' />");
                     $(newItem).append(img);
                     if (!img.complete) {
+                        $(img).css('display', 'none');
                         var spin = $('<i style="font-size:30px;color:rgb(200,200,140);" class="fa fa-spinner fa-spin" />');
                         $(newItem).append(spin);
-                        $(img).load(function () {
+                        $(img).on('load error', function () {
+                            $(img).css('display', '');
                             spin.remove();
                         });
                     }
@@ -336,7 +338,19 @@ try {
             ExtraEmoticons.prototype.makeButton = function (name, label, image) {
                 logger.Log('ExtraEmoticons.makeButton: start');
                 var link = $('<a id="' + name + '" style="cursor:pointer;" title="' + label + ' Emoticons" />');
-                $(link).append('<img class="icon_16" style="width: 18px; height: 18px" src="' + image.split('|')[0] + '"></img>');
+                var img = $('<img class="icon_16" style="width: 18px; height: 18px" src="' + image.split('|')[0] + '"></img>');
+                $(link).append(img);
+
+                if (!img[0].complete) {
+                    $(img).css('display', 'none');
+                    var spin = $('<i style="line-height:18px;" class="fa fa-spinner fa-spin" />');
+                    $(img).after(spin);
+                    $(img).on('load error', function () {
+                        $(img).css('display', '');
+                        spin.remove();
+                    });
+                }
+
                 var me = this;
                 $(link).click(function () {
                     me.switc(this.id);
@@ -433,10 +447,12 @@ try {
                 $(mote).append(img);
 
                 if (!img[0].complete) {
+                    $(img).css('display', 'none');
                     var spin = $('<i style="font-size:30px;color:rgb(200,200,140);" class="fa fa-spinner fa-spin" />');
                     $(mote).append(spin);
 
-                    $(img).load(function () {
+                    $(img).on('load error', function () {
+                        $(img).css('display', '');
                         spin.remove();
                     });
                 }
