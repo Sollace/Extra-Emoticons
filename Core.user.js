@@ -24,6 +24,7 @@ function reverse(me) { return me.split('').reverse().join() }
 function contains(me, it) { return me.indexOf(it) != -1 }
 function startsWith(me, it) { return me.indexOf(it) == 0 }
 function endsWith(me, it) { return startsWith(reverse(me), reverse(it)) }
+function replaceAll(find, replace, str) { return str.replace(new RegExp(find.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'g'), replace); }
 
 var logger = new Logger('Extra Emoticons', 0);
 var mapping = {
@@ -1209,8 +1210,7 @@ try {
 //Returns standard addres for a sites favicon.ico
 function getSiteFavicon(domain) {
     var text = mapping[domain];
-    if (text == null)
-        return undefined;
+    if (text == null) return undefined;
     if (!startsWith(text, '*')) {
         text = 'www.' + text
     }
@@ -1270,9 +1270,6 @@ function isMyPage() {
 //==API FUNCTION==//
 //Returns true if the given string is recognized as a website
 function getBoolIsSite(domain) {return getIsSite(domain) != '';}
-
-//==API FUNCTION==//
-function replaceAll(find, replace, str) {return str.replace(new RegExp(find.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'g'), replace);}
 
 //==API FUNCTION==//
 function getUserNameEncoded() { return encodeURIComponent(getUserName()); }
