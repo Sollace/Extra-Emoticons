@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     4.5.2
+// @version     4.5.3
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -955,11 +955,10 @@ try {
 
         function unspoilerSiblings() {
             $('.comment .data .comment_data .user_image_link:not(.dontUnspoiler').each(function () {
-                var type = EmoteType($(this).attr('href'));
+                var url = $(this).attr('href').replace('https://', 'http://');
+                var type = EmoteType(url);
                 if (type.result > 0) {
-                    var url = $(this).attr('href');
                     var img = $('<img />');
-
                     if (type.result == 2) {
                         $(img).css('max-width', '100%');
                     } else {
