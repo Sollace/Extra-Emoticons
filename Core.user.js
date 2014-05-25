@@ -462,13 +462,15 @@ try {
                 $(holder).append(newA);
             }
             ExtraEmoticons.prototype.Name = function (url) {
-                var panels = this.panelholder.children;
+                url = url.split('?')[0];
+                var panels = getVirtualEmotes();
+                panels.unshift(getDefaultEmotes());
+
                 for (var i = 0; i < panels.length; i++) {
-                    for (var k = 0; k < panels[i].children.length; k++) {
-                        var path = panels[i].children[k].children[0].children[0];
-                        if (path != null) {
-                            if ($(path).attr('src') == url) {
-                                return $(path).attr('title').split('\n')[0]
+                    if (!panels[i].IsRaw) {
+                        for (var k = 0; k < panels[i].Emotes.length; k++) {
+                            if (url == panels[i].Emotes[k]) {
+                                return ':' + panels[i].Id + panels[i].EmoteTitles[k];
                             }
                         }
                     }
@@ -647,8 +649,8 @@ try {
         //--------------------------------------------------------------------------------------------------
 
         function returnAliases(txt) {
+            txt = replaceAll('?wrap=true', '', txt);
             var vpanels = getVirtualEmotes();
-
             for (var i = 0; i < vpanels.length; i++) {
                 if (!vpanels[i].IsRaw && !vpanels[i].External) {
                     for (var k = 0; k < vpanels[i].Emotes.length; k++) {
@@ -656,7 +658,6 @@ try {
                         var emote = '[img]' + vpanels[i].Emotes[k] + '[/img]';
                         txt = replaceAll(emote, tit, txt);
                     }
-
                 }
             }
 
@@ -671,6 +672,7 @@ try {
                     for (var k = 0; k < vpanels[i].Emotes.length; k++) {
                         var tit = ':' + vpanels[i].Id + vpanels[i].EmoteTitles[k];
                         var emote = ' [img]' + vpanels[i].Emotes[k] + '[/img]';
+                        txt = replaceAll('\n' + tit, '\n [img]' + vpanels[i].Emotes[k] + '?wrap=true[/img]', txt);
                         txt = replaceAll(tit, emote, txt);
                     }
                 }
@@ -783,33 +785,9 @@ try {
         }
 
         var AllEmotes = null;
-        function isEmote(url) {
-            if (AllEmotes == null) {
-                AllEmotes = getAllEmotes();
-            }
-            if (url != null && url != undefined) {
-                logger.Log('isEmote: ' + url);
-                var splitten = url.split('?');
-                if (splitten != null && splitten.length == 2) {
-                    splitten = splitten[1].split('&');
-                    for (var i = 0; i < splitten.length; i++) {
-                        if (splitten[i] == 'isEmote=true') {
-                            return 2;
-                        }
-                    }
-                }
-                for (var i = 0; i < AllEmotes.length; i++) {
-                    if (url == AllEmotes[i]) {
-                        logger.Log('isEmote: true');
-                        return 1;
-                    }
-                }
-            }
-            logger.Log('isEmote: false');
-            return 0;
-        }
-
         function EmoteType(url) {
+            var mustWrap = false;
+            
             if (url != null && url != undefined) {
                 var splitten = url.split('?');
                 if (splitten != null && splitten.length == 2) {
@@ -818,8 +796,13 @@ try {
                         if (splitten[i] == 'isEmote=true') {
                             return {
                                 result: 2,
-                                lim: true
+                                lim: true,
+                                wrap: mustWrap
                             };
+                        } else if (splitten[i] == 'wrap=true') {
+                            url = url.split('?')[0];
+                            mustWrap = true;
+                            break;
                         }
                     }
                 }
@@ -835,7 +818,8 @@ try {
                                 logger.Log('EmoteType: true');
                                 return {
                                     result: 1,
-                                    lim: AllEmotes[i].Normalized
+                                    lim: AllEmotes[i].Normalized,
+                                    wrap: mustWrap
                                 }
                             }
                         }
@@ -844,7 +828,7 @@ try {
             }
 
             logger.Log('EmoteType: false');
-            return { result: 0, lim: true };
+            return { result: 0, lim: true, wrap: false };
         }
 
         function getAllEmotes() {
@@ -971,9 +955,16 @@ try {
                     }
 
                     $(img).attr('src', url);
-                    $(this).parent().attr('style', 'display: inline;');
-                    $(this).after(img);
-                    $(this).remove();
+
+                    var p = $(this).parent().prev();
+                    if (type.wrap || p.length == 0 || p.prop('tagName') != 'P') {
+                        $(this).parent().attr('style', 'display: inline;');
+                        $(this).after(img);
+                        $(this).remove();
+                    } else {
+                        $(this).parent().remove();
+                        p.append(img);
+                    }
                     logger.Log("unspoilerSiblings: " + url);
                 } else {
                     $(this).addClass('dontUnspoiler');
