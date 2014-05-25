@@ -3,7 +3,7 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2
+// @version     2.1
 // @icon        http://fc00.deviantart.net/fs70/f/2014/013/0/2/nerdgasm_by_comeha-d72140i.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -113,15 +113,16 @@ ExtraEmotes.addEmoticons("x", "Dropbox", "Extra", ([
 "http://i.imgur.com/CjCo3YR.png|bloomsceptr",
 "http://i.imgur.com/IFkl4RG.png|sweetiescepter",
 "http://i.imgur.com/j0bYpQa.png|scootscepter",
+"http://i453.photobucket.com/albums/qq260/spacewings/EmZecora_zpscd7ac24a.png|zecora",
 "http://i453.photobucket.com/albums/qq260/spacewings/ButtonStache_zps2e28ea66.png|button_stache",
+"http://i453.photobucket.com/albums/qq260/spacewings/EmoteTom_zps20851d31.png|tom",
+"http://i453.photobucket.com/albums/qq260/spacewings/EmoteTom2_zps51c59779.png|mandy",
 "http://fc02.deviantart.net/fs70/f/2013/357/9/7/hoof_up_by_comeha-d6z0jqb.png|hoof_up",
 "http://fc09.deviantart.net/fs71/f/2013/357/3/d/hoof_down_by_comeha-d6z0jqf.png|hoof_down",
 "http://fc09.deviantart.net/fs70/f/2013/357/a/1/2_hoofs_up_by_comeha-d6z0lto.png|2_hoofs_up",
 "http://fc04.deviantart.net/fs71/f/2013/357/c/0/fave_by_comeha-d6z0jqh.png|faved",
 "http://fc07.deviantart.net/fs71/f/2013/357/a/f/later_by_comeha-d6z0jq9.png|read_later",
 "http://i.imgur.com/1LNo58W.png|watch",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteTom_zps20851d31.png|tom",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteTom2_zps51c59779.png|mandy",
 "http://fc04.deviantart.net/fs70/f/2014/011/1/6/molestia_by_comeha-d71qbk9.png"
 ]).reverse());
 
