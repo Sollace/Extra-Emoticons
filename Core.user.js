@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     4.5.3
+// @version     4.5.4
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -463,9 +463,14 @@ try {
             }
             ExtraEmoticons.prototype.Name = function (url) {
                 url = url.split('?')[0];
-                var panels = getVirtualEmotes();
-                panels.unshift(getDefaultEmotes());
+                var panels = getDefaultEmotes();
+                for (var k = 0; k < panels.Emotes.length; k++) {
+                    if (url == panels.Emotes[k]) {
+                        return ':' + panels.Id + panels.EmoteTitles[k];
+                    }
+                }
 
+                panels = getVirtualEmotes();
                 for (var i = 0; i < panels.length; i++) {
                     if (!panels[i].IsRaw) {
                         for (var k = 0; k < panels[i].Emotes.length; k++) {
@@ -478,9 +483,6 @@ try {
                 return url;
             }
             ExtraEmoticons.prototype.findMatchingEmotes = function (name) {
-                var panels = getVirtualEmotes();
-                panels.unshift(getDefaultEmotes());
-
                 var terms = $.grep(name.replace('_', ' ').split(' '), function (v) {
                     return v != '';
                 });
@@ -492,6 +494,21 @@ try {
                     }
                 }
                 var results = [];
+
+                var panels = getDefaultEmotes();
+                for (var k = 0; k < panels.Emotes.length; k++) {
+                    for (var t = 0; t < terms.length; t++) {
+                        if (contains((group.length > 0 && !panels.IsRaw ? panels.Emotes[k] : panels.EmoteTitles[k]).toLowerCase(), terms[t].toLowerCase())) {
+                            if (panels.IsRaw) {
+                                results.push('RAW,url=' + panels.Emotes[k] + '|' + panels.EmoteTitles[k]);
+                            } else {
+                                results.push(panels.Emotes[k] + '|' + (panels.Id == null ? '' : panels.Id) + panels.EmoteTitles[k]);
+                            }
+                        }
+                    }
+                }
+
+                panels = getVirtualEmotes(); 
                 for (var i = 0; i < panels.length; i++) {
                     for (var k = 0; k < panels[i].Emotes.length; k++) {
                         for (var t = 0; t < terms.length; t++) {
@@ -850,6 +867,7 @@ try {
         function getDefaultEmotes() {
             if (_defaultEmotes == null) {
                 _defaultEmotes = {
+                    External: true,
                     IsRaw: false,
                     Id: '',
                     Emotes: [],
