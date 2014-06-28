@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     4.5.4
+// @version     4.5.5
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -487,7 +487,6 @@ try {
                     return v != '';
                 });
 
-                var group = isGroupSearch(terms, panels);
                 if (contains(name, 'social') || contains(name, 'media')) {
                     for (var i = 0; i < socialMapping.length; i++) {
                         terms.push(socialMapping[i]);
@@ -495,20 +494,22 @@ try {
                 }
                 var results = [];
 
-                var panels = getDefaultEmotes();
-                for (var k = 0; k < panels.Emotes.length; k++) {
+                var panels = getVirtualEmotes();
+                var defaultPanel = getDefaultEmotes();
+                var group = isGroupSearch(terms, panels, defaultPanel.Name);
+
+                for (var k = 0; k < defaultPanel.Emotes.length; k++) {
                     for (var t = 0; t < terms.length; t++) {
-                        if (contains((group.length > 0 && !panels.IsRaw ? panels.Emotes[k] : panels.EmoteTitles[k]).toLowerCase(), terms[t].toLowerCase())) {
-                            if (panels.IsRaw) {
-                                results.push('RAW,url=' + panels.Emotes[k] + '|' + panels.EmoteTitles[k]);
+                        if (contains((group.length > 0 && !defaultPanel.IsRaw ? defaultPanel.Emotes[k] : defaultPanel.EmoteTitles[k]).toLowerCase(), terms[t].toLowerCase())) {
+                            if (defaultPanel.IsRaw) {
+                                defaultPanel.push('RAW,url=' + defaultPanel.Emotes[k] + '|' + defaultPanel.EmoteTitles[k]);
                             } else {
-                                results.push(panels.Emotes[k] + '|' + (panels.Id == null ? '' : panels.Id) + panels.EmoteTitles[k]);
+                                results.push(defaultPanel.Emotes[k] + '|' + (defaultPanel.Id == null ? '' : defaultPanel.Id) + defaultPanel.EmoteTitles[k]);
                             }
                         }
                     }
                 }
 
-                panels = getVirtualEmotes(); 
                 for (var i = 0; i < panels.length; i++) {
                     for (var k = 0; k < panels[i].Emotes.length; k++) {
                         for (var t = 0; t < terms.length; t++) {
@@ -1132,14 +1133,21 @@ try {
 
         function isGroupSearch(terms, panels) {
             var result = [];
-            for (var i = 0; i < panels.length; i++) {
-                for (var path = 0; path < terms.length; path++) {
+            for (var path = 0; path < terms.length; path++) {
+                for (var i = 0; i < panels.length; i++) {
                     var mat = panels[i].Name;
                     if (mat != null) {
                         if (contains(terms[path].toLowerCase(), mat.toLowerCase())) {
                             if (result.indexOf(mat) == -1) {
                                 result.push(mat);
                             }
+                        }
+                    }
+                }
+                if (extra != null) {
+                    if (contains(terms[path].toLowerCase(), extra.toLowerCase())) {
+                        if (result.indexOf(extra) == -1) {
+                            result.push(extra);
                         }
                     }
                 }
