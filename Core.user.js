@@ -1,11 +1,11 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name        FimFiction Extra Emoticons Core
 // @description Allows additional emoticons to be added to FimFiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     4.5.5
+// @version     4.6.2
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -1131,7 +1131,7 @@ try {
             }
         }
 
-        function isGroupSearch(terms, panels) {
+        function isGroupSearch(terms, panels, extra) {
             var result = [];
             for (var path = 0; path < terms.length; path++) {
                 for (var i = 0; i < panels.length; i++) {
