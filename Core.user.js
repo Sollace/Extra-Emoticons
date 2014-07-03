@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     4.6.2
+// @version     4.6.3
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ if (isJQuery())
 $.ajaxSetup({
     catch: true
 });
-$.getScript("https://github.com/Sollace/FimFiction-UserScripts/raw/Dev/Internal/SpecialTitles.user.js");
+$.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js");
 
 //==================================================================================================
 
@@ -1104,7 +1104,6 @@ try {
         function refreshComments() {
             try {
                 if (UnspoilerEmoticons()) {
-                    SpecialTitles.setUpSpecialTitles();
                     var editComments = getEditCommentButtons();
                     if (editComments.length > 0) {
                         logger.Log('refreshComments: adding comment editing...');
