@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     4.6.3
+// @version     4.7
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -1017,7 +1017,8 @@ try {
             div[id="emoteAPI_Table:FF_Area"] > .extra_emoticons_panel {\
                 display: inline-block;}\
             .extra_emoticons_panel > .extra_emoticons_shown {\
-                overflow-y: auto;}\
+                overflow-y: auto;\
+                overflow-x: hidden;}\
             .fullOpaque > * {\
                 opacity: 1 !important;}\
             .extra_emoticons_panel:focus {\
