@@ -3,7 +3,7 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.2
+// @version     2.2.1
 // @icon        http://fc00.deviantart.net/fs70/f/2014/013/0/2/nerdgasm_by_comeha-d72140i.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -26,7 +26,7 @@ ExtraEmotes.addEmoticons("x", "Dropbox", "Extra", ([
 "http://fc02.deviantart.net/fs70/f/2014/103/7/3/maud_by_comeha-d7eb0mc.png",
 "http://fc04.deviantart.net/fs70/f/2014/103/c/f/loves_rocks_by_comeha-d7eb3je.png",
 "http://fc01.deviantart.net/fs71/f/2014/013/d/b/cslyra_by_comeha-d7220ek.png",
-"http://fc02.deviantart.net/fs71/f/2014/013/3/6/schmoopie_by_comeha-d7213zs.png",
+"http://fc06.deviantart.net/fs71/f/2014/153/f/b/schmoopie_by_comeha-d7213zs.png",
 "http://fc00.deviantart.net/fs70/f/2014/013/3/1/lovelee_by_comeha-d72141j.png",
 "http://fc04.deviantart.net/fs71/f/2014/013/d/d/confusedlee_by_comeha-d72141b.png",
 "http://fc01.deviantart.net/fs71/f/2014/013/e/f/80slee_by_comeha-d72140p.png",
@@ -34,13 +34,15 @@ ExtraEmotes.addEmoticons("x", "Dropbox", "Extra", ([
 "http://fc09.deviantart.net/fs70/f/2014/013/4/1/cheersilee_by_comeha-d72140d.png",
 "http://fc05.deviantart.net/fs70/f/2014/013/8/b/derpilee_by_comeha-d7213zo.png",
 "http://fc04.deviantart.net/fs71/f/2014/013/8/f/naughtilee_by_comeha-d7213zj.png",
-"http://fc04.deviantart.net/fs70/f/2014/013/c/f/pisst_by_comeha-d7213zv.png",
+"http://fc06.deviantart.net/fs70/f/2014/153/f/a/pisst_by_comeha-d7213zv.png",
 "http://fc04.deviantart.net/fs71/f/2014/013/7/7/dawwtwist_by_comeha-d72140m.png",
 "http://fc04.deviantart.net/fs71/f/2014/013/a/d/thpring_by_comeha-d721404.png",
 "http://fc03.deviantart.net/fs70/f/2014/013/f/5/sorrytwist_by_comeha-d721405.png",
 "http://fc04.deviantart.net/fs70/f/2014/013/9/0/madtwist_by_comeha-d721409.png",
 "http://fc08.deviantart.net/fs71/f/2014/013/2/0/ootwist_by_comeha-d7213zw.png",
 "http://fc08.deviantart.net/fs71/f/2014/161/d/b/kissaloo_by_comeha-d7lso4c.png",
+"http://fc07.deviantart.net/fs70/f/2014/236/8/a/roseluck_by_comeha-d7wi620.png",
+"http://fc07.deviantart.net/fs70/f/2014/236/0/b/flutter_blush_by_comeha-d7wi62v.png",
 "http://i453.photobucket.com/albums/qq260/spacewings/EmoteDimondMad_zps1373258d.png|dtiara_mad",
 "http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Redheart_gasp.png",
 "http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Redheart_smile.png",
@@ -129,7 +131,7 @@ ExtraEmotes.addEmoticons("x", "Dropbox", "Extra", ([
 
 ExtraEmotes.addEmoticons("c", "Clap", "Clap", [
 "http://fc06.deviantart.net/fs71/f/2013/354/a/c/clapping_pony_icon___sollace_by_comeha-d6ymjq8.gif",
-"http://fc07.deviantart.net/fs71/f/2013/354/6/4/clapping_pony_icon___twiscepter_by_comeha-d6ymjpx.gif",
+"http://fc08.deviantart.net/fs71/f/2014/073/0/0/clapping_pony_icon___twiscepter_by_comeha-d6ymjpx.gif",
 "http://fc00.deviantart.net/fs71/f/2014/047/c/2/clapping_pony_icon___applejewel_by_comeha-d76qgay.gif",
 "http://fc02.deviantart.net/fs71/f/2014/047/e/6/clapping_pony_icon___flutterbat_by_comeha-d76qgbd.gif",
 "http://fc02.deviantart.net/fs70/f/2013/349/d/7/clapping_pony_icon___nyx_by_comeha-d6y1o60.gif",
