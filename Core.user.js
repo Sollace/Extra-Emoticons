@@ -5,16 +5,11 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     4.7
+// @version     5
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
 if (isJQuery())
-
-$.ajaxSetup({
-    catch: true
-});
-$.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js");
 
 //==================================================================================================
 
@@ -47,7 +42,6 @@ var mapping = {
     'Reddit': 'reddit.com'
 };
 var socialMapping = ['fav', 'thumb', 'twitter', 'facebook', 'youtube', 'google', 'linkedin', 'intensedebate', 'wordpress', 'tumblr', 'disqus', 'myspace', 'blogger', 'pinterest', 'reddit'];
-
 
 try {
     (function (win) {
@@ -1006,8 +1000,20 @@ try {
                 }
                 logger.Log('refreshComments');
                 if (!startsWith(document.location.href, 'http://www.fimfiction.net/manage_user/messages/')) {
-                    refreshComments();
-                    setInterval(refreshComments, 500);
+                    var temp = setInterval(refreshComments, 500);
+                    $.ajaxSetup({
+                        catch: true
+                    });
+                    $.getScript("https://github.com/Sollace/UserScripts/raw/Dev/Internal/Events.user.js", function() {
+                        $.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js", function() {
+                            clearInterval(temp);
+                            SpecialTitles.setUpSpecialTitles();
+                            FimFicEvents.on('pageChanged, editComment', function() {
+                                refreshComments();
+                                SpecialTitles.setUpSpecialTitles();
+                            });
+                        });
+                    });
                 }
                 if (isMyPage()) {
                     setInterval(refreshEmotePanels, 1000);
@@ -1386,4 +1392,3 @@ function Logger(name,l) {
                 $(test).empty();}
             $(test).append('<p style="background: rgba('+(line%2==0?'155,0':'0,155')+',0,0.3);">'+ ++line +'):'+name+') '+txt+'</p>');}}
 }
-
