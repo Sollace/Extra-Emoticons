@@ -937,10 +937,7 @@ if (isJQuery()) {
                 if (comments.length == 0) return false;
                 unspoilerSiblings();
                 comments.find('img:not(.done)').each(function () {
-                    var tit = $(this).attr('alt');
-                    if ($(this).attr('title') != tit) {
-                        $(this).attr('title', tit);
-                    }
+                    $(this).attr('title', $(this).attr('alt'));
                     $(this).addClass('done');
                 });
 
@@ -953,28 +950,24 @@ if (isJQuery()) {
                     var url = $(this).attr('href').replace('https://', 'http://');
                     var type = EmoteType(url);
                     if (type.result > 0) {
-                        var img = $('<img />');
                         if (type.result == 2) {
-                            $(img).css('max-width', '100%');
+                            $(this).parent().after('<img class="user_image" src="' + $(this).attr('href') + '" />').remove();
                         } else {
+                            var tit = ExtraEmotes.Name(url);
+                            var img = $('<img alt="' + tit + '" title="' + tit + '" src="' + url + '" />');
                             if (type.lim) {
                                 $(img).css('max-height', '27px');
                             }
-                            var tit = ExtraEmotes.Name(url);
-                            $(img).attr('alt', tit);
-                            $(img).attr('title', tit);
-                        }
 
-                        $(img).attr('src', url);
-
-                        var p = $(this).parent().prev();
-                        if (type.wrap || p.length == 0 || p.prop('tagName') != 'P') {
-                            $(this).parent().attr('style', 'display: inline;');
-                            $(this).after(img);
-                            $(this).remove();
-                        } else {
-                            $(this).parent().remove();
-                            p.append(img);
+                            var p = $(this).parent().prev();
+                            if (type.wrap || p.length == 0 || p.prop('tagName') != 'P') {
+                                $(this).parent().attr('style', 'display: inline;');
+                                $(this).after(img);
+                                $(this).remove();
+                            } else {
+                                $(this).parent().remove();
+                                p.append(img);
+                            }
                         }
                         logger.Log("unspoilerSiblings: " + url);
                     } else {
@@ -1006,7 +999,7 @@ if (isJQuery()) {
                             $.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js", function() {
                                 clearInterval(temp);
                                 SpecialTitles.setUpSpecialTitles();
-                                FimFicEvents.on('afterpagechange aftereditComment afterpreviewcomment', function() {
+                                FimFicEvents.on('afterpagechange aftereditcomment afterpreviewcomment', function() {
                                     refreshComments();
                                     SpecialTitles.setUpSpecialTitles();
                                 });
