@@ -999,7 +999,7 @@ if (isJQuery()) {
                             $.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js", function() {
                                 clearInterval(temp);
                                 SpecialTitles.setUpSpecialTitles();
-                                FimFicEvents.on('afterpagechange aftereditcomment afterpreviewcomment', function() {
+                                FimFicEvents.on('afterpagechange aftereditcomment afteraddcomment afterpreviewcomment', function() {
                                     refreshComments();
                                     SpecialTitles.setUpSpecialTitles();
                                 });
