@@ -999,7 +999,7 @@ if (isJQuery()) {
                         $.ajaxSetup({
                             catch: true
                         });
-                        $.getScript("https://github.com/Sollace/UserScripts/raw/Dev/Internal/Events.user.js", function() {
+                        $.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js", function() {
                             $.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js", function() {
                                 clearInterval(temp);
                                 SpecialTitles.setUpSpecialTitles();
