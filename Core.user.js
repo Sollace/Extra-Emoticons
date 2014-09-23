@@ -992,6 +992,10 @@ if (isJQuery()) {
                     logger.Log('refreshComments');
                     if (!startsWith(document.location.href, 'http://www.fimfiction.net/manage_user/messages/')) {
                         var temp = setInterval(refreshComments, 500);
+                        var tempb;
+                        if (isMyPage()) {
+                            tempb = setInterval(refreshEmotePanels, 1000);
+                        }
                         $.ajaxSetup({
                             catch: true
                         });
@@ -1003,11 +1007,12 @@ if (isJQuery()) {
                                     refreshComments();
                                     SpecialTitles.setUpSpecialTitles();
                                 });
+                                if (isMyPage()) {
+                                    clearInterval(tempb);
+                                    FimFicEvents.on('aftereditmodule', refreshEmotePanels);
+                                }
                             });
                         });
-                    }
-                    if (isMyPage()) {
-                        setInterval(refreshEmotePanels, 1000);
                     }
                 }, 200);
                 makeStyle('\
