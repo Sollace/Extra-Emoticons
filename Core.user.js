@@ -1033,8 +1033,6 @@ display: block !important;}\
 display: inline-block;\
 padding: 2px;\
 transition: opacity 0.2s linear;}\
-.extra_emoticons_shown:hover > *:not(:hover) {\
-opacity: 0.7;}\
 .extra_emoticons_shown a:not(:hover) {\
 color: rgb(0,10,90) !important;}\
 .extra_emoticons_shown > *:hover {\
