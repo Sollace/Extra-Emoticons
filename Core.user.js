@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.0
+// @version     5.0.1
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -763,7 +763,7 @@ if (isJQuery()) {
             function emoteExtenderIsRunning() {
                 if (emoteExtenderFF == null && !emoteExtenderIsNull) {
                     emoteExtenderFF = getEmoteExtenderFF();
-                    emoteExtenderIsNull = emoteExtenderFF == null;
+                    emoteExtenderIsNull = emoteExtenderFF.length > 0;
                 }
                 return !emoteExtenderIsNull;
             }
