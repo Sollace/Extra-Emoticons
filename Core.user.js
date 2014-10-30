@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.0.1
+// @version     5.1
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -47,57 +47,44 @@ if (isJQuery()) {
                 //--------------------------------------------------------------------------------------------------
                 //---------------------------------EXTRA EMOTICONS MODULE-------------------------------------------
                 //--------------------------------------------------------------------------------------------------
-                function ExtraEmoticons(index, hook) {
-                    this.childGuest = hook;
-                    this.IsSpecial = index <= 0;
-
+                function ExtraEmoticons(hook) {
+                    this.region = $(hook);
+                    this.childGuest;
                     this.previewButton;
                     this.submitButton;
                     this.textArea;
                     this.backupText;
-                    this.parentGuest;
                     this.toolbar;
                     this.emotesTypes;
                     this.search;
                     this.search_Tag;
-                    this.buttonFormat;
                     this.panelholder;
-
-                    if (!this.IsSpecial) {
-                        this.buttonFormat = $(this.childGuest).attr('onclick');
-                        if (this.buttonFormat != null) {
-                            this.buttonFormat = this.buttonFormat.replace(':duck:', '{0}');
-                        }
-                    }
                 }
                 ExtraEmoticons.prototype.init = function (force) {
                     logger.Log('ExtraEmoticons.init: start');
                     if (!has_init || force == true) {
                         var me = this;
-                        if (this.IsSpecial) {
+                        if (this.region.hasClass('.module_editing_form')) {
                             if (this.previewButton == null) {
-                                this.previewButton = document.getElementById('preview_comment');
+                                this.previewButton = $('#preview_comment');
                             }
-                            if (this.previewButton != null) {
-                                $(this.previewButton).click(function () {
+                            if (this.previewButton.length) {
+                                this.previewButton.on('click.extraemotes', function () {
                                     handleSubmit(me);
                                 });
                             }
-                        }
-                        if (this.toolbar == null || force == true) {
-                            this.toolbar = this.getToolbar()
                         }
 
                         this.reInit();
 
                         setTimeout(function () {
                             if (emoteExtenderIsRunning()) {
-                                $(me.previewButton).click(function () {
+                                me.submitButton.on('mousedown.extraemotes', function () {
                                     handleSubmit(me);
                                 });
-                                me.submitButton.onmousedown = function () {
+                                me.previewButton.on('click.extraemotes',function () {
                                     handleSubmit(me);
-                                };
+                                });
                                 recordExtraEmotesPanels();
                             }
                         }, 1300);
@@ -106,153 +93,62 @@ if (isJQuery()) {
                 }
                 ExtraEmoticons.prototype.reInit = function () {
                     logger.Log('ExtraEmoticons.reInit: start');
-                    this.submitButton = this.getSubmitButton();
-
-                    this.textArea = this.getTextArea();
-
+                    this.region.attr('data-init', 'true');
                     var me = this;
-                    this.submitButton.onmousedown = function () {
+                    
+                    this.submitButton = this.getSubmitButton();
+                    this.textArea = this.getTextArea();
+                    this.childGuest = this.getEmotesButton();
+                    this.toolbar = this.region.find('.format-toolbar').first();
+                    
+                    this.submitButton.on('mousedown.extraemotes', function () {
                         handleSubmit(me);
-                    };
-
-                    this.textArea.ondrop = handleDrop;
-
-                    this.backupText = document.createElement('textarea');
-                    $(this.backupText).css('display', 'none');
-
-                    $(this.textArea.parentNode).append(this.backupText);
-
-                    this.parentGuest = this.childGuest.parentNode;
-
-                    var oClass = $(this.parentGuest).attr('class');
-
-                    $(this.parentGuest).attr('class', 'extra_emoticons_normalized extra_emoticons_shown');
-                    $(this.parentGuest).attr('extraemotes', 'FimFiction');
-
-                    this.panelholder = document.createElement('div');
-
-                    $(this.panelholder).attr('tabindex', 0);
-                    $(this.panelholder).keydown(function (e) {
-                        if (e.keyCode == 65 && e.ctrlKey) {
-                            selectElementContents($(this).find('.extra_emoticons_shown')[0]);
-                            e.preventDefault();
-                        }
                     });
+                    this.textArea.on('drop', handleDrop);
 
-                    $(this.panelholder).addClass('extra_emoticons_panel');
-
-
-                    var parentHolder = document.createElement('div');
-                    $(parentHolder).append(this.panelholder);
-
-                    if ($('span[id="emoteAPI_Table:FF"]').length == 0) {
-                        $(parentHolder).addClass('emoticons_panel');
-                        $(parentHolder).css('padding', '0px');
-                    } else {
-                        var tmp = $(this.parentGuest).attr('id');
-                        $(this.parentGuest).removeAttr('id');
-                        $(parentHolder).attr('id', tmp);
-                        tmp = $(this.parentGuest).attr('style');
-                        $(this.parentGuest).removeAttr('style');
-                        $(parentHolder).attr('style', tmp);
-                        $(this.parentGuest.parentNode).css('padding', '0px');
-                    }
-
-                    if ($(this.parentGuest.parentNode).hasClass('emoticons_panel')) {
-                        $(this.parentGuest.parentNode).after(parentHolder);
-                        $(this.parentGuest.parentNode).remove();
-                    } else {
-                        $(this.parentGuest.parentNode).append(parentHolder);
-                    }
-
-                    $(this.panelholder).append(this.parentGuest);
-                    $(this.parentGuest).css('height', '260px');
-
-                    for (var i = 0; i < this.parentGuest.children.length; i++) {
-                        var item = this.parentGuest.children[i];
-                        var img = item.children[0];
-                        if (img != null) {
-                            var tit = getTitle($(img).attr('src'));
-                            $(img).attr('title', tit);
-                            if (!this.IsSpecial) {
-                                $(item).attr('href', 'insertEmote:' + tit);
-                            }
-                        }
-
-                        var newItem = $("<div class='extra_emote' />");
-                        $(newItem).append(img);
-                        if (!img.complete) {
-                            $(img).css('display', 'none');
-                            var spin = $('<i style="font-size:30px;color:rgb(200,200,140);" class="fa fa-spinner fa-spin" />');
-                            $(newItem).append(spin);
-                            $(img).on('load error', function () {
-                                $(img).css('display', '');
-                                spin.remove();
-                            });
-                        }
-                        $(item).append(newItem);
-                    }
-
+                    this.backupText = $('<textarea style="display:none;" />');
+                    this.textArea.parent().append(this.backupText);
+                    
                     this.emotesTypes = makeToolbar('emotes_type_switch');
-                    $(this.toolbar).append(this.emotesTypes);
-                    this.search = this.makeEmotesPanel('', 'search', true);
-                    this.makeSearch('search');
-                    this.makeButton('FimFiction', 'Default', this.childGuest.children[0].children[0].src);
+                    this.toolbar.append(this.emotesTypes);
+                    this.emotesTypes.append(this.childGuest.parent());
+                    
+                    /*this.search = this.makeEmotesPanel('', 'search', true);
+                    this.makeSearch('search');*/
+                    
+                    $(this.childGuest).find('i').after('<img class="icon_16" style="width: 18px; height: 18px" src="' + getDefaultEmoteUrl('twilightsmile') + '" />').remove();
+                    $(this.childGuest).attr('data-function', '');
+                    $(this.childGuest).attr('data-panel', 'default');
+                    
+                    var def = getDefaultEmotes();
+                    var holder = this.makeEmotesPanel('', 'default', true);
+                    this.addImagesToPanel(def.Id, holder, def.Emotes, true);
+                    this.openEmoticonsPanel($(this.childGuest)).append(holder);
+                    
                     logger.Log('ExtraEmoticons.reInit: end');
                 }
+                ExtraEmoticons.prototype.openEmoticonsPanel = function(button) {
+                    var holder = $('<div class="drop-down drop-down-emoticons"><div class="arrow" /><div data-id="' + $(button).attr('data-panel') + '" class="extra_emoticons_panel" />');
+                    $(button).after(holder);
+                    return holder.find('.extra_emoticons_panel');
+                };
                 ExtraEmoticons.prototype.getTextArea = function () {
-                    logger.Log('ExtraEmoticons.getTextArea: start');
-                    var result = null;
-                    if (this.IsSpecial) {
-                        result = document.getElementById('comment_comment');
-                    } else {
-                        var nod = this.childGuest;
-                        for (var i = 0; i < 4; i++) {
-                            nod = nod.parentNode;
-                        }
-                        result = nod.children[1].children[0].children[0];
-                    }
-                    logger.Log('ExtraEmoticons.getTextArea: end');
-                    return result;
+                    return this.region.find('textarea').first();
+                }
+                ExtraEmoticons.prototype.getEmotesButton = function () {
+                    return $(this.region).find('.drop-down-expander[data-function="emoticons-picker"]');
                 }
                 ExtraEmoticons.prototype.getSubmitButton = function () {
-                    logger.Log('ExtraEmoticons.getSubmitButton: start');
-                    var nod = this.childGuest;
-                    if (this.IsSpecial) {
-                        if (this.previewButton != null) {
-                            return this.previewButton.parentNode.children[0];
-                        } else {
-                            for (var i = 0; i < 3; i++) {
-                                nod = nod.parentNode;
-                            }
-                        }
-                    } else {
-                        for (var i = 0; i < 5; i++) {
-                            nod = nod.parentNode;
-                        }
+                    if (this.region.hasClass('.module_editing_form')) {
+                        return this.region.find('.drop-down-pop-up-footer button').first();
+                    } else if (this.region.hasClass('.edit_area')) {
+                        return this.region.find('.save_button').first();
                     }
-                    var childs = nod.children;
-                    childs = childs[childs.length - 1].children[0]
-                    logger.Log('ExtraEmoticons.getSubmitButton: end');
-                    return childs;
+                    return this.region.find('.form_submitter').first();
                 }
                 ExtraEmoticons.prototype.getToolbar = function () {
                     logger.Log('ExtraEmoticons.getToolbar: called');
-                    if (this.IsSpecial) {
-                        var button = document.getElementById('text_sizecomment_comment');
-                        return button.parentNode.parentNode;
-                    } else {
-                        var elem = this.childGuest;
-                        for (var i = 0; i < 4; i++) {
-                            elem = elem.parentNode
-                        }
-                        var childs = elem.children;
-                        for (var i = 0; i < childs.length; i++) {
-                            if ($(childs[i]).hasClass('light_toolbar') || $(childs[i]).hasClass('dark_toolbar')) {
-                                return childs[i];
-                            }
-                        }
-                    }
+                    return this.childGuest.parentNode.parentNode;
                 }
                 ExtraEmoticons.prototype.makeSearch = function (label) {
                     logger.Log('ExtraEmoticons.makeSearch: start');
@@ -266,13 +162,7 @@ if (isJQuery()) {
                     box.id = label;
                     var me = this;
                     box.oninput = function () {
-                        var saved = $(this).attr('selected_tab');
-                        if (saved == null || saved == '') {
-                            saved = $(me.getSelectedTab()).attr('extraemotes');
-                            $(this).attr('selected_tab', saved);
-                        }
                         if (this.value == '') {
-                            me.switc(saved);
                             $(this).attr('selected_tab', '');
                             $(me.search_Tag).css('display', 'none');
                         }
@@ -297,15 +187,16 @@ if (isJQuery()) {
                     var searchbar = makeToolbar('emotes_search_toolbar');
                     $(searchbar).append(li);
 
-                    $(li).append('<a style="font-family:FontAwesome;" href="javascript:void();"></a>');
-
-                    $(li).children()[1].onclick = function () {
+                    $(li).append('<button style="font-family:FontAwesome;"></button>');
+                    $(li).find('button').click(function () {
                         if (box.value != '') {
-                            me.switc(box.id);
-                            me.refreshSearch(box.value)
+                            if (!$(this).parent().find('.extra_emoticons_panel[data-id="search"]').length) {
+                                me.openEmoticonsPanel(this);
+                            }
+                            me.refreshSearch(box.value);
                         }
-                    }
-
+                    });
+                    
                     $(searchbar).append(li);
 
                     $(this.toolbar).append(searchbar);
@@ -320,19 +211,11 @@ if (isJQuery()) {
                     $(tagBar).append(this.search_Tag);
                     logger.Log('ExtraEmoticons.makeSearch: end');
                 }
-                ExtraEmoticons.prototype.getSelectedTab = function () {
-                    var tabs = this.panelholder.children;
-                    for (var i = 0; i < tabs.length; i++) {
-                        if ($(tabs[i]).hasClass('extra_emoticons_shown')) {
-                            return tabs[i];
-                        }
-                    }
-                }
                 ExtraEmoticons.prototype.makeButton = function (name, label, image) {
                     logger.Log('ExtraEmoticons.makeButton: start');
-                    var link = $('<a id="' + name + '" style="cursor:pointer;" title="' + label + ' Emoticons" />');
+                    var link = $('<button class="drop-down-expander" data-panel="' + name + '" title="' + label + ' Emoticons" />');
                     var img = $('<img class="icon_16" style="width: 18px; height: 18px" src="' + image.split('|')[0] + '"></img>');
-                    $(link).append(img);
+                    link.append(img);
 
                     if (!img[0].complete) {
                         $(img).css('display', 'none');
@@ -343,40 +226,16 @@ if (isJQuery()) {
                             spin.remove();
                         });
                     }
-
-                    var me = this;
-                    $(link).click(function () {
-                        me.switc(this.id);
-                        $('#search').attr('selected_tab', this.id);
-                    });
-                    var li = $('<li style="line-height:0px;" />');
+                    
+                    var li = $('<li class="button-group" />');
                     $(li).append(link);
                     $(this.emotesTypes).append(li);
                     logger.Log('ExtraEmoticons.makeButton: end');
-                }
-                ExtraEmoticons.prototype.switc = function (panelName) {
-                    var panels = this.panelholder.children;
-                    for (var i = 0; i < panels.length; i++) {
-                        var mat = $(panels[i]).attr('extraemotes');
-                        if (mat != null || mat == 'search') {
-                            if (mat == panelName) {
-                                $(panels[i]).addClass('extra_emoticons_shown');
-                                $(panels[i]).removeClass('extra_emoticons_hidden');
-                            } else {
-                                $(panels[i]).addClass('extra_emoticons_hidden');
-                                $(panels[i]).removeClass('extra_emoticons_shown');
-                            }
-                        }
-                    }
-                    if (emoteExtenderIsRunning()) {
-                        emoteExtenderFF.click();
-                    }
+                    return this.openEmoticonsPanel(link);
                 }
                 ExtraEmoticons.prototype.makeEmotesPanel = function (id, name, norma) {
                     logger.Log('ExtraEmoticons.makeEmotesPanel: start');
                     var innerPannel = document.createElement('div');
-                    $(innerPannel).attr('style', 'height: 260px');
-                    $(innerPannel).addClass('extra_emoticons_hidden');
                     if (norma != false) {
                         $(innerPannel).addClass('extra_emoticons_normalized');
                     }
@@ -406,12 +265,8 @@ if (isJQuery()) {
                     if (contains(item, '\'')) {
                         item = item.replace('\'', '\\\'');
                     }
-                    if (this.IsSpecial) {
-                        $(newA).attr('href', 'javascript:smilie(\'' + item.replace('\\', '\\\\\\') + '\');');
-                    } else {
-                        $(newA).attr('onclick', this.buttonFormat.replace('{0}', item));
-                        $(newA).attr('href', 'insertemote:' + item);
-                    }
+                    $(newA).attr('data-function', 'emoticon');
+                    $(newA).attr('data-emoticon', item);
                     $(newA).append('<div><div class="raw_emote" isRaw="true" title="' + title + '">' + item + '</div></div>');
                     $(holder).append(newA);
                 }
@@ -426,16 +281,11 @@ if (isJQuery()) {
                 ExtraEmoticons.prototype.addImageToPanel = function (id, holder, item) {
                     var newA = $('<a />');
                     var title = getTitle(item);
-                    if (this.IsSpecial) {
-                        $(newA).attr('href', 'javascript:smilie(\'' + id + title + '\');');
-                    } else {
-                        $(newA).attr('onclick', this.buttonFormat.replace('{0}', id + title));
-                        $(newA).attr('href', 'insertemote:' + id + title);
-                    }
-
+                    $(newA).attr('data-function', 'emoticon');
+                    $(newA).attr('data-emoticon', id + title);
+                    
                     var img = $('<img title="' + id + title + '" src="' + item.split('|')[0] + '" />');
-
-
+                    
                     var mote = $('<div class="extra_emote"></div>');
                     $(mote).append(img);
 
@@ -589,54 +439,73 @@ if (isJQuery()) {
                         }
                     }
                 }
-
-                //==API FUNCTION==//
-                //Gets the logging object
-                ExtraEmoticons.prototype.getLogger = function () {
-                    return logger;
-                }
-
-                //==API FUNCTION==//
-                //Adds a collection of image emoticons
                 ExtraEmoticons.prototype.addEmoticons = function (id, name, title, emotes, normalize) {
                     var holder = this.makeEmotesPanel(id, name, normalize);
                     this.addImagesToPanel(id, holder, emotes);
-                    this.makeButton(name, title, emotes[emotes.length - 1])
-                    recordEmotesPanel(false, id, name, title, emotes, emotes[emotes.length - 1], normalize);
-                    logger.Log('addEmoticons: finalizing...');
+                    this.makeButton(name, title, emotes[emotes.length - 1]).append(holder);
                 }
-
-                //==API FUNCTION==//
-                //Adds a collection of text emoticons
                 ExtraEmoticons.prototype.addRaw = function (id, name, title, emotes, buttonImage) {
                     if (buttonImage == null) {
                         buttonImage = 'http://www.fimfiction-static.net/images/icons/quote.png'
                     }
                     var holder = this.makeEmotesPanel(id, name, false);
                     this.addRawsToPanel(holder, emotes);
-                    this.makeButton(name, title, buttonImage);
+                    this.makeButton(name, title, buttonImage).append(holder);
+                }
+                
+                function ExtraEmotesAPI(special,hooks) {
+                    this.modules = [];
+                    this.modules.push(new ExtraEmoticons(special));
+                    for (var i = 0; i < hooks.length; i++) {
+                        this.modules.push(new ExtraEmoticons(hooks[i]));
+                    }
+                    for (var i = 0; i < this.modules.length; i++) {
+                        this.modules[i].init();
+                    }
+                }
+                //==API FUNCTION==//
+                //Gets the logging object
+                ExtraEmotesAPI.prototype.getLogger = function () {
+                    return logger;
+                }
+
+                //==API FUNCTION==//
+                //Adds a collection of image emoticons
+                ExtraEmotesAPI.prototype.addEmoticons = function (id, name, title, emotes, normalize) {
+                    for (var i = 0; i < this.modules.length; i++) {
+                        this.modules[i].addEmoticons(id, name, title, emotes, normalize);
+                    }
+                    recordEmotesPanel(false, id, name, title, emotes, emotes[emotes.length - 1], normalize);
+                    logger.Log('addEmoticons: finalizing...');
+                }
+
+                //==API FUNCTION==//
+                //Adds a collection of text emoticons
+                ExtraEmotesAPI.prototype.addRaw = function (id, name, title, emotes, buttonImage) {
+                    for (var i = 0; i < this.modules.length; i++) {
+                        this.modules[i].addRaw(id, name, title, emotes, buttonImage);
+                    }
                     recordEmotesPanel(true, id, name, title, emotes, buttonImage, false);
                     logger.Log('addRaw: finalizing...');
                 }
 
-
+                var modules = [];
                 var has_init = false;
-                var mainHook = getElementByAttributeValue("a", "href", "javascript:smilie(':duck:');");
-
-                if (mainHook != null && mainHook != undefined) {
-                    win.ExtraEmotes = new ExtraEmoticons(0, mainHook);
-                    win.ExtraEmotes.init();
+                var mainHook = $('#add_comment_box');
+                
+                if (mainHook.length) {
+                    win.ExtraEmotes = new ExtraEmotesAPI(mainHook, $('.edit_area'));
                     logger.Log('Checkpoint 1: mainHook created succesfully');
                     finalInit(win.ExtraEmotes);
                 } else {
+                    logger.Log('no mainHook found, creating dummy object');
                     win.ExtraEmotes = {
                         addEmoticons: function (id, name, title, emotes, normalize) {},
                         addRaw: function (id, name, title, emotes, buttonImage) { },
                         getLogger: function () { return logger; }
                     }
-                    logger.Log('Checkpoint 1: no mainHook found created dummy object');
                 }
-                logger.Log('Checkpoint 2: setup completed succesfully');
+                logger.Log('setup completed succesfully');
             }
 
             if (win != window) {
@@ -693,16 +562,17 @@ if (isJQuery()) {
 
             function cleanse(s) {
                 while (contains(s, '  ')) {
-                    s = replaceAll('  ', ' ', s);
+                    s = s.replace(/  /g, ' ');
                 }
                 return s;
             }
 
             function makeToolbar(name) {
-                var bar = document.createElement('ul');
-                $(bar).addClass('toolbar_buttons');
-                bar.name = name;
-                return bar;
+                return $('<ul name="' + name + '" class="toolbar_buttons" />');
+            }
+            
+            function getDefaultEmoteUrl(name) {
+                return 'https://fimfiction-static.net/images/emoticons/' + name + '.png';
             }
 
             function handleDrop(event) {
@@ -710,7 +580,7 @@ if (isJQuery()) {
                 var links = event.dataTransfer.getData('text/plain').split('\n');
                 var inserted = '';
                 for (var i = 0; i < links.length; i++) {
-                    links[i] = replaceAll(']', '', replaceAll('[', '', links[i].trim()));
+                    links[i] = links[i].trim().replace(/\[/g, '').replace(/\]/g, '');
                     if (links[i] != '') {
                         var insert = '';
                         if (startsWith(links[i].replace('[', ''), 'javascript:smilie(')) {
@@ -737,21 +607,20 @@ if (isJQuery()) {
             function handleSubmit(me) {
                 if (!handling) {
                     handling = true;
-                    me.backupText.value = me.textArea.value;
-                    $(me.backupText).css('height', $(me.textArea).css('height'));
-                    $(me.backupText).css('display', 'block');
-                    me.backupText.scrollTop = me.textArea.scrollTop;
-                    $(me.textArea).css('display', 'none');
-                    me.textArea.value = replaceAliases(me.textArea.value);
+                    me.backupText.val(me.textArea.val());
+                    me.backupText.css('height', me.textArea.outerHeight());
+                    me.backupText.css('display', 'block');
+                    me.backupText.scrollTop(me.textArea.scrollTop());
+                    me.textArea.css('display', 'none');
+                    me.textArea.val(replaceAliases(me.textArea.val()));
 
-                    document.onmousemove = function () {
-                        me.textArea.value = me.backupText.value;
-                        $(me.textArea).css('display', 'block');
-                        $(me.backupText).css('display', 'none');
-                        me.backupText.innerHTML = '';
-                        document.onmousemove = function () { }
+                    $(document).one('mousemove', function () {
+                        me.textArea.val(me.backupText.val());
+                        me.textArea.css('display', 'block');
+                        me.backupText.css('display', 'none');
+                        me.backupText.val('');
                         handling = false;
-                    }
+                    });
                 }
             }
 
@@ -762,13 +631,10 @@ if (isJQuery()) {
             //Returns true if FimFiction Emote extender is running on the current page
             function emoteExtenderIsRunning() {
                 if (emoteExtenderFF == null && !emoteExtenderIsNull) {
-                    emoteExtenderFF = getEmoteExtenderFF();
+                    emoteExtenderFF = $('span[id="emoteAPI_Table:FF"]');
                     emoteExtenderIsNull = emoteExtenderFF.length > 0;
                 }
                 return !emoteExtenderIsNull;
-            }
-            function getEmoteExtenderFF() {
-                return $('span[id="emoteAPI_Table:FF"]');
             }
 
             function restoreFromRecord(hook) {
@@ -785,10 +651,10 @@ if (isJQuery()) {
                         var emotes = store[i].rawEmotes;
                         if (store[i].IsRaw) {
                             hook.addRawsToPanel(holder, emotes);
-                            hook.makeButton(name, title, store[i].Image);
+                            hook.makeButton(name, title, store[i].Image).append(holder);
                         } else {
                             hook.addImagesToPanel(id, holder, emotes, norm);
-                            hook.makeButton(name, title, emotes[emotes.length - 1]);
+                            hook.makeButton(name, title, emotes[emotes.length - 1]).append(holder);
                         }
                     }
                 }
@@ -867,10 +733,11 @@ if (isJQuery()) {
                         EmoteTitles: []
                     }
 
-                    $('.extra_emoticons_normalized[extraemotes="FimFiction"] .extra_emote img').each(function () {
-                        _defaultEmotes.Emotes.push($(this).attr('src'));
-                        _defaultEmotes.EmoteTitles.push($(this).attr('title'));
-                    });
+                    var def = ['ajbemused','ajsleepy','ajsmug','applecry','applejackconfused','applejackunsure','coolphoto','derpyderp1','derpyderp2','derpytongue2','fluttercry','flutterrage','fluttershbad','fluttershyouch','fluttershysad','heart','pinkiecrazy','pinkiegasp','pinkiehappy','pinkiesad2','pinkiesick','pinkiesmile','rainbowderp','rainbowdetermined2','rainbowhuh','rainbowkiss','rainbowlaugh','rainbowwild','raritycry','raritydespair','raritystarry','raritywink','scootangel','trixieshiftleft','trixieshiftright','twilightangry2','twilightblush','twilightoops','twilightsheepish','twilightsmile','twistnerd','unsuresweetie','yay','trollestia','moustache','facehoof','eeyup','duck'];
+                    for (var i = 0; i < def.length; i++) {
+                        _defaultEmotes.Emotes.push(getDefaultEmoteUrl(def[i]));
+                        _defaultEmotes.EmoteTitles.push(':' + def[i] + ':');
+                    }
                 }
 
                 return _defaultEmotes;
@@ -992,116 +859,94 @@ if (isJQuery()) {
                     logger.Log('refreshComments');
                     if (!startsWith(document.location.href, 'http://www.fimfiction.net/manage_user/messages/')) {
                         var temp = setInterval(refreshComments, 500);
-                        var tempb;
-                        if (isMyPage()) {
-                            tempb = setInterval(refreshEmotePanels, 1000);
-                        }
-                        $.ajaxSetup({
-                            catch: true
-                        });
+                        var tempb = setInterval(refreshEmotePanels, 1000);
+                        $.ajaxSetup({catch: true});
                         $.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js", function() {
-                            $.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js", function() {
-                                clearInterval(temp);
+                            clearInterval(tempb);
+                            FimFicEvents.on('afterpagechange', refreshEmotePanels);
+                            if (isMyPage()) {
+                                FimFicEvents.on('aftereditmodule', refreshEmotePanels);
+                            }
+                            clearInterval(temp);
+                            FimFicEvents.on('afterpagechange aftereditcomment afteraddcomment afterpreviewcomment', function() {
+                                refreshComments();
+                            });
+                        });
+                        $.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js", function() {
+                            SpecialTitles.setUpSpecialTitles();
+                            FimFicEvents.on('afterpagechange aftereditcomment afteraddcomment afterpreviewcomment', function() {
                                 SpecialTitles.setUpSpecialTitles();
-                                FimFicEvents.on('afterpagechange aftereditcomment afteraddcomment afterpreviewcomment', function() {
-                                    refreshComments();
-                                    SpecialTitles.setUpSpecialTitles();
-                                });
-                                if (isMyPage()) {
-                                    clearInterval(tempb);
-                                    FimFicEvents.on('aftereditmodule', refreshEmotePanels);
-                                }
                             });
                         });
                     }
                 }, 200);
                 makeStyle('\
-div[id="emoteAPI_Table:FF_Area"] > .extra_emoticons_panel {\
-display: inline-block;}\
-.extra_emoticons_panel > .extra_emoticons_shown {\
-overflow-y: auto;\
-overflow-x: hidden;}\
+.extra_emoticons_panel > div {\
+  overflow-y: auto;\
+  overflow-x: hidden;}\
 .fullOpaque > * {\
-opacity: 1 !important;}\
-.extra_emoticons_panel:focus {\
-background: linear-gradient(to right, rgb(221, 221, 221) 0%, rgb(218, 218, 238) 14px) repeat scroll 0% 0% transparent;}\
-.extra_emoticons_panel:focus:hover {\
-background: linear-gradient(to right, rgb(221, 221, 221) 0%, rgb(218, 218, 258) 14px) repeat scroll 0% 0% transparent;}\
-.extra_emoticons_shown {\
-display: block !important;}\
-.extra_emoticons_shown > * {\
-display: inline-block;\
-padding: 2px;\
-transition: opacity 0.2s linear;}\
-.extra_emoticons_shown a:not(:hover) {\
-color: rgb(0,10,90) !important;}\
-.extra_emoticons_shown > *:hover {\
-transition: none;\
-background: rgba(0,0,0,0.1);\
-border-radius: 500px;\
-box-shadow: inset rgba(0,0,0,0.1) 4px 4px 4px;}\
+  opacity: 1 !important;}\
+.extra_emoticons_panel > div > * {\
+  display: inline-block;\
+  padding: 2px;\
+  transition: opacity 0.2s linear;}\
+.extra_emoticons_panel a:not(:hover) {\
+  color: rgb(0,10,90) !important;}\
+.extra_emoticons_panel > div > *:hover {\
+  transition: none;\
+  background: rgba(0,0,0,0.1);\
+  border-radius: 500px;\
+  box-shadow: inset rgba(0,0,0,0.1) 4px 4px 4px;}\
 .extra_emoticons_message {\
-opacity: 1;\
-transition: none;\
-background: rgba(0,0,0,0.1);\
-border-radius: 500px;\
-box-shadow: inset rgba(0,0,0,0.1) 4px 4px 4px;\
-text-align: center;\
-width: 100%;\
-padding: 5px 0 5px 0;}\
+  opacity: 1;\
+  transition: none;\
+  background: rgba(0,0,0,0.1);\
+  border-radius: 500px;\
+  box-shadow: inset rgba(0,0,0,0.1) 4px 4px 4px;\
+  text-align: center;\
+  width: 100%;\
+  padding: 5px 0 5px 0;}\
 .extra_emoticons_normalized img {\
-max-height: 27px;\
-max-width: 27px;\
-position: absolute;\
-margin: auto !important;\
-top: 0 !important;\
-left: 0 !important;\
-bottom: 0 !important;\
-right: 0 !important;}\
+  max-height: 27px;\
+  max-width: 27px;\
+  position: absolute;\
+  margin: auto !important;\
+  top: 0 !important;\
+  left: 0 !important;\
+  bottom: 0 !important;\
+  right: 0 !important;}\
 .extra_emoticons_normalized .extra_emote {\
-width: 27px !important;\
-height: 27px !important;\
-position: relative;}\
-.extra_emoticons_hidden {display: none !important;}\
+  width: 27px !important;\
+  height: 27px !important;\
+  position: relative;}\
 .extra_emoticons_panel {\
-background: linear-gradient(to right, rgb(221, 221, 221) 0%, rgb(238, 238, 238) 14px) repeat scroll 0% 0% transparent;\
-width: 300px;\
-display: table-cell;\
-vertical-align: top;\
-border-left: 1px solid rgb(204, 204, 204);\
-padding: 10px;\
-overflow: auto;\
-font-size: 0.8em;\
-font-weight: bold;\
-text-align: center;\
-height: auto !important;\
-min-height: 285px !important;\
-padding-top: 15px !important;\
-border: medium none !important;}\
+  padding: 5px;\
+  vertical-align: top;\
+  overflow: auto;\
+  font-size: 0.8em;\
+  font-weight: bold;\
+  text-align: center;\
+  max-height: 300px;\
 .raw_emote {\
-border: dotted 1px rgb(154,174,192);\
-border-radius: 4px;\
-margin: 4px;\
-display: inline-block;}\
+  border: dotted 1px rgb(154,174,192);\
+  border-radius: 4px;\
+  margin: 4px;\
+  display: inline-block;}\
 .raw_emote:hover {text-decoration: none;}');
                 logger.Log('finalInit: init complete');
             }
 
             function refreshEmotePanels() {
-                var edit = document.getElementById('text_post_editor');
-                if (edit != null && edit != undefined && $(edit).attr('extraEmotesInit') != 'true') {
-                    $(edit).attr('extraEmotesInit', 'true');
-
-                    var childGuest = edit.parentNode.parentNode.children[1];
-                    childGuest = childGuest.children[0].children;
-                    childGuest = childGuest[childGuest.length - 1];
-
-                    var engine = new ExtraEmoticons(1, childGuest);
-                    engine.init(true);
-                    restoreFromRecord(engine);
-                }
+                $('.edit_area, .module_editing_form').each(function() {
+                    logger.Log('RefreshEmotePanels: .edit_area[data-init="' + $(this).attr('data-init') + '"]');
+                    if ($(this).attr('data-init') != 'true') {
+                        var module = new ExtraEmoticons(this);
+                        module.reInit();
+                        restoreFromRecord(module);
+                    }
+                });
             }
-
+            
             function refreshComments() {
                 try {
                     if (UnspoilerEmoticons()) {
@@ -1115,10 +960,10 @@ display: inline-block;}\
                                     logger.Log(ttextArea.value);
                                     ttextArea.value = returnAliases(ttextArea.value);
                                     logger.Log(ttextArea.value);
-                                    (ttextArea.parentNode.parentNode.children[1]).onmousedown = function () {
-                                        logger.Log(ttextArea.value);
+                                    ttextArea.parentNode.parentNode.children[1].onmousedown = function () {
+                                        logger.Log('Replace Aliases (before): ' + ttextArea.value);
                                         ttextArea.value = replaceAliases(ttextArea.value);
-                                        logger.Log(ttextArea.value)
+                                        logger.Log('Replace Aliases (after): ' + ttextArea.value)
                                     }
                                     ttextArea.ondrop = handleDrop;
                                 });
@@ -1127,7 +972,7 @@ display: inline-block;}\
                         }
                     }
                 } catch (e) {
-                    logger.SevereException('Error in refreshing comments', e);
+                    logger.SevereException('Error in refreshing comments: {0}', e);
                 }
             }
 
@@ -1215,7 +1060,7 @@ display: inline-block;}\
             }
         })(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);
     } catch (e) {
-        logger.SevereException("Unhandled Exception", e);
+        logger.SevereException("Unhandled Exception: {0}", e);
     }
 }
 
@@ -1277,11 +1122,17 @@ function selectElementContents(el) {
 }
 
 //==API FUNCTION==//
+function getIsLoggedIn() {
+    try { return logged_in_user != null;
+    } catch (e) {}
+    return false;
+}
+
+//==API FUNCTION==//
 function isMyPage() {
-    if (document.location.href == ("http://www.fimfiction.net/user/" + getUserNameEncoded())) {
-        return true;
-    }
-    return document.location.href == ("http://www.fimfiction.net/user/" + replaceAll(' ', '+', getUserName()));
+    var locationCheck = document.location.href.replace('http:','').replace('https:','');
+    if (locationCheck.indexOf('//www.fimfiction.net/user/' + getUserNameEncoded()) == 0) return true;
+    return locationCheck.indexOf('//www.fimfiction.net/user/' + getUserName().replace(/ /g, '+')) == 0;
 }
 
 //==API FUNCTION==//
@@ -1292,10 +1143,12 @@ function getBoolIsSite(domain) {return getIsSite(domain) != '';}
 function getUserNameEncoded() { return encodeURIComponent(getUserName()); }
 
 //==API FUNCTION==//
-function getUserName() {return $(getUserButton()).attr("href").split("/").reverse()[0];}
+function getUserName() {return getIsLoggedIn() ? getUserButton().getAttribute("href").split("/").reverse()[0] : 'Anon';}
 
 //==API FUNCTION==//
-function getUserButton() {return getElementByAttributeValue("div", "class", "user_drop_down_menu").children[0];}
+function getUserButton() {
+    return $('.user_toolbar a.button[href^="/user/"]')[0];
+}
 
 //==API FUNCTION==//
 function makeStyle(input, id) {
@@ -1321,69 +1174,92 @@ function isJQuery() {
 }
 
 //==API FUNCTION==//
-function Logger(name,l) {
-    var test=null;
-    var minLevel=0;
-    var line=0;
-    var paused=false;
-    if(typeof(l)=='number')minLevel=l;
-    this.Start=function(level){
-        if(typeof(level)=='number')minLevel=level;
-        test=$('#debug-console')[0];        
-        paused=false;
-        if(test==null||test==undefined){
+function Logger(name, l) {
+    var test = null;
+    var minLevel = 0;
+    var line = 0;
+    var paused = false;
+    if (typeof (l) == 'number') minLevel = l;
+    this.Start = function (level) {
+        if (typeof (level) == 'number') minLevel = level;
+        test = $('#debug-console')[0];
+        paused = false;
+        if (test == null || test == undefined) {
             test = $('<div id="debug-console" style="position:fixed;bottom:0px;left:0px;" />');
             $('body').append(test);
-            $(test).click(function(){
+            $(test).click(function () {
                 $(this).empty();
-                this.style.bottom=this.style.left=line=0;});}
-        Output('===Logging Enabled===',minLevel+1);}
-    this.Stop=function(){
-        if(test!=null){
+                this.style.bottom = this.style.left = line = 0;
+            });
+        }
+        Output('===Logging Enabled===', minLevel + 1);
+    }
+    this.Stop = function () {
+        if (test != null) {
             $(test).remove();
-            test=null;}
-        line=0;
-        Output('===Logging Disabled===',minLevel+1);}
-    this.Pause=function(){
-        Output('===Logging Paused===',minLevel+1);
-        paused=true;}
-    this.Continue=function(){
-        paused=false;
-        Output('===Logging Continued===',minLevel+1);}
-    this.Log=function(txt){Output(txt,0);}
-    this.Error=function(txt){Output(txt,1);}
-    this.SevereException=function(txt,excep){
-        if(excep!='handled'){
-            try{
-                var stopped=false;
-                if(test==null){
-                    stopped=true;
-                    this.Start();}
-                SOut(txt.replace('{0}',excep),2);
-                if(excep.stack!=undefined&&excep.stack!=null)SOut(excep.stack,2);
-                if(stopped)this.Pause();
-            }catch(e){
-                alert('Error in displaying Severe: '+e);
-                alert('Severe: '+txt);}
-            throw'handled';}}
-    this.Severe=function(txt){
-        try{
-            var stopped=false;
-            if(test==null){
-                stopped=true;
-                this.Start();}
-            SOut(txt,2);
-            if(stopped)this.Pause();
-        }catch(e){
-            alert('Error in displaying Severe: '+e);
-            alert('Severe: '+txt);}}
-    function Output(txt,level){
-        if(!paused)SOut(txt,level);}
+            test = null;
+        }
+        line = 0;
+        Output('===Logging Disabled===', minLevel + 1);
+    }
+    this.Pause = function () {
+        Output('===Logging Paused===', minLevel + 1);
+        paused = true;
+    }
+    this.Continue = function () {
+        paused = false;
+        Output('===Logging Continued===', minLevel + 1);
+    }
+    this.Log = function (txt) { Output(txt, 0); }
+    this.Error = function (txt) { Output(txt, 1); }
+    this.SevereException = function (txt, excep) {
+        if (excep != 'handled') {
+            try {
+                var stopped = false;
+                if (test == null) {
+                    stopped = true;
+                    this.Start();
+                }
+                if (txt.indexOf('{0}') != -1) {
+                    SOut(txt.replace('{0}', excep), 2);
+                } else {
+                    SOut(txt, 2);
+                    SOut(excep, 2);
+                }
+                if (excep.stack != undefined && excep.stack != null) SOut(excep.stack, 2);
+                if (stopped) this.Pause();
+            } catch (e) {
+                alert('Error in displaying Severe: ' + e);
+                alert('Severe: ' + txt);
+            }
+            throw 'handled';
+        }
+    }
+    this.Severe = function (txt) {
+        try {
+            var stopped = false;
+            if (test == null) {
+                stopped = true;
+                this.Start();
+            }
+            SOut(txt, 2);
+            if (stopped) this.Pause();
+        } catch (e) {
+            alert('Error in displaying Severe: ' + e);
+            alert('Severe: ' + txt);
+        }
+    }
+    function Output(txt, level) {
+        if (!paused) SOut(txt, level);
+    }
     function SOut(txt, level) {
-        if(level==null||level==undefined)level=0;
-        if(test!=null&&level>=minLevel){
-            if (line>50){
-                line=0;
-                $(test).empty();}
-            $(test).append('<p style="background: rgba('+(line%2==0?'155,0':'0,155')+',0,0.3);">'+ ++line +'):'+name+') '+txt+'</p>');}}
+        if (level == null || level == undefined) level = 0;
+        if (test != null && level >= minLevel) {
+            if (line > 50) {
+                line = 0;
+                $(test).empty();
+            }
+            $(test).append('<p style="background: rgba(' + (line % 2 == 0 ? '155,0' : '0,155') + ',0,0.3);">' + ++line + '):' + name + ') ' + txt + '</p>');
+        }
+    }
 }
