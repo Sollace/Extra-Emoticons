@@ -19,7 +19,7 @@ function replaceAll(find, replace, str) { return str.replace(new RegExp(find.rep
 
 if (isJQuery()) {
   var logger = new Logger('Extra Emoticons', 6);
-  logger.Start();
+  
   var siteMapping = (function() {
     var Mapping = {};
     var aliased = {};
