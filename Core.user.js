@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.1
+// @version     5.1.1
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -895,7 +895,7 @@ if (isJQuery()) {
       
       function emotifyImg() {
         $('.comment .data .comment_data .user_image:not(.done').each(function () {
-          var url = $(this).attr('href').replace('https:','http:');
+          var url = $(this).attr('src').replace('https:','http:');
           if (!url.indexOf('http:')) {
             url = 'http:' + url;
           }
@@ -1055,8 +1055,10 @@ background: none repeat scroll 0% 0% #FFF;}\
   background: none !important;\
   box-shadow: none !important;}\
 #edit_story_form .drop-down-emoticons.reverse {\
-  left: 0px !important;\
+  left: 0px;\
   margin-left: 0px;}\
+.emoticon-expander + .reverse {\
+  left: 5px !important}\
 #edit_story_form .drop-down-emoticons.reverse .arrow {\
   left: 14px;\
   right: initial;}\
