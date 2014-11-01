@@ -181,9 +181,20 @@ if (isJQuery()) {
 
           this.makeSearch('search');
           
-          $(this.childGuest).find('i').after('<img class="emote-button" src="' + getDefaultEmoteUrl('twilightsmile') + '" />').remove();
-          $(this.childGuest).attr('data-function', '');
-          $(this.childGuest).attr('data-panel', 'default');
+          this.childGuest.attr('data-function', '');
+          this.childGuest.attr('data-panel', 'default');
+          this.childGuest.addClass('emoticon-expander');
+          var img = $('<img class="emote-button" src="' + getDefaultEmoteUrl('twilightsmile') + '"></img>');
+          this.childGuest.find('i').after(img).remove();
+          if (!img[0].complete) {
+            $(img).css('display', 'none');
+            var spin = $('<i style="line-height:18px;" class="fa fa-spinner fa-spin" />');
+            $(img).after(spin);
+            $(img).on('load error', function () {
+              $(img).css('display', '');
+              spin.remove();
+            });
+          }
 
           var def = getDefaultEmotes();
           var holder = this.makeEmotesPanel('', 'default', true);
@@ -289,7 +300,7 @@ if (isJQuery()) {
         }
         ExtraEmoticons.prototype.makeButton = function (name, label, image) {
           logger.Log('ExtraEmoticons.makeButton: {0}:{1}', 7, name, label);
-          var link = $('<button class="drop-down-expander" data-panel="' + name + '" title="' + label + ' Emoticons" />');
+          var link = $('<button class="drop-down-expander emoticon-expander" data-panel="' + name + '" title="' + label + ' Emoticons" />');
           var me = this;
           link.on('click', function() {
             var space_left = $(this).offset().left - me.toolbar.offset().left;
@@ -332,7 +343,6 @@ if (isJQuery()) {
           }
         }
         ExtraEmoticons.prototype.addRawToPanel = function (holder, item) {
-          var newA = document.createElement('a');
           var title = item;
           if (contains(item, '|')) {
             var splitten = SplitTitle(item);
@@ -346,9 +356,8 @@ if (isJQuery()) {
           if (contains(item, '\'')) {
             item = item.replace('\'', '\\\'');
           }
-          $(newA).attr('data-function', 'emoticon');
-          $(newA).attr('data-emoticon', item);
-          $(newA).append('<div><div class="raw_emote" isRaw="true" title="' + title + '">' + item + '</div></div>');
+          var newA = $('<a data-function="emoticon" data-emoticon="' + item + '" />');
+          $(newA).append('<div class="raw_emote" isRaw="true" title="' + title + '">' + item + '</div>');
           $(holder).append(newA);
         }
         ExtraEmoticons.prototype.addImagesToPanel = function (id, holder, emotes) {
@@ -360,27 +369,20 @@ if (isJQuery()) {
           }
         }
         ExtraEmoticons.prototype.addImageToPanel = function (id, holder, item) {
-          var newA = $('<a />');
           var title = getTitle(item);
-          $(newA).attr('data-function', 'emoticon');
-          $(newA).attr('data-emoticon', id + title);
-
-          var img = $('<img title="' + id + title + '" src="' + item.split('|')[0] + '" />');
-
           var mote = $('<div class="extra_emote"></div>');
+          var img = $('<img title="' + id + title + '" src="' + item.split('|')[0] + '" />');
           $(mote).append(img);
-
           if (!img[0].complete) {
             $(img).css('display', 'none');
             var spin = $('<i style="font-size:30px;color:rgb(200,200,140);" class="fa fa-spinner fa-spin" />');
             $(mote).append(spin);
-
             $(img).on('load error', function () {
               $(img).css('display', '');
               spin.remove();
             });
           }
-
+          var newA = $('<a data-function="emoticon" data-emoticon="' + (id + title) + '" />');
           $(newA).append(mote);
           $(holder).append(newA);
         }
@@ -391,39 +393,24 @@ if (isJQuery()) {
           var results = [];
           
           var panels = getVirtualEmotes();
-          var defaultPanel = getDefaultEmotes();
-          var group = isGroupSearch(terms, panels, defaultPanel.Name);
+          var group = isGroupSearch(terms, panels);
           
           if (contains(name, 'social') || contains(name, 'media')) {
-            var social = siteMapping.getSocial();
-            for (var i = 0; i < social.length; i++) {
-              terms.push(social[i]);
-            }
+            [].push.apply(terms, siteMapping.getSocial());
           }
           
           terms = new RegExp('(' + terms.join(')|(') + ')');
-          var defHasName = false;
-          for (var i = 0; i < group.title.length; i++) {
-            if (group.title[i] == defaultPanel.Name) defHasName = true;
-          }
-          for (var k = 0; k < defaultPanel.Emotes.length; k++) {
-            if (defHasName || defaultPanel.EmoteTitles[k].toLowerCase().match(terms)) {
-              results.push(defaultPanel.Emotes[k] + '|' + (defaultPanel.Id == null ? '' : defaultPanel.Id) + defaultPanel.EmoteTitles[k]);
-            }
-          }
-          
           for (var i = 0; i < panels.length; i++) {
             var named = false;
             for (var k = 0; k < group.title.length; k++) {
               if (group.title[k] == panels[i].Name) named = true;
             }
             for (var k = 0; k < panels[i].Emotes.length; k++) {
-              if (named || (group.title.length > 0 && !panels[i].IsRaw ? panels[i].Emotes[k] : panels[i].EmoteTitles[k]).toLowerCase().match(terms)) {
-                if (panels[i].IsRaw) {
-                  results.push('RAW,url=' + panels[i].Emotes[k] + '|' + panels[i].EmoteTitles[k]);
-                } else {
-                  results.push(panels[i].Emotes[k] + '|' + (panels[i].Id == null ? '' : panels[i].Id) + panels[i].EmoteTitles[k]);
-                }
+              if (named || (!panels[i].IsRaw ? panels[i].Emotes[k].replace(/http:/g,'').replace(/https:/g,'') : panels[i].EmoteTitles[k]).toLowerCase().match(terms)) {
+                results.push({
+                  raw: panels[i].IsRaw,
+                  emote: panels[i].Emotes[k] + '|' + (panels[i].Id == null || panels[i].IsRaw ? '' : panels[i].Id) + panels[i].EmoteTitles[k]
+                });
               }
             }
           }
@@ -473,19 +460,13 @@ if (isJQuery()) {
           logger.Log('Refresh search: terms="' + term + '" ' + results.length + ' results',4);
           if (results.length > 0) {
             for (var i = 0; i < results.length; i++) {
-              var raw = '';
-              var item = results[i];
-              if (contains(item, ',url=')) {
-                raw = item.split(',url=')[0];
-                item = item.split(',url=')[1];
-              }
-              logger.Log('raw="' + raw + '" item="' + item + '"');
-              if (raw == 'RAW') {
-                this.addRawToPanel(this.search, item);
+              logger.Log('raw="' + results[i].raw + '" item="' + results[i].emote + '"');
+              if (results[i].raw) {
                 logger.Log('Adding RAW to panel',3);
+                this.addRawToPanel(this.search, results[i].emote);
               } else {
-                this.addImageToPanel('', this.search, item);
                 logger.Log('Adding IMG to panel',3);
+                this.addImageToPanel('', this.search, results[i].emote);
               }
             }
           } else {
@@ -596,14 +577,7 @@ if (isJQuery()) {
       
       function Name(url) {
         url = url.split('?')[0];
-        var panels = getDefaultEmotes();
-        for (var k = 0; k < panels.Emotes.length; k++) {
-          if (url == panels.Emotes[k]) {
-            return ':' + panels.Id + panels.EmoteTitles[k];
-          }
-        }
-
-        panels = getVirtualEmotes();
+        var panels = getVirtualEmotes();
         for (var i = 0; i < panels.length; i++) {
           if (!panels[i].IsRaw) {
             for (var k = 0; k < panels[i].Emotes.length; k++) {
@@ -620,7 +594,7 @@ if (isJQuery()) {
         txt = replaceAll('?wrap=true', '', txt);
         var vpanels = getVirtualEmotes();
         for (var i = 0; i < vpanels.length; i++) {
-          if (!vpanels[i].IsRaw && !vpanels[i].External) {
+          if (vpanels[i].Name != 'default' && !vpanels[i].IsRaw && !vpanels[i].External) {
             for (var k = 0; k < vpanels[i].Emotes.length; k++) {
               var tit = ':' + vpanels[i].Id + vpanels[i].EmoteTitles[k];
               var emote = '[img]' + vpanels[i].Emotes[k] + '[/img]';
@@ -636,7 +610,7 @@ if (isJQuery()) {
         var vpanels = getVirtualEmotes();
 
         for (var i = 0; i < vpanels.length; i++) {
-          if (!vpanels[i].IsRaw && !vpanels[i].External) {
+          if (vpanels[i].Name != 'default' && !vpanels[i].IsRaw && !vpanels[i].External) {
             for (var k = 0; k < vpanels[i].Emotes.length; k++) {
               var tit = ':' + vpanels[i].Id + vpanels[i].EmoteTitles[k];
               var emote = ' [img]' + vpanels[i].Emotes[k] + '[/img]';
@@ -809,11 +783,14 @@ if (isJQuery()) {
         return result;
       }
 
-      var virtualEmotes = [];
+      var virtualEmotes;
+      var _defaultEmotes;
       function getVirtualEmotes() {
+        if (virtualEmotes == null) {
+          virtualEmote = [];
+        }
         return virtualEmotes;
       }
-      var _defaultEmotes;
       function getDefaultEmotes() {
         if (_defaultEmotes == null) {
           _defaultEmotes = {
@@ -824,17 +801,20 @@ if (isJQuery()) {
             Emotes: [],
             EmoteTitles: []
           }
-
-          var def = ['ajbemused','ajsleepy','ajsmug','applecry','applejackconfused','applejackunsure','coolphoto','derpyderp1','derpyderp2','derpytongue2','fluttercry','flutterrage','fluttershbad','fluttershyouch','fluttershysad','heart','pinkiecrazy','pinkiegasp','pinkiehappy','pinkiesad2','pinkiesick','pinkiesmile','rainbowderp','rainbowdetermined2','rainbowhuh','rainbowkiss','rainbowlaugh','rainbowwild','raritycry','raritydespair','raritystarry','raritywink','scootangel','trixieshiftleft','trixieshiftright','twilightangry2','twilightblush','twilightoops','twilightsheepish','twilightsmile','twistnerd','unsuresweetie','yay','trollestia','moustache','facehoof','eeyup','duck'];
-          for (var i = 0; i < def.length; i++) {
+          var def = ['ajbemused','ajsleepy','ajsmug','applejackconfused','applejackunsure','applecry','eeyup','fluttercry','flutterrage','fluttershbad','fluttershyouch','fluttershysad','yay','heart','pinkiecrazy','pinkiegasp','pinkiehappy','pinkiesad2','pinkiesmile','pinkiesick','twistnerd','rainbowderp','rainbowdetermined2','rainbowhuh','rainbowkiss','rainbowlaugh','rainbowwild','scootangel','raritycry','raritydespair','raritystarry','raritywink','duck','unsuresweetie','coolphoto','twilightangry2','twilightoops','twilightblush','twilightsheepish','twilightsmile','facehoof','moustache','trixieshiftleft','trixieshiftright','derpyderp1','derpyderp2','derpytongue2','trollestia'];
+          for (var i = def.length - 1; i >= 0; i--) {
             _defaultEmotes.Emotes.push(getDefaultEmoteUrl(def[i]));
             _defaultEmotes.EmoteTitles.push(':' + def[i] + ':');
           }
+          if (virtualEmotes == null) {
+            virtualEmotes = [];
+          }
+          virtualEmotes.push(_defaultEmotes);
         }
 
         return _defaultEmotes;
       }
-
+      
       function VirtualEmotePanel(israw, id, name, title, emotes, img, norm, ext) {
         this.Normalized = norm != false;
         this.Title = title;
@@ -1000,13 +980,13 @@ if (isJQuery()) {
   margin-bottom: -5px;}\
 .extra_emoticons_panel > div > * {\
   display: inline-block;\
-  padding: 2px;}\
-.extra_emoticons_panel a:not(:hover) {\
-  color: rgb(0,10,90) !important;}\
+  padding: 5px;}\
 .extra_emoticons_panel > div > *:hover {\
   background: rgba(0,0,0,0.1);\
-  border-radius: 500px;\
-  box-shadow: inset rgba(0,0,0,0.1) 4px 4px 4px;}\
+  border-radius: 4px;\
+  border: 1px solid rgba(0, 0, 0, 0.2);\
+  margin: -1px;\
+background: none repeat scroll 0% 0% #FFF;}\
 .extra_emoticons_normalized img {\
   max-height: 27px;\
   max-width: 27px;\
@@ -1029,12 +1009,16 @@ if (isJQuery()) {
   text-align: center;\
   max-height: 300px;}\
 .raw_emote {\
-  border: dotted 1px rgb(154,174,192);\
+  color: #333;\
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.2);\
+  font-size: 10px;\
+  line-height: 17px;\
+  background: rgba(100,100,100,0.1);\
+  border: dotted 1px rgba(154,174,192,0.5);\
   border-radius: 4px;\
-  margin: 4px;\
+  padding: 5px;\
+  vertical-align: bottom;\
   display: inline-block;}\
-.raw_emote:hover {\
-  text-decoration: none;}\
 #search_emotes_input {\
   margin: 0px;\
   padding: 3px;\
@@ -1068,6 +1052,8 @@ if (isJQuery()) {
 #edit_story_form .drop-down-emoticons.reverse .arrow {\
   left: 14px;\
   right: initial;}\
+.emoticon-expander + .drop-down-emoticons {\
+  right: -5px;}\
 .drop-up {\
   top: auto !important;\
   bottom: 36px;}\
@@ -1121,7 +1107,7 @@ if (isJQuery()) {
         }
       }
 
-      function isGroupSearch(terms, panels, extra) {
+      function isGroupSearch(terms, panels) {
         var result = {'title':[],'type':[]};
         for (var path = 0; path < terms.length; path++) {
           for (var i = 0; i < panels.length; i++) {
@@ -1132,14 +1118,6 @@ if (isJQuery()) {
                   result.title.push(mat);
                   result.type.push('panel');
                 }
-              }
-            }
-          }
-          if (extra != null) {
-            if (contains(terms[path].toLowerCase(), extra.toLowerCase())) {
-              if (result.title.indexOf(extra) == -1) {
-                result.title.push(extra);
-                result.type.push('panel');
               }
             }
           }
@@ -1302,7 +1280,7 @@ function Logger(name, l) {
     if (!test.length) {
       test = $('<div id="debug-console" style="overflow-y:auto;max-height:50%;max-width:100%;min-width:50%;background:rgba(255,255,255,0.8);position:fixed;bottom:0px;left:0px;" />');
       $('body').append(test);
-      $(test).click(function () {
+      test.click(function () {
         $(this).empty();
         this.style.bottom = this.style.left = line = 0;
       });
@@ -1311,7 +1289,7 @@ function Logger(name, l) {
   }
   this.Stop = function () {
     if (test != null) {
-      $(test).remove();
+      test.remove();
       test = null;
     }
     line = 0;
@@ -1382,12 +1360,15 @@ function Logger(name, l) {
   function SOut(txt, level) {
     if (level == null || level == undefined) level = 0;
     if (test != null && level >= minLevel) {
-      var line = $(test).children().length + 1;
+      var line = test.children().length;
       if (line > 150) {
         line = 0;
-        $(test).empty();
+        test.empty();
       }
-      $(test).append('<p style="background: rgba(' + (line % 2 == 0 ? '155,0' : '0,155') + ',0,0.3);">' + (line + 1) + '):' + name + ') ' + txt + '</p>');
+      test.append('<p style="background: rgba(' + (line % 2 == 0 ? '155,0' : '0,155') + ',0,0.3);">' + (line + 1) + '):' + name + ') ' + txt + '</p>');
+      test.stop().animate({
+        scrollTop: test[0].scrollHeight
+      },800);
     }
   }
 }
