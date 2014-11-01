@@ -184,6 +184,14 @@ if (isJQuery()) {
           this.childGuest.attr('data-function', '');
           this.childGuest.attr('data-panel', 'default');
           this.childGuest.addClass('emoticon-expander');
+          this.childGuest.on('click', function() {
+            var space_left = $(this).offset().left - me.toolbar.offset().left;
+            if (space_left < 300) {
+              $(this).parent().find('.drop-down').addClass('reverse');
+            } else {
+              $(this).parent().find('.drop-down').removeClass('reverse');
+            }
+          });
           var img = $('<img class="emote-button" src="' + getDefaultEmoteUrl('twilightsmile') + '"></img>');
           this.childGuest.find('i').after(img).remove();
           if (!img[0].complete) {
