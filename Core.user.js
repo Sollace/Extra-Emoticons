@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.1.1
+// @version     5.1.2
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -171,10 +171,15 @@ if (isJQuery()) {
           });
           
           this.textArea.on('drop.extraemotes', handleDrop);
-
+          if (me.textArea.val() != '') {
+            $(document).on('ready', function() {
+              me.textArea.val(returnAliases(me.textArea.val()));
+            });
+          }
+          
           this.backupText = $('<textarea style="display:none;" />');
           this.textArea.parent().append(this.backupText);
-
+          
           this.emotesTypes = makeToolbar('emotes_type_switch');
           this.toolbar.append(this.emotesTypes);
           this.emotesTypes.append(this.childGuest.parent());
@@ -236,6 +241,10 @@ if (isJQuery()) {
             return this.region.find('td').last().find('.fa.fa-save').parent();
           } else if (this.region.hasClass('bbcode-editor')) {
             return $('#chapter_edit_form button[data-function="save"]');
+          } else if (this.region.attr('id') == 'form_send_pm' || this.region.attr('id') == 'new_thread') {
+            return this.region.find('.add_comment_toolbar button').first();
+          } else if (this.region.attr('id') ==  'send_pm_form') {
+            return $('#message_box_container #popup_accept').first();
           }
           return this.region.find('.form_submitter').first();
         }
@@ -250,7 +259,7 @@ if (isJQuery()) {
           var li = $('<li class="button-group" />');
           $(searchbar).append(li);
 
-          var button = $('<button data-panel="search" style="font-family:FontAwesome;"></button>');
+          var button = $('<button class="emoticon-expander" data-panel="search" style="font-family:FontAwesome;"></button>');
           $(li).append(button);
           button.click(function(e) {
             e.stopPropagation();
@@ -400,34 +409,36 @@ if (isJQuery()) {
           });
           var results = [];
           
-          var panels = getVirtualEmotes();
-          var group = isGroupSearch(terms, panels);
-          
-          if (contains(name, 'social') || contains(name, 'media')) {
-            [].push.apply(terms, siteMapping.getSocial());
-          }
-          
-          terms = new RegExp('(' + terms.join(')|(') + ')');
-          for (var i = 0; i < panels.length; i++) {
-            var named = false;
-            for (var k = 0; k < group.title.length; k++) {
-              if (group.title[k] == panels[i].Name) named = true;
+          if (terms.length > 0) {
+            var panels = getVirtualEmotes();
+            var group = isGroupSearch(terms, panels);
+            
+            terms = '(' + terms.join(' ') + ')';
+            if (contains(name, 'social') || contains(name, 'media')) {
+              terms += '|(' + siteMapping.getSocial().join(')|(') + ')';
             }
-            for (var k = 0; k < panels[i].Emotes.length; k++) {
-              if (named || (!panels[i].IsRaw ? panels[i].Emotes[k].replace(/http:/g,'').replace(/https:/g,'') : panels[i].EmoteTitles[k]).toLowerCase().match(terms)) {
-                results.push({
-                  raw: panels[i].IsRaw,
-                  emote: panels[i].Emotes[k] + '|' + (panels[i].Id == null || panels[i].IsRaw ? '' : panels[i].Id) + panels[i].EmoteTitles[k]
-                });
+            
+            terms = new RegExp(terms);
+            for (var i = 0; i < panels.length; i++) {
+              var named = false;
+              for (var k = group.title.length - 1; k >= 0; k--) {
+                if (group.title[k] == panels[i].Name) named = true;
+              }
+              for (var k = panels[i].Emotes.length - 1; k >= 0; k--) {
+                if (named || (!panels[i].IsRaw ? panels[i].Emotes[k].replace(/http:/g,'').replace(/https:/g,'') : panels[i].EmoteTitles[k]).toLowerCase().match(terms)) {
+                  results.push({
+                    raw: panels[i].IsRaw,
+                    emote: panels[i].Emotes[k] + '|' + (panels[i].Id == null || panels[i].IsRaw ? '' : panels[i].Id) + panels[i].EmoteTitles[k]
+                  });
+                }
               }
             }
+            if (contains(name, 'social') || contains(name, 'media')) {
+              group.title.push('!autoFilled$social');
+              group.type.push('url');
+            }
+            this.DisplayGroupIcons(group);
           }
-
-          if (contains(name, 'social') || contains(name, 'media')) {
-            group.title.push('!autoFilled$social');
-            group.type.push('url');
-          }
-          this.DisplayGroupIcons(group);
           return results;
         }
         ExtraEmoticons.prototype.DisplayGroupIcons = function (groups) {
@@ -547,7 +558,7 @@ if (isJQuery()) {
         }
 
         var modules = [];
-        var mainHook = $('#add_comment_box, #edit_story_form, .edit_area, #chapter_edit_form .bbcode-editor');
+        var mainHook = $('#add_comment_box, #edit_story_form, .edit_area, #chapter_edit_form .bbcode-editor, #form_send_pm, #new_thread');
         
         if (mainHook.length) {
           logger.Log('mainHook created succesfully',20);
@@ -679,7 +690,7 @@ if (isJQuery()) {
         if (!handling) {
           handling = true;
           me.backupText.val(me.textArea.val());
-          me.backupText.css('height', me.textArea.outerHeight());
+          me.backupText.attr('style', me.textArea.attr('style'));
           me.backupText.css('display', 'block');
           me.backupText.scrollTop(me.textArea.scrollTop());
           me.textArea.css('display', 'none');
@@ -915,22 +926,22 @@ if (isJQuery()) {
       }
 
       function unspoilerSiblings() {
-        $('.comment .data .comment_data .user_image_link:not(.dontUnspoiler').each(function () {
+        $('.comment .data .comment_data .user_image_link:not(.dontUnspoiler)').each(function () {
           var url = $(this).attr('href').replace('https:','http:');
           if (!url.indexOf('http:') == 0) {
             url = 'http:' + url;
           }
           var type = EmoteType(url);
+          var img;
           if (type.result > 0) {
             if (type.result == 2) {
-              $(this).parent().after('<img class="user_image" src="' + $(this).attr('href') + '" />').remove();
+              img = $('<img class="user_image" src="' + $(this).attr('href') + '" />');
+              $(this).parent().after(img).remove();
             } else {
               var tit = Name(url);
-              var img = $('<img class="emoticon" alt="' + tit + '" title="' + tit + '" src="' + url + '" />');
-              if (type.lim) {
-                $(img).css('max-height', '27px');
-              }
-
+              img = $('<img class="emoticon" alt="' + tit + '" title="' + tit + '" src="' + url + '" />');
+              if (type.lim) $(img).css('max-height', '27px');
+              
               var p = $(this).parent().prev();
               if (type.wrap || p.length == 0 || p.prop('tagName') != 'P') {
                 $(this).parent().attr('style', 'display: inline;');
@@ -941,6 +952,7 @@ if (isJQuery()) {
                 p.append(img);
               }
             }
+            img.parent().find('i').remove();
             logger.Log("unspoilerSiblings: " + url);
           } else {
             $(this).addClass('dontUnspoiler');
@@ -968,8 +980,13 @@ if (isJQuery()) {
             $.ajaxSetup({catch: true});
             $.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js", function() {
               clearInterval(tempb);
-              FimFicEvents.on('afterpagechange', refreshEmotePanels);
-              if (isMyPage()) FimFicEvents.on('aftereditmodule', refreshEmotePanels);
+              FimFicEvents.on('afterpagechange aftercomposepm', refreshEmotePanels);
+              if (isMyPage()) FimFicEvents.on('aftereditmodule', function() {
+                refreshEmotePanels();
+                $('.module_editing_form textarea').each(function() {
+                  $(this).val(returnAliases($(this).val()));
+                });
+              });
               clearInterval(temp);
               FimFicEvents.on('afterpagechange aftereditcomment afteraddcomment afterpreviewcomment', refreshComments);
             });
@@ -1057,12 +1074,21 @@ background: none repeat scroll 0% 0% #FFF;}\
 #edit_story_form .drop-down-emoticons.reverse {\
   left: 0px;\
   margin-left: 0px;}\
-.emoticon-expander + .reverse {\
-  left: 5px !important}\
+#form_send_pm textarea, #send_pm_form textarea,\
+#send_pm_form textarea, #send_pm_form textarea {\
+ min-height: 300px;}\
+.emoticon-expander ~ .reverse {\
+  left: 75px !important;}\
+.emoticon-expander ~ .reverse .arrow,\
+.emoticon-expander ~ .reverse .arrow {\
+  left: 20px;\
+  right: initial;}\
+#edit_story_form .drop-down-emoticons.reverse {\
+  left: 5px !important;}\
 #edit_story_form .drop-down-emoticons.reverse .arrow {\
   left: 14px;\
   right: initial;}\
-.emoticon-expander + .drop-down-emoticons {\
+.emoticon-expander ~ .drop-down-emoticons {\
   right: -5px;}\
 .drop-up {\
   top: auto !important;\
@@ -1081,7 +1107,7 @@ background: none repeat scroll 0% 0% #FFF;}\
       }
 
       function refreshEmotePanels() {
-        $('.edit_area, .module_editing_form').each(function() {
+        $('.edit_area, .module_editing_form, #send_pm_form').each(function() {
           logger.Log('RefreshEmotePanels: .edit_area[data-init="' + $(this).attr('data-init') + '"]');
           if ($(this).attr('data-init') != 'true') {
             var module = new ExtraEmoticons(this);
@@ -1285,6 +1311,9 @@ function Logger(name, l) {
   if (typeof (l) == 'number') minLevel = l;
   this.Start = function (level) {
     if (typeof (level) == 'number') minLevel = level;
+    if (test == null) {
+      Output('===Logging Started===', minLevel + 1);
+    }
     test = $('#debug-console');
     paused = false;
     if (!test.length) {
@@ -1292,26 +1321,25 @@ function Logger(name, l) {
       $('body').append(test);
       test.click(function () {
         $(this).empty();
-        this.style.bottom = this.style.left = line = 0;
       });
     }
-    Output('===Logging Enabled===', minLevel + 1);
   }
   this.Stop = function () {
     if (test != null) {
       test.remove();
       test = null;
+      Output('===Logging Stopped===', minLevel + 1);
     }
-    line = 0;
-    Output('===Logging Disabled===', minLevel + 1);
   }
   this.Pause = function () {
-    Output('===Logging Paused===', minLevel + 1);
+    if (!paused) Output('===Logging Paused===', minLevel + 1);
     paused = true;
   }
   this.Continue = function () {
-    paused = false;
-    Output('===Logging Continued===', minLevel + 1);
+    if (paused) {
+      paused = false;
+      Output('===Logging Continued===', minLevel + 1);
+    }
   }
   this.Log = function (txt, level, params) {
     if (arguments.length > 1) {
@@ -1327,7 +1355,10 @@ function Logger(name, l) {
     }
     Output(txt, level);
   }
-  this.Error = function (txt, params) { Output(txt, 1000); }
+  this.Error = function (txt, params) {
+    arguments.splice(1,0,1000);
+    this.Log.apply(this,arguments);
+  }
   this.SevereException = function (txt, excep) {
     if (excep != 'handled') {
       try {
@@ -1344,8 +1375,7 @@ function Logger(name, l) {
         if (excep.stack != null) SOut(excep.stack, 2000);
         if (stopped) this.Pause();
       } catch (e) {
-        alert('Error in displaying Severe: ' + e);
-        alert('Severe: ' + txt);
+        alert('Error in displaying Severe: ' + e + '\n' + 'Severe: ' + excep);
       }
       throw 'handled';
     }
@@ -1360,8 +1390,7 @@ function Logger(name, l) {
       SOut(txt, 2);
       if (stopped) this.Pause();
     } catch (e) {
-      alert('Error in displaying Severe: ' + e);
-      alert('Severe: ' + txt);
+      alert('Error in displaying Severe: ' + e + '\n' + 'Severe: ' + excep);
     }
   }
   function Output(txt, level) {
