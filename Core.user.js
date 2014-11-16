@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.1.2
+// @version     5.2
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -19,7 +19,6 @@ function replaceAll(find, replace, str) { return str.replace(new RegExp(find.rep
 
 if (isJQuery()) {
   var logger = new Logger('Extra Emoticons', 6);
-  
   var siteMapping = (function() {
     var Mapping = {};
     var aliased = {};
@@ -161,6 +160,7 @@ if (isJQuery()) {
           this.region.attr('data-init', 'true');
           
           this.submitButton = this.getSubmitButton();
+          logger.Log('SubmitButton:' + this.submitButton.length, 20);
           this.textArea = this.getTextArea();
           this.childGuest = this.getEmotesButton();
           this.toolbar = this.getToolbar();
@@ -233,20 +233,20 @@ if (isJQuery()) {
           return $(this.region).find('.drop-down-expander[data-function="emoticons-picker"]');
         }
         ExtraEmoticons.prototype.getSubmitButton = function () {
-          if (this.region.hasClass('module_editing_form')) {
-            return this.region.find('.drop-down-pop-up-footer button').first();
-          } else if (this.region.hasClass('edit_area')) {
-            return this.region.find('.save_button').first();
+          if (this.region.hasClass('edit_area') || this.region.attr('id') == 'add_comment_box' || this.region.hasClass('form-send-pm')) {
+            return this.region.find('.button-submit').first();// add comment, edit comment, send pm
+          } else if (this.region.attr('id') == 'send_pm_form') {
+            return $('#message_box_container #popup_accept').first();// popup send pm
+          } else if (this.region.attr('id') == 'new_thread') {
+            return this.region.find('.add_comment_toolbar button').first();// create thread
+          } else if (this.region.hasClass('module_editing_form')) {
+            return this.region.find('.drop-down-pop-up-footer button').first();// edit module
           } else if (this.region.attr('id') == 'edit_story_form') {
-            return this.region.find('td').last().find('.fa.fa-save').parent();
+            return this.region.find('td').last().find('.fa.fa-save').parent();// edit blog post
           } else if (this.region.hasClass('bbcode-editor')) {
-            return $('#chapter_edit_form button[data-function="save"]');
-          } else if (this.region.attr('id') == 'form_send_pm' || this.region.attr('id') == 'new_thread') {
-            return this.region.find('.add_comment_toolbar button').first();
-          } else if (this.region.attr('id') ==  'send_pm_form') {
-            return $('#message_box_container #popup_accept').first();
+            return $('#chapter_edit_form button[data-function="save"]');// edit chapter
           }
-          return this.region.find('.form_submitter').first();
+          return this.region.find('.form_submitter').first();// default
         }
         ExtraEmoticons.prototype.getToolbar = function () {
           return this.region.find('.format-toolbar').first();
@@ -558,7 +558,7 @@ if (isJQuery()) {
         }
 
         var modules = [];
-        var mainHook = $('#add_comment_box, #edit_story_form, .edit_area, #chapter_edit_form .bbcode-editor, #form_send_pm, #new_thread');
+        var mainHook = $('#add_comment_box, #edit_story_form, .edit_area, #chapter_edit_form .bbcode-editor, .form-send-pm, #new_thread');
         
         if (mainHook.length) {
           logger.Log('mainHook created succesfully',20);
@@ -892,7 +892,10 @@ if (isJQuery()) {
 
       function UnspoilerEmoticons() {
         var comments = $('.comment .data .comment_data');
-        if (comments.length == 0) return false;
+        if (comments.length == 0) {
+          logger.Log("unspoiler: abort", 10);
+          return false;
+        }
         emotifyImg();
         unspoilerSiblings();
         comments.find('img:not(.done)').each(function () {
@@ -900,7 +903,7 @@ if (isJQuery()) {
           $(this).addClass('done');
         });
 
-        logger.Log("unspoiler: complete");
+        logger.Log("unspoiler: complete", 10);
         return true;
       }
       
@@ -1074,8 +1077,7 @@ background: none repeat scroll 0% 0% #FFF;}\
 #edit_story_form .drop-down-emoticons.reverse {\
   left: 0px;\
   margin-left: 0px;}\
-#form_send_pm textarea, #send_pm_form textarea,\
-#send_pm_form textarea, #send_pm_form textarea {\
+.form-send-pm textarea, #send_pm_form textarea {\
  min-height: 300px;}\
 .emoticon-expander ~ .reverse {\
   left: 75px !important;}\
@@ -1122,7 +1124,7 @@ background: none repeat scroll 0% 0% #FFF;}\
           if (UnspoilerEmoticons()) {
             var editComments = getEditCommentButtons();
             if (editComments.length > 0) {
-              logger.Log('refreshComments: adding comment editing...');
+              logger.Log('refreshComments: adding comment editing...', 20);
               editComments.each(function () {
                 $(this).on('mousedown', function () {
                   var form = $(this).parents('.comment').find('form');
@@ -1133,9 +1135,10 @@ background: none repeat scroll 0% 0% #FFF;}\
                     ttextArea.val(returnAliases(ttextArea.val()));
                     logger.Log(ttextArea.val());
                   }
+                  refreshEmotePanels();
                 });
               });
-              logger.Log('refreshComments: Comment editing added succesfully')
+              logger.Log('refreshComments: Comment editing added succesfully', 20)
             }
           }
         } catch (e) {
