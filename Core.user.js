@@ -5,11 +5,10 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.2.1
+// @version     5.3
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
-
 //==================================================================================================
 function reverse(me) { return me.split('').reverse().join() }
 function contains(me, it) { return me.indexOf(it) != -1 }
@@ -102,6 +101,7 @@ if (isJQuery()) {
   //==================================================================================================
   try {
     (function (win) {
+      var version = '5.3';
       if (typeof (win.ExtraEmotes) === 'undefined') {
         //--------------------------------------------------------------------------------------------------
         //---------------------------------EXTRA EMOTICONS MODULE-------------------------------------------
@@ -531,6 +531,7 @@ if (isJQuery()) {
             this.modules.push(module);
           }
         }
+        
         //==API FUNCTION==//
         //Gets the logging object
         ExtraEmotesAPI.prototype.getLogger = function () {
@@ -556,7 +557,52 @@ if (isJQuery()) {
           recordEmotesPanel(true, id, name, title, emotes, buttonImage, false);
           logger.Log('addRaw: finalizing...',11);
         }
-
+        
+        ExtraEmotesAPI.prototype.getVersion = function() {
+          function parseVersion(s) {
+            var num = 0;
+            var highest = 0;
+            var broken = s.split('.');
+            for (var i = 0; i < broken.length; i++) {
+              broken[i] = parseInt(broken[i]);
+              var adjusted = broken[i];
+              for (var j = 0; j < i; j++) {
+                adjusted /= 10;
+              }
+              if (j > highest) highest = j;
+              num+= adjusted;
+            }
+            return {
+              number: num,
+              rax: broken,
+              high: highest
+            }
+          }
+          var parsed = parseVersion(version);
+          return {
+            number: parsed.number,
+            version: version,
+            string: 'Extra Emoticons ' + version,
+            full: parsed.raw,
+            toString: function() {
+              return this.string;
+            },
+            valueOf: function() {
+              return parsed.number;
+            },
+            equals: function(a) {
+              if (typeof(a) == 'string') {
+                return this.version == a || this.string == a;
+              }
+              return this.valueOf() == a.valueOf();
+            },
+            compare: function(a) {
+              if (typeof(a) == 'string') a = parseVersion(a).number;
+              return this.valueOf() - a.valueOf();
+            }
+          };
+        }
+        
         var modules = [];
         var mainHook = $('#add_comment_box, #edit_story_form, .edit_area, #chapter_edit_form .bbcode-editor, .form-send-pm, #new_thread');
         
@@ -572,6 +618,20 @@ if (isJQuery()) {
             getLogger: function () { return logger; }
           }
         }
+        
+        win.ExtraEmotes.toString = function() {
+          return '[object API] {\ngetLogger() -> Object\naddEmoticons(id, name, title, emotes, normalize)\naddRaw(id, name, title, emotes, buttonImage)\n}';
+        }
+        for (var i in win.ExtraEmotes) {
+          win.ExtraEmotes[i].toString = (function() {
+            var result = function toString() {
+              return 'function ' + this.name + '() {\n  [native code]\n}';
+            }
+            result.toString = result;
+            return result;
+          })();
+        }
+        
         logger.Log('setup completed succesfully',20);
       }
 
