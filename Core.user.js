@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.3
+// @version     5.3.1
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -425,7 +425,7 @@ if (isJQuery()) {
                 if (group.title[k] == panels[i].Name) named = true;
               }
               for (var k = panels[i].Emotes.length - 1; k >= 0; k--) {
-                if (named || (!panels[i].IsRaw ? panels[i].Emotes[k].replace(/http:/g,'').replace(/https:/g,'') : panels[i].EmoteTitles[k]).toLowerCase().match(terms)) {
+                if (named || (!panels[i].IsRaw ? panels[i].Emotes[k].replace(/http:/g,'').replace(/https:/g,'') + panels[i].EmoteTitles[k].replace(/\:/g,'') : panels[i].EmoteTitles[k]).toLowerCase().match(terms)) {
                   results.push({
                     raw: panels[i].IsRaw,
                     emote: panels[i].Emotes[k] + '|' + (panels[i].Id == null || panels[i].IsRaw ? '' : panels[i].Id) + panels[i].EmoteTitles[k]
