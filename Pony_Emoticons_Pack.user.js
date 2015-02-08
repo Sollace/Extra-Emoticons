@@ -3,7 +3,7 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.3
+// @version     2.3.1
 // @icon        http://fc00.deviantart.net/fs70/f/2014/013/0/2/nerdgasm_by_comeha-d72140i.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -42,7 +42,7 @@ ExtraEmotes.addEmoticons("x", "Dropbox", "Extra", ([
 "http://fc08.deviantart.net/fs71/f/2014/013/2/0/ootwist_by_comeha-d7213zw.png",
 "http://fc08.deviantart.net/fs71/f/2014/161/d/b/kissaloo_by_comeha-d7lso4c.png",
 "http://fc07.deviantart.net/fs70/f/2014/236/8/a/roseluck_by_comeha-d7wi620.png",
-"http://fc07.deviantart.net/fs70/f/2014/236/0/b/flutter_blush_by_comeha-d7wi62v.png",
+"http://fc07.deviantart.net/fs70/f/2014/236/0/b/flutter_blush_by_comeha-d7wi62v.png|flitter_blush",
 "http://i453.photobucket.com/albums/qq260/spacewings/EmoteDimondMad_zps1373258d.png|dtiara_mad",
 "http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Redheart_gasp.png",
 "http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Redheart_smile.png",
