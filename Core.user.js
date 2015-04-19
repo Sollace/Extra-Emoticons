@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.3.1
+// @version     5.3.2
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ if (isJQuery()) {
   siteMapping.registerMapping('Google', 'google.com',true);
   siteMapping.registerMapping('Twitter', 'twitter.com',true);
   siteMapping.registerMapping('Facebook', 'facebook.com',true);
-  siteMapping.registerMapping('FimFiction', 'fimfiction-static.net');
+  siteMapping.registerMapping('FimFiction', 'fimfiction.net');
   siteMapping.registerMapping('FanFiction', 'fanfiction.net');
   siteMapping.registerMapping('DeviantArt', 'deviantart.com',['DA']);
   siteMapping.registerMapping('Tumblr', 'tumblr.com',true);
@@ -494,7 +494,7 @@ if (isJQuery()) {
         }
         ExtraEmoticons.prototype.getGroupButtonIcon = function (name) {
           if (name == '!autoFilled$social') {
-            return 'http://www.fimfiction-static.net/images/icons/quote.png';
+            return 'http://static.fimfiction.net/images/icons/quote.png';
           } else {
             var icon = siteMapping.getFavicon(name);
             if (icon != null) {
@@ -516,7 +516,7 @@ if (isJQuery()) {
         }
         ExtraEmoticons.prototype.addRaw = function (id, name, title, emotes, buttonImage) {
           if (buttonImage == null) {
-            buttonImage = 'http://www.fimfiction-static.net/images/icons/quote.png'
+            buttonImage = 'http://static.fimfiction.net/images/icons/quote.png'
           }
           var holder = this.makeEmotesPanel(id, name, false);
           this.addRawsToPanel(holder, emotes);
@@ -714,7 +714,7 @@ if (isJQuery()) {
       }
 
       function getDefaultEmoteUrl(name) {
-        return 'https://fimfiction-static.net/images/emoticons/' + name + '.png';
+        return 'https://static.fimfiction.net/images/emoticons/' + name + '.png';
       }
 
       function handleDrop(event) {
