@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.3.2
+// @version     5.3.3
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -809,23 +809,22 @@ if (isJQuery()) {
         var mustWrap = false;
 
         if (url != null && url != undefined) {
-          var splitten = url.split('?');
-          if (splitten != null && splitten.length == 2) {
-            splitten = splitten[1].split('&');
-            for (var i = 0; i < splitten.length; i++) {
-              if (splitten[i] == 'isEmote=true') {
-                return {
-                  result: 2,
-                  lim: true,
-                  wrap: mustWrap
-                };
-              } else if (splitten[i] == 'wrap=true') {
-                url = url.split('?')[0];
-                mustWrap = true;
-                break;
-              }
+          var questionStart = url.indexOf('?');
+          if (questionStart != -1) {
+            var splitten = url.substring(questionStart + 1, url.length);
+            if (splitten.indexOf('isEmote=true') != -1) {
+              return {
+                result: 2,
+                lim: true,
+                wrap: mustWrap
+              };
+            } else if (splitten.indexOf('wrap=true')) {
+              url = url.split('?')[0];
+              mustWrap = true;
+              break;
             }
           }
+        }
 
           if (AllEmotes == null) {
             AllEmotes = getVirtualEmotes();
