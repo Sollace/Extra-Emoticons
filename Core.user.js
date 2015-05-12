@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.3.3
+// @version     5.3.4
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -821,11 +821,9 @@ if (isJQuery()) {
             } else if (splitten.indexOf('wrap=true')) {
               url = url.split('?')[0];
               mustWrap = true;
-              break;
             }
           }
-        }
-
+          
           if (AllEmotes == null) {
             AllEmotes = getVirtualEmotes();
           }
@@ -839,7 +837,7 @@ if (isJQuery()) {
                     result: 1,
                     lim: AllEmotes[i].Normalized,
                     wrap: mustWrap
-                  }
+                  };
                 }
               }
             }
