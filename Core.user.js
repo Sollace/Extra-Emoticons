@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.3.4
+// @version     5.3.5
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ if (isJQuery()) {
   //==================================================================================================
   try {
     (function (win) {
-      var version = '5.3.4';
+      var version = '5.3.5';
       if (typeof (win.ExtraEmotes) === 'undefined') {
         //--------------------------------------------------------------------------------------------------
         //---------------------------------EXTRA EMOTICONS MODULE-------------------------------------------
@@ -818,7 +818,7 @@ if (isJQuery()) {
                 lim: true,
                 wrap: mustWrap
               };
-            } else if (splitten.indexOf('wrap=true')) {
+            } else if (splitten.indexOf('wrap=true') != -1) {
               url = url.split('?')[0];
               mustWrap = true;
             }
