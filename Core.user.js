@@ -5,7 +5,9 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     5.3.5
+// @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Logger.js
+// @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
+// @version     5.4
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -101,7 +103,7 @@ if (isJQuery()) {
   //==================================================================================================
   try {
     (function (win) {
-      var version = '5.3.5';
+      var version = '5.3.6';
       if (typeof (win.ExtraEmotes) === 'undefined') {
         //--------------------------------------------------------------------------------------------------
         //---------------------------------EXTRA EMOTICONS MODULE-------------------------------------------
@@ -212,12 +214,19 @@ if (isJQuery()) {
           var def = getDefaultEmotes();
           var holder = this.makeEmotesPanel('', 'default', true);
           this.addImagesToPanel(def.Id, holder, def.Emotes, true);
-          this.openEmoticonsPanel($(this.childGuest)).append(holder);
+          
+          
+          var dropTipHolder = this.openEmoticonsPanel($(this.childGuest));
+          dropTipHolder.append(holder);
+          /*var legacy = $(getLegacyEmotes());
+          legacy.css('display', 'none');
+          legacy.attr('data-hash', legacy.html().length);
+          dropTipHolder.parent().before(legacy);*/
           
           logger.Log('ExtraEmoticons.setupGUI: end',10);
         }
         ExtraEmoticons.prototype.makeDropTip = function(button) {
-          var holder = $('<div class="drop-down drop-down-emoticons"><div class="arrow" /></div>');
+          var holder = $('<div class="drop-down drop-down-emotes"><div class="arrow" /></div>');
           $(button).after(holder);
           return holder;
         };
@@ -863,7 +872,7 @@ if (isJQuery()) {
       var _defaultEmotes;
       function getVirtualEmotes() {
         if (virtualEmotes == null) {
-          virtualEmote = [];
+          virtualEmotes = [];
         }
         return virtualEmotes;
       }
@@ -889,6 +898,9 @@ if (isJQuery()) {
         }
 
         return _defaultEmotes;
+      }
+      function getLegacyEmotes() {
+        return '<div class="drop-down drop-down-emoticons"><div class="arrow"></div><ul><li><a data-function="emoticon" data-emoticon=":ajbemused:"><img src="//static.fimfiction.net/images/emoticons/ajbemused.png"></a></li><li><a data-function="emoticon" data-emoticon=":ajsleepy:"><img src="//static.fimfiction.net/images/emoticons/ajsleepy.png"></a></li><li><a data-function="emoticon" data-emoticon=":ajsmug:"><img src="//static.fimfiction.net/images/emoticons/ajsmug.png"></a></li><li><a data-function="emoticon" data-emoticon=":applecry:"><img src="//static.fimfiction.net/images/emoticons/applecry.png"></a></li><li><a data-function="emoticon" data-emoticon=":applejackconfused:"><img src="//static.fimfiction.net/images/emoticons/applejackconfused.png"></a></li><li><a data-function="emoticon" data-emoticon=":applejackunsure:"><img src="//static.fimfiction.net/images/emoticons/applejackunsure.png"></a></li><li><a data-function="emoticon" data-emoticon=":coolphoto:"><img src="//static.fimfiction.net/images/emoticons/coolphoto.png"></a></li><li><a data-function="emoticon" data-emoticon=":derpyderp1:"><img src="//static.fimfiction.net/images/emoticons/derpyderp1.png"></a></li><li><a data-function="emoticon" data-emoticon=":derpyderp2:"><img src="//static.fimfiction.net/images/emoticons/derpyderp2.png"></a></li><li><a data-function="emoticon" data-emoticon=":derpytongue2:"><img src="//static.fimfiction.net/images/emoticons/derpytongue2.png"></a></li><li><a data-function="emoticon" data-emoticon=":fluttercry:"><img src="//static.fimfiction.net/images/emoticons/fluttercry.png"></a></li><li><a data-function="emoticon" data-emoticon=":flutterrage:"><img src="//static.fimfiction.net/images/emoticons/flutterrage.png"></a></li><li><a data-function="emoticon" data-emoticon=":fluttershbad:"><img src="//static.fimfiction.net/images/emoticons/fluttershbad.png"></a></li><li><a data-function="emoticon" data-emoticon=":fluttershyouch:"><img src="//static.fimfiction.net/images/emoticons/fluttershyouch.png"></a></li><li><a data-function="emoticon" data-emoticon=":fluttershysad:"><img src="//static.fimfiction.net/images/emoticons/fluttershysad.png"></a></li><li><a data-function="emoticon" data-emoticon=":heart:"><img src="//static.fimfiction.net/images/emoticons/heart.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiecrazy:"><img src="//static.fimfiction.net/images/emoticons/pinkiecrazy.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiegasp:"><img src="//static.fimfiction.net/images/emoticons/pinkiegasp.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiehappy:"><img src="//static.fimfiction.net/images/emoticons/pinkiehappy.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiesad2:"><img src="//static.fimfiction.net/images/emoticons/pinkiesad2.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiesick:"><img src="//static.fimfiction.net/images/emoticons/pinkiesick.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiesmile:"><img src="//static.fimfiction.net/images/emoticons/pinkiesmile.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowderp:"><img src="//static.fimfiction.net/images/emoticons/rainbowderp.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowdetermined2:"><img src="//static.fimfiction.net/images/emoticons/rainbowdetermined2.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowhuh:"><img src="//static.fimfiction.net/images/emoticons/rainbowhuh.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowkiss:"><img src="//static.fimfiction.net/images/emoticons/rainbowkiss.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowlaugh:"><img src="//static.fimfiction.net/images/emoticons/rainbowlaugh.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowwild:"><img src="//static.fimfiction.net/images/emoticons/rainbowwild.png"></a></li><li><a data-function="emoticon" data-emoticon=":raritycry:"><img src="//static.fimfiction.net/images/emoticons/raritycry.png"></a></li><li><a data-function="emoticon" data-emoticon=":raritydespair:"><img src="//static.fimfiction.net/images/emoticons/raritydespair.png"></a></li><li><a data-function="emoticon" data-emoticon=":raritystarry:"><img src="//static.fimfiction.net/images/emoticons/raritystarry.png"></a></li><li><a data-function="emoticon" data-emoticon=":raritywink:"><img src="//static.fimfiction.net/images/emoticons/raritywink.png"></a></li><li><a data-function="emoticon" data-emoticon=":scootangel:"><img src="//static.fimfiction.net/images/emoticons/scootangel.png"></a></li><li><a data-function="emoticon" data-emoticon=":trixieshiftleft:"><img src="//static.fimfiction.net/images/emoticons/trixieshiftleft.png"></a></li><li><a data-function="emoticon" data-emoticon=":trixieshiftright:"><img src="//static.fimfiction.net/images/emoticons/trixieshiftright.png"></a></li><li><a data-function="emoticon" data-emoticon=":twilightangry2:"><img src="//static.fimfiction.net/images/emoticons/twilightangry2.png"></a></li><li><a data-function="emoticon" data-emoticon=":twilightblush:"><img src="//static.fimfiction.net/images/emoticons/twilightblush.png"></a></li><li><a data-function="emoticon" data-emoticon=":twilightoops:"><img src="//static.fimfiction.net/images/emoticons/twilightoops.png"></a></li><li><a data-function="emoticon" data-emoticon=":twilightsheepish:"><img src="//static.fimfiction.net/images/emoticons/twilightsheepish.png"></a></li><li><a data-function="emoticon" data-emoticon=":twilightsmile:"><img src="//static.fimfiction.net/images/emoticons/twilightsmile.png"></a></li><li><a data-function="emoticon" data-emoticon=":twistnerd:"><img src="//static.fimfiction.net/images/emoticons/twistnerd.png"></a></li><li><a data-function="emoticon" data-emoticon=":unsuresweetie:"><img src="//static.fimfiction.net/images/emoticons/unsuresweetie.png"></a></li><li><a data-function="emoticon" data-emoticon=":yay:"><img src="//static.fimfiction.net/images/emoticons/yay.png"></a></li><li><a data-function="emoticon" data-emoticon=":trollestia:"><img src="//static.fimfiction.net/images/emoticons/trollestia.png"></a></li><li><a data-function="emoticon" data-emoticon=":moustache:"><img src="//static.fimfiction.net/images/emoticons/moustache.png"></a></li><li><a data-function="emoticon" data-emoticon=":facehoof:"><img src="//static.fimfiction.net/images/emoticons/facehoof.png"></a></li><li><a data-function="emoticon" data-emoticon=":eeyup:"><img src="//static.fimfiction.net/images/emoticons/eeyup.png"></a></li><li><a data-function="emoticon" data-emoticon=":duck:"><img src="//static.fimfiction.net/images/emoticons/duck.png"></a></li></ul></div>';
       }
       
       function VirtualEmotePanel(israw, id, name, title, emotes, img, norm, ext) {
@@ -1137,6 +1149,15 @@ background: none repeat scroll 0% 0% #FFF;}\
 .extra_emoticons_message:hover {\
   background: none !important;\
   box-shadow: none !important;}\
+.format-toolbar .drop-down-emotes {\
+  width: 280px;\
+  right: -10px;\
+  left: initial;\
+  line-height: 0;}\
+.format-toolbar .drop-down-emotes .arrow {\
+    right: 14px;\
+    left: initial;}\
+#edit_story_form .drop-down-emotes.reverse,\
 #edit_story_form .drop-down-emoticons.reverse {\
   left: 0px;\
   margin-left: 0px;}\
@@ -1148,11 +1169,14 @@ background: none repeat scroll 0% 0% #FFF;}\
 .emoticon-expander ~ .reverse .arrow {\
   left: 20px;\
   right: initial;}\
+#edit_story_form .drop-down-emotes.reverse,\
 #edit_story_form .drop-down-emoticons.reverse {\
   left: 5px !important;}\
+#edit_story_form .drop-down-emotes.reverse .arrow,\
 #edit_story_form .drop-down-emoticons.reverse .arrow {\
   left: 14px;\
   right: initial;}\
+.emoticon-expander ~ .drop-down-emotes,\
 .emoticon-expander ~ .drop-down-emoticons {\
   right: -5px;}\
 .drop-up {\
@@ -1292,21 +1316,17 @@ background: none repeat scroll 0% 0% #FFF;}\
   }
 }
 
+function getEditCommentButtons() {
+  var result = $("a[title='Edit this comment'][extraemotesInit!=true]");
+  result.attr('extraemotesInit', 'true');
+  return result;
+}
+
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------API FUNCTIONS-----------------------------------------------
 //--------------------------------------------------------------------------------------------------
 
-//==API FUNCTION==//
-function getEditCommentButtons() {
-  var result = $("a[title='Edit this comment'][extraemotesInit!=true]");
-  result.each(function() {
-    $(this).attr('extraemotesInit', 'true');
-  });
-
-  return result;
-}
-
-//==API FUNCTION==//
+//==unused=//
 function selectElementContents(el) {
   if (window.getSelection && document.createRange) {
     var sel = window.getSelection();
@@ -1318,162 +1338,5 @@ function selectElementContents(el) {
     var textRange = document.body.createTextRange();
     textRange.moveToElementText(el);
     textRange.select();
-  }
-}
-
-//==API FUNCTION==//
-function getIsLoggedIn() {
-  try { return logged_in_user != null;
-      } catch (e) {}
-  return false;
-}
-
-//==API FUNCTION==//
-function isMyPage() {
-  var locationCheck = document.location.href.replace('http:','').replace('https:','');
-  if (locationCheck.indexOf('//www.fimfiction.net/user/' + getUserNameEncoded()) == 0) return true;
-  return locationCheck.indexOf('//www.fimfiction.net/user/' + getUserName().replace(/ /g, '+')) == 0;
-}
-
-//==API FUNCTION==//
-function getUserNameEncoded() { return encodeURIComponent(getUserName()); }
-
-//==API FUNCTION==//
-function getUserName() {return getIsLoggedIn() ? getUserButton().getAttribute("href").split("/").reverse()[0] : 'Anon';}
-
-//==API FUNCTION==//
-function getUserButton() {
-  return $('.user_toolbar a.button[href^="/user/"]')[0];
-}
-
-//==API FUNCTION==//
-function makeStyle(input, id) {
-  while (contains(input, '  ')) {
-    input = replaceAll('  ',' ', input);
-  }
-  var style = document.createElement('style');
-  $(style).attr('type', 'text/css');
-  $(style).append(input);
-  if (id != undefined && id != null) {
-    style.id = id;
-  }
-  $('head').append(style);
-}
-
-//==API FUNCTION==//
-function isJQuery() {
-  try {
-    if ($ === undefined) {}
-    return true;
-  } catch (e) {}
-  return false;
-}
-
-//==API FUNCTION==//
-function Logger(name, l) {
-  var test = null;
-  var minLevel = 0;
-  var paused = false;
-  if (typeof (l) == 'number') minLevel = l;
-  this.Start = function (level) {
-    if (typeof (level) == 'number') minLevel = level;
-    if (test == null) {
-      Output('===Logging Started===', minLevel + 1);
-    }
-    test = $('#debug-console');
-    paused = false;
-    if (!test.length) {
-      test = $('<div id="debug-console" style="overflow-y:auto;max-height:50%;max-width:100%;min-width:50%;background:rgba(255,255,255,0.8);position:fixed;bottom:0px;left:0px;" />');
-      $('body').append(test);
-      test.click(function () {
-        $(this).empty();
-      });
-    }
-  }
-  this.Stop = function () {
-    if (test != null) {
-      test.remove();
-      test = null;
-      Output('===Logging Stopped===', minLevel + 1);
-    }
-  }
-  this.Pause = function () {
-    if (!paused) Output('===Logging Paused===', minLevel + 1);
-    paused = true;
-  }
-  this.Continue = function () {
-    if (paused) {
-      paused = false;
-      Output('===Logging Continued===', minLevel + 1);
-    }
-  }
-  this.Log = function (txt, level, params) {
-    if (arguments.length > 1) {
-      if (typeof arguments[1] == 'string') {
-        [].splice.apply(arguments, [1, 0, 0]);
-        level = 0;
-      }
-      for (var i = 2; i < arguments.length; i++) {
-        txt = txt.replace(new RegExp('\\{' + (i-2) + '\\}', 'g'), arguments[i]);
-      }
-    } else {
-      level = 0;
-    }
-    Output(txt, level);
-  }
-  this.Error = function (txt, params) {
-    arguments.splice(1,0,1000);
-    this.Log.apply(this,arguments);
-  }
-  this.SevereException = function (txt, excep) {
-    if (excep != 'handled') {
-      try {
-        var stopped = false;
-        if (test == null) {
-          stopped = true;
-          this.Start();
-        }
-        if (txt.indexOf('{0}') != -1) {
-          SOut(txt.replace('{0}', excep), 2000);
-        } else {
-          SOut(txt + '<br/>' + except, 2000);
-        }
-        if (excep.stack != null) SOut(excep.stack, 2000);
-        if (stopped) this.Pause();
-      } catch (e) {
-        alert('Error in displaying Severe: ' + e + '\n' + 'Severe: ' + excep);
-      }
-      throw 'handled';
-    }
-  }
-  this.Severe = function (txt) {
-    try {
-      var stopped = false;
-      if (test == null) {
-        stopped = true;
-        this.Start();
-      }
-      SOut(txt, 2);
-      if (stopped) this.Pause();
-    } catch (e) {
-      alert('Error in displaying Severe: ' + e + '\n' + 'Severe: ' + excep);
-    }
-  }
-  function Output(txt, level) {
-    if (!paused) SOut(txt, level);
-  }
-  function SOut(txt, level) {
-    if (level == null || level == undefined) level = 0;
-    if (test != null && level >= minLevel) {
-      var line = test.children().length;
-      if (line > 150) {
-        line = 0;
-        test.empty();
-      }
-      test.append('<p style="background: rgba(' + (line % 2 == 0 ? '155,0' : '0,155') + ',0,0.3);">' + (line + 1) + '):' + name + ') ' + txt + '</p>');
-      test.stop().animate({
-        scrollTop: test[0].scrollHeight
-      },800);
-    }
   }
 }
