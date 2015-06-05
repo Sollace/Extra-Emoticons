@@ -3,10 +3,12 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2
+// @version     2.1
 // @icon        http://www.roundstable.com/forums/images/smilies/DashEmote2.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
 // ==/UserScript==

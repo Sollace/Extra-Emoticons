@@ -3,12 +3,14 @@
 // @description Adds all emoticons from Twitch.tv to FimFiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
+// @version     2.1
+// @icon        http://www.twitch.tv/favicon.ico
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2
-// @icon        http://www.twitch.tv/favicon.ico
-// @grant       none
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
+// @grant       none
 // ==/UserScript==
 
 ExtraEmotes.addEmoticons("tt", "Twitch", "Twitch", ([

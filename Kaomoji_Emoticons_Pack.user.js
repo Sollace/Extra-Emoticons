@@ -1,12 +1,14 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name        Kaomoji Emoticons Pack
 // @description Adds all japanese smilies as emoticons
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2
+// @version     2.1
 // @icon        http://www.chatslang.com/images/main/kaomoji.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
 // @nocompat    Chrome

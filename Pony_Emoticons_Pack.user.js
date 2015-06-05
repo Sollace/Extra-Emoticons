@@ -3,10 +3,12 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.3.1
+// @version     2.4
 // @icon        http://fc00.deviantart.net/fs70/f/2014/013/0/2/nerdgasm_by_comeha-d72140i.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
 // ==/UserScript==
@@ -166,6 +168,7 @@ ExtraEmotes.addEmoticons("c", "Clap", "Clap", [
 "http://fc01.deviantart.net/fs71/f/2015/013/e/4/clapping_pony_icon___fancy_pants_by_comeha-d8drj8h.gif",
 "http://fc00.deviantart.net/fs71/f/2013/056/f/4/clapping_pony_icon___shining_armor_by_taritoons-d5w67ti.gif",
 "http://fc09.deviantart.net/fs71/f/2014/103/a/1/maud_by_comeha-d7ee4tv.gif",
+"http://orig10.deviantart.net/d992/f/2015/153/1/0/clapping_pony_icon___discord_by_comeha-d8vpbw9.gif",
 "http://fc04.deviantart.net/fs70/f/2012/363/f/6/clapping_pony_icon___pinkie_pie_by_taritoons-d5pkuzy.gif",
 "http://fc01.deviantart.net/fs71/f/2012/363/c/3/clapping_pony_icon___fluttershy_by_taritoons-d5pl2gh.gif",
 "http://fc00.deviantart.net/fs70/f/2012/363/2/f/clapping_pony_icon___rainbow_dash_by_taritoons-d5pkzrg.gif",

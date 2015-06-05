@@ -3,10 +3,12 @@
 // @description Adds emoticons from MinecraftForum
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2
+// @version     2.1
 // @icon        http://static.minecraftforum.net//public/style_emoticons/default/mobcreeper.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
 // ==/UserScript==

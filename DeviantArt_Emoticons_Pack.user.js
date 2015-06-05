@@ -3,10 +3,12 @@
 // @description Adds DeviantArt emoticons
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     3
+// @version     3.1
 // @icon        http://s.deviantart.net/emoticons/d/dalogo1.gif
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
 // ==/UserScript==
@@ -504,6 +506,7 @@ ExtraEmotes.addEmoticons("da", "DeviantArt", "DeviantArt Official", [
 "http://s.deviantart.net/emoticons/c/clap2.gif",
 "http://s.deviantart.net/emoticons/a/animesweat.gif",
 "http://s.deviantart.net/emoticons/c/cries.gif",
+"http://st.deviantart.net/emoticons/d/deviantart.png",
 "http://s.deviantart.net/emoticons/d/dalogo1.gif"
 ]);
 ExtraEmotes.addEmoticons("dc", "Deviant Community", "DeviantArt Community", [
