@@ -7,7 +7,7 @@
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Logger.js
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
-// @version     5.4
+// @version     5.5
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -20,90 +20,37 @@ function replaceAll(find, replace, str) { return str.replace(new RegExp(find.rep
 
 if (isJQuery()) {
   var logger = new Logger('Extra Emoticons', 6);
-  var siteMapping = (function() {
-    var Mapping = {};
-    var aliased = {};
-    var socialMapping = [];
-    return {
-      'registerMapping': function(name, domain, aliases, social) {
-        if (typeof domain == 'boolean') {
-          social = domain;
-          domain = null;
-        }
-        if (typeof aliases == 'boolean') {
-          social = aliases;
-          aliases = [];
-        }
-        if (domain != null) {
-          Mapping[name] = domain;
-          aliased[name.toLowerCase()] = name;
-          if (aliases != null) {
-            for (var i = 0; i < aliases.length; i++) {
-              aliased[aliases[i].toLowerCase()] = name;
-            }
-          }
-        }
-        if (social) socialMapping.push(name.toLowerCase());
-      },
-      'getMapped': function(id) {
-        var name = this.getName(id);
-        if (name == null) return null;
-        return {'name': name, 'domain': Mapping[name]};
-      },
-      'getName': function(id) {
-        id = aliased[id.toLowerCase()];
-        if (id == undefined) return null;
-        return id;
-      },
-      'getDomain': function(id) {
-        id = this.getName(id);
-        if (id == null) return null;
-        return Mapping[id];
-      },
-      'getIsSite': function(id) {
-        return aliased[id.toLowerCase()] != undefined;
-      },
-      'getFavicon': function (id) {
-        id = this.getDomain(id);
-        if (id == null) return null;
-        if (!startsWith(id, '*')) id = 'www.' + id;
-        return '//' + id.replace(/\*/g, '') + (endsWith(id, '*') ? '' : '/favicon.ico');
-      },
-      'getSocial': function() {
-        return socialMapping;
-      }
-    }
-  })();
-  siteMapping.registerMapping('fav',true);
-  siteMapping.registerMapping('thumb',true);
-  siteMapping.registerMapping('Imgur', 'imgur.com');
-  siteMapping.registerMapping('Google', 'google.com',true);
-  siteMapping.registerMapping('Twitter', 'twitter.com',true);
-  siteMapping.registerMapping('Facebook', 'facebook.com',true);
-  siteMapping.registerMapping('FimFiction', 'fimfiction.net');
-  siteMapping.registerMapping('FanFiction', 'fanfiction.net');
-  siteMapping.registerMapping('DeviantArt', 'deviantart.com',['DA']);
-  siteMapping.registerMapping('Tumblr', 'tumblr.com',true);
-  siteMapping.registerMapping('MyLittleFaceWhen', 'mylittlefacewhen.com');
-  siteMapping.registerMapping('Amazon', 'amazon.com', ['Amazonaws']);
-  siteMapping.registerMapping('PhotoBucket', 'photobucket.com');
-  siteMapping.registerMapping('Disqus', 'disqus.com',true);
-  siteMapping.registerMapping('MySpace', '*x.myspacecdn.com/new/common/images/favicons',true);
-  siteMapping.registerMapping('Blogger', 'blogger.com',true);
-  siteMapping.registerMapping('Pinterist', 'pinterest.com',true);
-  siteMapping.registerMapping('Reddit', 'reddit.com',true);
-  siteMapping.registerMapping('GitHub', 'github.com');
-  siteMapping.registerMapping('EquestriaDaily', 'equestriadaily.com');
-  siteMapping.registerMapping('YouTube', true);
-  siteMapping.registerMapping('LinkedIn', true);
-  siteMapping.registerMapping('WordPress', true);
-  siteMapping.registerMapping('IntenseDebate', true);
-  siteMapping.registerMapping('DropBox', '*dt8kf6553cww8.cloudfront.net/static/images/favicon-vflk5FiAC.ico*');
-  
   //==================================================================================================
   try {
     (function (win) {
-      var version = '5.3.6';
+      var version = '5.5';
+      var siteMapping = SiteMapping();
+      siteMapping.registerMapping('fav', true);
+      siteMapping.registerMapping('thumb', true);
+      siteMapping.registerMapping('Imgur', 'imgur.com');
+      siteMapping.registerMapping('Google', 'google.com',true);
+      siteMapping.registerMapping('Twitter', 'twitter.com',true);
+      siteMapping.registerMapping('Facebook', 'facebook.com',true);
+      siteMapping.registerMapping('FimFiction', 'fimfiction.net');
+      siteMapping.registerMapping('FanFiction', 'fanfiction.net');
+      siteMapping.registerMapping('DeviantArt', 'deviantart.com',['DA']);
+      siteMapping.registerMapping('Tumblr', 'tumblr.com',true);
+      siteMapping.registerMapping('MyLittleFaceWhen', 'mylittlefacewhen.com');
+      siteMapping.registerMapping('Amazon', 'amazon.com', ['Amazonaws']);
+      siteMapping.registerMapping('PhotoBucket', 'photobucket.com');
+      siteMapping.registerMapping('Disqus', 'disqus.com',true);
+      siteMapping.registerMapping('MySpace', '*x.myspacecdn.com/new/common/images/favicons',true);
+      siteMapping.registerMapping('Blogger', 'blogger.com',true);
+      siteMapping.registerMapping('Pinterist', 'pinterest.com',true);
+      siteMapping.registerMapping('Reddit', 'reddit.com',true);
+      siteMapping.registerMapping('GitHub', 'github.com');
+      siteMapping.registerMapping('EquestriaDaily', 'equestriadaily.com');
+      siteMapping.registerMapping('YouTube', true);
+      siteMapping.registerMapping('LinkedIn', true);
+      siteMapping.registerMapping('WordPress', true);
+      siteMapping.registerMapping('IntenseDebate', true);
+      siteMapping.registerMapping('DropBox', '*dt8kf6553cww8.cloudfront.net/static/images/favicon-vflk5FiAC.ico*');
+
       if (typeof (win.ExtraEmotes) === 'undefined') {
         //--------------------------------------------------------------------------------------------------
         //---------------------------------EXTRA EMOTICONS MODULE-------------------------------------------
@@ -172,7 +119,6 @@ if (isJQuery()) {
             handleSubmit(me);
           });
           
-          this.textArea.on('drop.extraemotes', handleDrop);
           if (me.textArea.val() != '') {
             $(document).on('ready', function() {
               me.textArea.val(returnAliases(me.textArea.val()));
@@ -213,10 +159,12 @@ if (isJQuery()) {
 
           var def = getDefaultEmotes();
           var holder = this.makeEmotesPanel('', 'default', true);
-          this.addImagesToPanel(def.Id, holder, def.Emotes, true);
           
-          
-          var dropTipHolder = this.openEmoticonsPanel($(this.childGuest));
+          var button = $(this.childGuest);
+          button.one('click', function() {
+            me.addImagesToPanel(def.Id, holder, def.Emotes, true);
+          });
+          var dropTipHolder = this.openEmoticonsPanel(button);
           dropTipHolder.append(holder);
           /*var legacy = $(getLegacyEmotes());
           legacy.css('display', 'none');
@@ -262,14 +210,12 @@ if (isJQuery()) {
         }
         ExtraEmoticons.prototype.makeSearch = function (label) {
           logger.Log('ExtraEmoticons.makeSearch: start',8);
-          var box = $('<input id="search_emotes_input" placeholder="search emoticons" autocomplete="off" type="text" />');
           var searchbar = makeToolbar('emotes_search_toolbar');
           $(this.toolbar).append(searchbar);
           var li = $('<li class="button-group" />');
           $(searchbar).append(li);
-
           var button = $('<button class="emoticon-expander" data-panel="search" style="font-family:FontAwesome;"></button>');
-          $(li).append(button);
+          li.append(button);
           button.click(function(e) {
             e.stopPropagation();
             var a = $(this).parent();
@@ -294,37 +240,40 @@ if (isJQuery()) {
             }
             e.preventDefault();
           });
-
-          this.search_Tag = this.makeDropTip(button);
-          this.search_Tag.addClass('drop-up').addClass('hide');
-          this.search_Tag.append('<div class="emote-groups" />');
-          
-          this.search = this.makeEmotesPanel('', 'search', true);
-          var panel = this.openEmoticonsPanel(button);
-          panel.append(box);
-          panel.append(this.search);
-
           var me = this;
-          box.on('input', function (e) {
-            if (this.value == '') {
-              me.search_Tag.addClass('hide');
-              me.search.html('');
-            } else {
-              me.refreshSearch(this.value);
-            }
-          });
-          box.on('keydown', function(e) {
-            if (e.keyCode == 13) {
-              e.preventDefault();
-            }
-          });
-          box.click(function(e) {
-            e.stopPropagation();
-          });
+          button.one('click', function() {
+            var box = $('<input id="search_emotes_input" placeholder="search emoticons" autocomplete="off" type="text" />');
 
+            me.search_Tag = me.makeDropTip(button);
+            me.search_Tag.addClass('drop-up').addClass('hide');
+            me.search_Tag.append('<div class="emote-groups" />');
+            
+            me.search = me.makeEmotesPanel('', 'search', true);
+            var panel = me.openEmoticonsPanel(button);
+            panel.append(box);
+            panel.append(me.search);
+            
+            box.on('input', function (e) {
+              if (this.value == '') {
+                me.search_Tag.addClass('hide');
+                me.search.html('');
+              } else {
+                me.refreshSearch(this.value);
+              }
+            });
+            box.on('keydown', function(e) {
+              if (e.keyCode == 13) {
+                e.preventDefault();
+              }
+            });
+            box.click(function(e) {
+              e.stopPropagation();
+            });
+
+          });
           logger.Log('ExtraEmoticons.makeSearch: end',8);
         }
-        ExtraEmoticons.prototype.makeButton = function (name, label, image) {
+        ExtraEmoticons.prototype.makeButton = function (name, label, image, callBack) {
           logger.Log('ExtraEmoticons.makeButton: {0}:{1}', 7, name, label);
           var link = $('<button class="drop-down-expander emoticon-expander" data-panel="' + name + '" title="' + label + ' Emoticons" />');
           var me = this;
@@ -336,6 +285,7 @@ if (isJQuery()) {
               $(this).parent().find('.drop-down').removeClass('reverse');
             }
           });
+          link.one('click', callBack);
           var img = $('<img class="emote-button" src="' + image.split('|')[0] + '"></img>');
           link.append(img);
           if (!img[0].complete) {
@@ -397,19 +347,34 @@ if (isJQuery()) {
         ExtraEmoticons.prototype.addImageToPanel = function (id, holder, item) {
           var title = getTitle(item);
           var mote = $('<div class="extra_emote"></div>');
-          var img = $('<img title="' + id + title + '" src="' + item.split('|')[0] + '" />');
-          $(mote).append(img);
+          var img = $('<img title="' + id + title + '" src="' + item.split('|')[0].split('?')[0] + '" />');
+          mote.append(img);
+          img.on('dragstart', function(event) {
+            var data = event.originalEvent.dataTransfer.getData('Text/plain');
+            
+            if (data && data.trim().indexOf('[') == 0) {
+              data = data.split('\n');
+              for (var i = 0; i < data.length; i++) {
+                data[i] = data[i].trim().replace(/\[/g, '').replace(/\]/g, '');
+              }
+              event.originalEvent.dataTransfer.setData('Text/plain', data.join(''));
+            } else {
+              event.originalEvent.dataTransfer.setData('Text/plain', id + title);
+            }
+            
+          });
           if (!img[0].complete) {
-            $(img).css('display', 'none');
+            img.css('display', 'none');
             var spin = $('<i style="font-size:30px;color:rgb(200,200,140);" class="fa fa-spinner fa-spin" />');
-            $(mote).append(spin);
-            $(img).on('load error', function () {
-              $(img).css('display', '');
+            mote.append(spin);
+            img.on('load error', function () {
+              img.css('display', '');
               spin.remove();
             });
           }
+          
           var newA = $('<a data-function="emoticon" data-emoticon="' + (id + title) + '" />');
-          $(newA).append(mote);
+          newA.append(mote);
           $(holder).append(newA);
         }
         ExtraEmoticons.prototype.findMatchingEmotes = function (name) {
@@ -520,16 +485,20 @@ if (isJQuery()) {
         }
         ExtraEmoticons.prototype.addEmoticons = function (id, name, title, emotes, normalize) {
           var holder = this.makeEmotesPanel(id, name, normalize);
-          this.addImagesToPanel(id, holder, emotes);
-          this.makeButton(name, title, emotes[emotes.length - 1]).append(holder);
+          var me = this;
+          this.makeButton(name, title, emotes[emotes.length - 1], function() {
+            me.addImagesToPanel(id, holder, emotes);
+          }).append(holder);
         }
         ExtraEmoticons.prototype.addRaw = function (id, name, title, emotes, buttonImage) {
           if (buttonImage == null) {
             buttonImage = 'http://static.fimfiction.net/images/icons/quote.png'
           }
           var holder = this.makeEmotesPanel(id, name, false);
-          this.addRawsToPanel(holder, emotes);
-          this.makeButton(name, title, buttonImage).append(holder);
+          var me = this;
+          this.makeButton(name, title, buttonImage, function() {
+            me.addRawsToPanel(holder, emotes);
+          }).append(holder);
         }
         
         function ExtraEmotesAPI(hooks) {
@@ -663,6 +632,61 @@ if (isJQuery()) {
       //----------------------------------------FUNCTIONS-------------------------------------------------
       //--------------------------------------------------------------------------------------------------
       
+      function SiteMapping() {
+        var Mapping = {};
+        var aliased = {};
+        var socialMapping = [];
+        return {
+          'registerMapping': function(name, domain, aliases, social) {
+            if (typeof domain == 'boolean') {
+              social = domain;
+              domain = null;
+            }
+            if (typeof aliases == 'boolean') {
+              social = aliases;
+              aliases = [];
+            }
+            if (domain != null) {
+              Mapping[name] = domain;
+              aliased[name.toLowerCase()] = name;
+              if (aliases != null) {
+                for (var i = 0; i < aliases.length; i++) {
+                  aliased[aliases[i].toLowerCase()] = name;
+                }
+              }
+            }
+            if (social) socialMapping.push(name.toLowerCase());
+          },
+          'getMapped': function(id) {
+            var name = this.getName(id);
+            if (name == null) return null;
+            return {'name': name, 'domain': Mapping[name]};
+          },
+          'getName': function(id) {
+            id = aliased[id.toLowerCase()];
+            if (id == undefined) return null;
+            return id;
+          },
+          'getDomain': function(id) {
+            id = this.getName(id);
+            if (id == null) return null;
+            return Mapping[id];
+          },
+          'getIsSite': function(id) {
+            return aliased[id.toLowerCase()] != undefined;
+          },
+          'getFavicon': function (id) {
+            id = this.getDomain(id);
+            if (id == null) return null;
+            if (!startsWith(id, '*')) id = 'www.' + id;
+            return '//' + id.replace(/\*/g, '') + (endsWith(id, '*') ? '' : '/favicon.ico');
+          },
+          'getSocial': function() {
+            return socialMapping;
+          }
+        }
+      }
+      
       function Name(url) {
         url = url.split('?')[0];
         var panels = getVirtualEmotes();
@@ -726,34 +750,6 @@ if (isJQuery()) {
         return 'https://static.fimfiction.net/images/emoticons/' + name + '.png';
       }
 
-      function handleDrop(event) {
-        logger.Log(event.originalEvent.dataTransfer.getData('text/plain'),20);
-        var links = event.originalEvent.dataTransfer.getData('text/plain').split('\n');
-        var inserted = '';
-        for (var i = 0; i < links.length; i++) {
-          links[i] = links[i].trim().replace(/\[/g, '').replace(/\]/g, '');
-          if (links[i] != '') {
-            var insert = '';
-            if (startsWith(links[i].replace('[', ''), 'javascript:smilie(')) {
-              insert = links[i].replace('javascript:smilie("', '').replace('");', '');
-              insert = insert.replace('javascript:smilie(\'', '').replace('\');', '');
-            } else if (startsWith(links[i].replace('[', ''), 'insertemote:')) {
-              insert = links[i].replace('insertemote:', '');
-            } else if (startsWith(links[i], ':') && endsWith(links[i], ':')) {
-              insert = links[i];
-            }
-          }
-          if (insert != '') {
-            inserted += insert;
-          }
-        }
-        if (inserted != '') {
-          logger.Log('InsertTextAt: ' + inserted);
-          InsertTextAt(this, decodeURIComponent(inserted));
-          return false;
-        }
-      }
-
       var handling = false;
       function handleSubmit(me) {
         if (!handling) {
@@ -794,23 +790,20 @@ if (isJQuery()) {
         var store = getVirtualEmotes();
         for (var i = 0; i < store.length; i++) {
           if (!store[i].External) {
-            var id = store[i].Id;
-            var name = store[i].Name;
-            var title = store[i].Title;
-            var norm = store[i].Normalized;
-
-            var holder = hook.makeEmotesPanel(id, name, norm);
-
-            var emotes = store[i].rawEmotes;
-            if (store[i].IsRaw) {
-              hook.addRawsToPanel(holder, emotes);
-              hook.makeButton(name, title, store[i].Image).append(holder);
-            } else {
-              hook.addImagesToPanel(id, holder, emotes, norm);
-              hook.makeButton(name, title, emotes[emotes.length - 1]).append(holder);
-            }
+            restoreEmotes(hook, store[i]);
           }
         }
+      }
+      
+      function restoreEmotes(hook, data) {
+        var holder = hook.makeEmotesPanel(data.Id, data.Name, data.Normalized);
+        hook.makeButton(data.Name, data.Title, data.Image, function() {
+          if (data.IsRaw) {
+            hook.addRawsToPanel(holder, data.rawEmotes);
+          } else {
+            hook.addImagesToPanel(data.id, holder, data.rawEmotes, data.Normalized);
+          }
+        }).append(holder);
       }
 
       var AllEmotes = null;
@@ -914,6 +907,8 @@ if (isJQuery()) {
         this.Image = null;
         if (this.IsRaw) {
           this.Image = img;
+        } else {
+          this.Image = emotes[emotes.length - 1];
         }
 
         this.Emotes = [];
@@ -1320,23 +1315,4 @@ function getEditCommentButtons() {
   var result = $("a[title='Edit this comment'][extraemotesInit!=true]");
   result.attr('extraemotesInit', 'true');
   return result;
-}
-
-//--------------------------------------------------------------------------------------------------
-//--------------------------------------API FUNCTIONS-----------------------------------------------
-//--------------------------------------------------------------------------------------------------
-
-//==unused=//
-function selectElementContents(el) {
-  if (window.getSelection && document.createRange) {
-    var sel = window.getSelection();
-    var range = document.createRange();
-    range.selectNodeContents(el);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  } else if (document.selection && document.body.createTextRange) {
-    var textRange = document.body.createTextRange();
-    textRange.moveToElementText(el);
-    textRange.select();
-  }
 }
