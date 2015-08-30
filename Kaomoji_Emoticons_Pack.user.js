@@ -3,7 +3,7 @@
 // @description Adds all japanese smilies as emoticons
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.1
+// @version     2.2
 // @icon        http://www.chatslang.com/images/main/kaomoji.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -15,9 +15,43 @@
 // ==/UserScript==
 
 ExtraEmotes.addRaw("jp", "Japan", "Kaomoji", ([
+"━╤デ╦︻(▀̿̿Ĺ̯̿̿▀̿ ̿)|Cool",
+"ლ(▀̿̿Ĺ̯̿̿▀̿ლ)|Cool2",
+"┬━┬ノ(▀̿̿Ĺ̯̿̿▀̿ ̿ノ)Cool Table",
+"ᗜಠ o ಠ)¤=[]:::::>|Sword1",
+"(つ･･)つ¤=[]:::::::>|Sword2",
+"~~~~~~~[]=¤ԅ(ˊᗜˋ* )੭|Sword3",
+"<====]-o¯\_༼☯‿☯✿༽ﾉ|Sword4",
+"╰( ⁰ ਊ ⁰ )━☆ﾟ.*･｡ﾟ|Magic",
+"(つ˵•́ω•̀˵)つ━☆ﾟ.*･｡ﾟ҉̛༽̨҉҉ﾉ|Magic2",
+". * ･ ｡ﾟ☆━੧༼ •́ ヮ •̀ ༽୨|Magic3",
+"╰( ͡° ͜ʖ ͡° )つ──☆*:・ﾟ|Magic4",
+"o͡͡͡╮༼  ಠДಠ ༽╭o͡͡͡━☆ﾟ.*･｡ﾟ|Magic5",
+"ᕕ( ⁰ ▽ ⁰ )ᕗ|Dance",
+"♪~ ᕕ( ᐛ )ᕗ|Dance2",
+"ᕕ( ͡° ͜ʖ ͡°)ᕗ|Dance3",
+"ᕕ(⌐■_■)ᕗ ♪♬|Dance4",
+"┏(-_-)┓┏(-_-)┛┗(-_-﻿ )┓|Dance5",
+"┴┬┴┤( ͡° ͜ʖ├┬┴┬|Wall1",
+"┬┴┬┴┤･ω･)ﾉ├┬┴┬┴|Wall2",
+"ლ(~•̀︿•́~)つ︻̷┻̿═━一|Gun1",
+"━╤デ╦︻(▀̿̿Ĺ̯̿̿▀̿ ̿)|Gun2",
+"ᕕ[*•̀͜ʖ•́*]︻̷┻̿═━一}Gun3",
+"໒(:ರωರ:)〜︻̷┻̿═━|Gun4",
+"⁞ つ: •̀ ⌂ •́ : ⁞-︻╦̵̵͇̿̿̿̿══╤─|Gun5",
+"╾━╤デ╦︻ԅ། ･ิ _ʖ ･ิ །ง|Gun6",
+"[ﾉಠೃಠ]︻̷┻̿═━一|Gun7",
+"ᕕ╏ ͡ᵔ ‸ ͡ᵔ ╏و︻̷┻̿═━一|Gun8",
+"╾━╤デ╦︻|Gun9",
+"▄︻̷̿┻̿═━一|Gun10",
+"(⌐■_■)–︻╦╤─|Gun11",
+"︻╦̵̵͇̿̿̿̿══╤─|Gun12",
+"༼ຈل͜ຈ༽ﾉ·︻̷┻̿═━一|Gun13",
+"┌( ͝° ͜ʖ͡°)=ε/̵͇̿̿/’̿’̿ ̿|Gun14",
+"( ͝ಠ ʖ ಠ)=ε/̵͇̿̿/’̿’̿ ̿|Gun15",
 "O(<>\'<>)O|Aang",
 "-_-+|Angry1",
-"(((p(>o<)q)))|Angry",
+"(((p(>o<)q)))|Angry2",
 "(◣_◢)|Angry3",
 "ヽ(#｀_つ´)ﾉﾌﾟ|Angry4",
 "o┤*｀□´ *├o|Angry5",
@@ -305,7 +339,12 @@ ExtraEmotes.addRaw("jp", "Japan", "Kaomoji", ([
 "T.T|Sad",
 "Y_Y|Sad2",
 "∑(゜Д゜;)|Scared",
-".∵･(ﾟДﾟ)|Scared",
+".∵･(ﾟДﾟ)|Scared2",
+"ԅ(☉Д☉)╮|Scared3",
+"ʕ⊙ᴥ⊙ʔ|Scared4",
+"╰(ಥдಥ)ノ|Scared5",
+"(ू˃̣̣̣̣̣̣︿˂̣̣̣̣̣̣ ू)|Scared6",
+"ᕦ[ •́ ﹏ •̀ ]⊃¤=[]::::::::>|Scared7",
 "(☄ฺ◣д◢)☄ฺ|Scaring",
 "(╯‵Д′)╯|Scary",
 "ಠᴗಠ|Scheming",
@@ -317,6 +356,9 @@ ExtraEmotes.addRaw("jp", "Japan", "Kaomoji", ([
 "(ﾟ皿ﾟ)ｒ┏┳－*|Shooting2",
 "¯\\(°_°)/¯|Shrugging",
 "¯\\_(ツ)_/¯|Shrugging2",
+"¯\_(⊙_ʖ⊙)_/¯|Shrugging3",
+"乁| ･ 〰 ･ |ㄏ|Shrugging4",
+"¯\_( ͠° ͟ʖ °͠ )_/¯|Shrugging5",
 "(*^_^*)|Shy",
 "(#^.^#)|Shy2",
 "(#/。\\#)|Shy3",
