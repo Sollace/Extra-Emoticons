@@ -3,8 +3,8 @@
 // @description Adds all emoticons from Twitch.tv to FimFiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.1
-// @icon        http://www.twitch.tv/favicon.ico
+// @version     2.2
+// @icon        http://sollace.github.io/emoticons/twitch/twitch.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
@@ -13,58 +13,77 @@
 // @grant       none
 // ==/UserScript==
 
-ExtraEmotes.addEmoticons("tt", "Twitch", "Twitch", ([
-"http://www.twitch.tv/favicon.ico|twitchlogo",
+function twitchify(emotes) {
+  for (var i = 0; i < emotes.length; i++) {
+    if (emotes[i].indexOf('http') != 0) {
+      emotes[i] = 'http://sollace.github.io/emoticons/twitch/' + emotes[i];
+    }
+  }
+  return emotes;
+}
 
+ExtraEmotes.addUrlMatcher(function(url, match) {
+  if (url.indexOf('www.chatslang.com') != -1) {
+    url = url.split('/').reverse()[0].split('.')[0];
+    match = match.split('/').reverse()[0].split('.')[0];
+    return url == match;
+  }
+  return false;
+});
+
+ExtraEmotes.addEmoticons("tt", "Twitch", "Twitch", twitchify([
 //Twitch
-"http://www.chatslang.com/images/shortcuts/twitch/angry.png",
-"http://www.chatslang.com/images/shortcuts/twitch/big_grin.png",
-"http://www.chatslang.com/images/shortcuts/twitch/bored.png",
-"http://www.chatslang.com/images/shortcuts/twitch/confused.png",
-"http://www.chatslang.com/images/shortcuts/twitch/cool.png",
-"http://www.chatslang.com/images/shortcuts/twitch/heart.png",
-"http://www.chatslang.com/images/shortcuts/twitch/pirate.png",
-"http://www.chatslang.com/images/shortcuts/twitch/sad.png",
-"http://www.chatslang.com/images/shortcuts/twitch/smile.png",
-"http://www.chatslang.com/images/shortcuts/twitch/sticking_tongue_out.png",
-"http://www.chatslang.com/images/shortcuts/twitch/surprised.png",
-"http://www.chatslang.com/images/shortcuts/twitch/undecided.png",
-"http://www.chatslang.com/images/shortcuts/twitch/wink.png",
-"http://www.chatslang.com/images/shortcuts/twitch/winking.png",
+"smile.png",
+"sad.png",
+"big_grin.png",
+"angry.png",
+"bored.png",
+"confused.png",
+"cool.png",
+"surprised.png",
+"undecided.png",
+"winking.png",
+"sticking_tongue_out.png",
+"wink.png",
+"pirate.png",
+"heart.png",
 
 //Twitch Turbo
-"http://www.chatslang.com/images/shortcuts/twitch/purple/angry.png|:t:angry",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/big_grin.png|:t:big_grin",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/confused.png|:t:confused",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/cool.png|:t:cool",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/heart.png|:t:heart",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/pirate.png|:t:pirate",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/sad.png|:t:sad",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/sleeping.png|:t:sleeping",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/smile.png|:t:smile",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/sticking_tongue_out.png|:t:sticking_tongue_out",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/surprised.png|:t:surprised",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/undecided.png|:t:undecided",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/winking_with_tongue_out.png|:t:winking_with_tongue_out",
-"http://www.chatslang.com/images/shortcuts/twitch/purple/winking.png|:t:winking",
+"purple/smile.png|:t:smile",
+"purple/sad.png|:t:sad",
+"purple/big_grin.png|:t:big_grin",
+"purple/angry.png|:t:angry",
+"purple/sleeping.png|:t:sleeping",
+"purple/confused.png|:t:confused",
+"purple/cool.png|:t:cool",
+"purple/surprised.png|:t:surprised",
+"purple/heart.png|:t:heart",
+"purple/undecided.png|:t:undecided",
+"purple/winking.png|:t:winking",
+"purple/sticking_tongue_out.png|:t:sticking_tongue_out",
+"purple/winking_with_tongue_out.png|:t:wink",
+"purple/pirate.png|:t:pirate",
 
 //Monkey Faces
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/angry.png|:m:angry",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/big_grin.png|:m:big_grin",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/confused.png|:m:confused",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/cool.png|:m:cool",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/crazy.png|:m:crazy",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/dunce.png|:m:dunce",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/in_love.png|:m:in_love",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/mouth_shut.png|:m:mouth_shut",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/ninja.png|:m:ninja",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/pirate.png|:m:pirate",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/sad.png|:m:sad",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/sleeping.png|:m:sleeping",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/smile.png|:m:smile",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/smoking.png|:m:smoking",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/sticking_tongue_out.png|:m:sticking_tongue_out",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/surprised.png|:m:surprised",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/undecided.png|:m:undecided",
-"http://www.chatslang.com/images/shortcuts/twitch/monkey/winking.png|:m:winking",
+"monkey/smile.png|:m:smile",
+"monkey/sad.png|:m:sad",
+"monkey/big_grin.png|:m:big_grin",
+"monkey/angry.png|:m:angry",
+"monkey/sleeping.png|:m:sleeping",
+"monkey/confused.png|:m:confused",
+"monkey/cool.png|:m:cool",
+"monkey/surprised.png|:m:surprised",
+"monkey/in_love.png|:m:in_love",
+"monkey/love_it.png|:m:love_it",
+"monkey/undecided.png|:m:undecided",
+"monkey/winking.png|:m:winking",
+"monkey/sticking_tongue_out.png|:m:sticking_tongue_out",
+"monkey/crazy.png|:m:crazy",
+"monkey/dunce.png|:m:dunce",
+"monkey/mouth_shut.png|:m:mouth_shut",
+"monkey/ninja.png|:m:ninja",
+"monkey/pirate.png|:m:pirate",
+"monkey/smoking.png|:m:smoking",
+
+"twitch.png"
 ]).reverse());

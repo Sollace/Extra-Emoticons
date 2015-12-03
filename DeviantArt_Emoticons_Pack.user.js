@@ -3,7 +3,7 @@
 // @description Adds DeviantArt emoticons
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     3.1
+// @version     3.2
 // @icon        http://s.deviantart.net/emoticons/d/dalogo1.gif
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -36,7 +36,6 @@ ExtraEmotes.addEmoticons("da", "DeviantArt", "DeviantArt Official", [
 "http://s.deviantart.net/emoticons/h/hexentanz.gif",
 "http://s.deviantart.net/emoticons/c/cweeks.gif",
 "http://s.deviantart.net/emoticons/l/llama.gif",
-"http://fc00.deviantart.net/fs71/f/2010/101/9/c/Backflip_Llama_by_Fred_Eye_Inc.gif|llama_backflip",
 "http://s.deviantart.net/emoticons/j/jedi.gif",
 "http://s.deviantart.net/emoticons/a/ahoy.gif",
 "http://s.deviantart.net/emoticons/s/saddrunk.gif",
@@ -510,31 +509,31 @@ ExtraEmotes.addEmoticons("da", "DeviantArt", "DeviantArt Official", [
 "http://s.deviantart.net/emoticons/d/dalogo1.gif"
 ]);
 ExtraEmotes.addEmoticons("dc", "Deviant Community", "DeviantArt Community", [
-"http://fc07.deviantart.net/fs36/f/2008/249/3/c/_balloon__by_NerdXV.gif|balloon-0",
-"http://fc05.deviantart.net/fs71/f/2010/025/9/3/931ab944fe07de5d338210fd1b5751a8.gif|balloon-1",
-"http://fc06.deviantart.net/fs20/f/2007/228/9/7/Heart_Balloon_Emote_by_artsyfartsymarcy.gif|balloon-2",
-"http://fc09.deviantart.net/fs9/i/2006/050/1/9/_balloon__by_Mrichston.gif|balloon-3",
-"http://fc07.deviantart.net/fs44/f/2009/099/7/f/Emote_Balloon_by_TheRockster.gif|balloon-4",
-"http://fc07.deviantart.net/fs40/f/2009/052/9/6/The_circle_of_life__by_xXAli_StarXx.gif|balloon-5",
-"http://fc05.deviantart.net/fs44/f/2009/157/e/c/Twin_highfive_balloons_by_MixedMilkChOcOlate.gif|balloon-6",
-"http://fc06.deviantart.net/fs71/f/2010/215/b/1/Balloons_V3_by_Synfull.gif|balloon-7",
-"http://fc09.deviantart.net/fs10/i/2006/121/7/d/_balloon2__by_Mrichston.gif|balloon-8",
-"http://fc00.deviantart.net/fs42/f/2009/061/e/f/Balloon_by_flashfrog.gif|balloon-9",
-"http://fc08.deviantart.net/fs43/f/2009/099/3/4/34308ffb93b9017fa210fdb71ffec781.gif|balloon-11",
-"http://fc02.deviantart.net/fs71/f/2011/237/c/d/x_hearts_x_by_prettyfarna30-d47re4c.gif|balloon-12",
-"http://fc02.deviantart.net/fs70/f/2013/330/b/3/evil_clown____4_nanoemo_by_mirz_alt-d6vp3fg.png|balloon-13",
-"http://fc01.deviantart.net/fs71/f/2010/225/5/d/happy_ending_by_noonrotation.gif|balloon-14",
-"http://fc03.deviantart.net/fs70/f/2012/359/c/1/balloon_mote_by_dully101-d5p3roj.gif|balloon-15",
-"http://fc08.deviantart.net/fs35/f/2008/292/8/0/8005312eebb53c27c68eb3a51f54b8ec.gif|big_cookie",
-"http://fc05.deviantart.net/fs71/f/2010/211/4/9/cookie_chase_by_LedMaiden.gif",
-"http://fc06.deviantart.net/fs23/f/2007/322/4/3/_cookies__by_Aurablade.gif|cookies",
-"http://fc09.deviantart.net/fs11/i/2006/256/6/e/cookie_thief_emote_by_Little_Vampire.gif|cookie_thief",
-"http://fc04.deviantart.net/fs71/f/2013/241/e/7/run_away_by_cookiemagik-d6k6ej5.gif",
-"http://fc00.deviantart.net/fs26/f/2008/145/e/7/_cookietease__by_Chimpantalones.gif|cookieteas",
-"http://fc01.deviantart.net/fs71/f/2013/227/a/3/come_with_me_by_cookiemagik-d6i9j77.gif",
-"http://fc01.deviantart.net/fs70/f/2013/335/2/f/_twilightsparkle__by_zoiby-d6wdcd7.gif|twilight",
-"http://fc06.deviantart.net/fs70/f/2013/335/7/4/_fluttershy__by_zoiby-d6wd858.gif|fluttershy",
-"http://fc07.deviantart.net/fs70/f/2013/335/9/7/_applejack__by_zoiby-d6wd4me.gif|applejack",
-"http://fc08.deviantart.net/fs70/f/2013/211/0/7/_rainbowdash__by_zoiby-d6ftlb7.gif|rainbow_dash",
-"http://fc06.deviantart.net/fs70/f/2013/207/a/e/_pinkiepie__by_zoiby-d6f8kx4.gif|pinkie_pie"
+"http://orig11.deviantart.net/5e32/f/2008/249/3/c/_balloon__by_nerdxv.gif|balloon-0",
+"http://orig07.deviantart.net/71fb/f/2010/025/9/3/931ab944fe07de5d338210fd1b5751a8.gif|balloon-1",
+"http://orig02.deviantart.net/34b3/f/2007/228/9/7/heart_balloon_emote_by_artsyfartsymarcy.gif|balloon-2",
+"http://img07.deviantart.net/6f51/i/2006/050/1/9/_balloon__by_mrichston.gif|balloon-3",
+"http://orig02.deviantart.net/df47/f/2009/099/7/f/emote_balloon_by_therockster.gif|balloon-4",
+"http://orig05.deviantart.net/9a6c/f/2009/052/9/6/the_circle_of_life__by_xxali_starxx.gif|balloon-5",
+"http://orig10.deviantart.net/cf38/f/2009/157/e/c/twin_highfive_balloons_by_mixedmilkchocolate.gif|balloon-6",
+"http://orig12.deviantart.net/be48/f/2010/215/b/1/balloons_v3_by_synfull.gif|balloon-7",
+"http://img12.deviantart.net/aa01/i/2006/121/7/d/_balloon2__by_mrichston.gif|balloon-8",
+"http://orig05.deviantart.net/ac3e/f/2009/061/e/f/balloon_by_flashfrog.gif|balloon-9",
+"http://orig06.deviantart.net/2586/f/2009/099/3/4/34308ffb93b9017fa210fdb71ffec781.gif|balloon-11",
+"http://orig15.deviantart.net/17d1/f/2011/237/c/d/x_hearts_x_by_prettyfarna30-d47re4c.gif|balloon-12",
+"http://orig05.deviantart.net/40e6/f/2013/330/b/3/evil_clown____4_nanoemo_by_mirz_alt-d6vp3fg.png|balloon-13",
+"http://orig05.deviantart.net/b43e/f/2010/225/5/d/happy_ending_by_noonrotation.gif|balloon-14",
+"http://orig08.deviantart.net/88f8/f/2012/359/c/1/balloon_mote_by_dully101-d5p3roj.gif|balloon-15",
+"http://orig02.deviantart.net/24f9/f/2008/292/8/0/8005312eebb53c27c68eb3a51f54b8ec.gif|big_cookie",
+"http://orig00.deviantart.net/f836/f/2010/211/4/9/cookie_chase_by_ledmaiden.gif",
+"http://orig02.deviantart.net/5aa8/f/2007/322/4/3/_cookies__by_aurablade.gif|cookies",
+"http://img02.deviantart.net/9fab/i/2006/256/6/e/cookie_thief_emote_by_little_vampire.gif|cookie_thief",
+"http://orig12.deviantart.net/8f24/f/2013/241/e/7/run_away_by_cookiemagik-d6k6ej5.gif",
+"http://orig15.deviantart.net/5eaf/f/2008/145/e/7/_cookietease__by_chimpantalones.gif|cookieteas",
+"http://orig00.deviantart.net/d6af/f/2013/227/a/3/come_with_me_by_cookiemagik-d6i9j77.gif",
+"http://orig03.deviantart.net/20b3/f/2013/335/2/f/_twilightsparkle__by_zoiby-d6wdcd7.gif|twilight",
+"http://orig06.deviantart.net/c254/f/2013/335/7/4/_fluttershy__by_zoiby-d6wd858.gif|fluttershy",
+"http://orig10.deviantart.net/897b/f/2013/335/9/7/_applejack__by_zoiby-d6wd4me.gif|applejack",
+"http://orig15.deviantart.net/cac6/f/2013/211/0/7/_rainbowdash__by_zoiby-d6ftlb7.gif|rainbow_dash",
+"http://orig08.deviantart.net/98fc/f/2013/207/a/e/_pinkiepie__by_zoiby-d6f8kx4.gif|pinkie_pie"
 ]);

@@ -7,7 +7,7 @@
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Logger.js
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
-// @version     5.5
+// @version     5.5.1
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -15,8 +15,7 @@
 if (isJQuery()) {
   function reverse(me) { return me.split('').reverse().join() }
   function contains(me, it) { return me.indexOf(it) != -1 }
-  function startsWith(me, it) { return me.indexOf(it) == 0 }
-  function endsWith(me, it) { return startsWith(reverse(me), reverse(it)) }
+  function endsWith(me, it) { return reverse(me).indexOf(reverse(it)) == 0; }
   function replaceAll(find, replace, str) { return str.replace(new RegExp(find.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'g'), replace); }
   
   var logger = new Logger('Extra Emoticons', 6);
@@ -321,7 +320,7 @@ if (isJQuery()) {
           },
           'addRawToPanel': function (holder, item) {
             var title = item;
-            if (contains(item, '|')) {
+            if (item.indexOf('|') != -1) {
               var splitten = SplitTitle(item);
               if (splitten[1] != '') {
                 item = splitten[0];
@@ -330,7 +329,7 @@ if (isJQuery()) {
                 title = splitten[0];
               }
             }
-            if (contains(item, '\'')) {
+            if (item.indexOf('\'') != -1) {
               item = item.replace('\'', '\\\'');
             }
             var newA = $('<a data-function="emoticon" data-emoticon="' + item + '" />');
@@ -348,11 +347,11 @@ if (isJQuery()) {
           'addImageToPanel': function (id, holder, item) {
             var title = getTitle(item);
             var mote = $('<div class="extra_emote"></div>');
-            var img = $('<img title="' + id + title + '" src="' + item.split('|')[0].split('?')[0] + '" />');
+            var img = $('<img title="' + id + title + '" src="' + CutProto(item).split('|')[0].split('?')[0] + '" />');
             mote.append(img);
             img.on('dragstart', function(event) {
               var data = event.originalEvent.dataTransfer.getData('Text/plain');
-
+              
               if (data && data.trim().indexOf('[') == 0) {
                 data = data.split('\n');
                 for (var i = 0; i < data.length; i++) {
@@ -389,7 +388,7 @@ if (isJQuery()) {
               var group = isGroupSearch(terms, panels);
 
               terms = '(' + terms.join(' ') + ')';
-              if (contains(name, 'social') || contains(name, 'media')) {
+              if (name.indexOf('social') != -1 || name.indexOf('media') != -1) {
                 terms += '|(' + siteMapping.getSocial().join(')|(') + ')';
               }
 
@@ -400,7 +399,7 @@ if (isJQuery()) {
                   if (group.title[k] == panels[i].Name) named = true;
                 }
                 for (var k = panels[i].Emotes.length - 1; k >= 0; k--) {
-                  if (named || (!panels[i].IsRaw ? panels[i].Emotes[k].replace(/http:/g,'').replace(/https:/g,'') + panels[i].EmoteTitles[k].replace(/\:/g,'') : panels[i].EmoteTitles[k]).toLowerCase().match(terms)) {
+                  if (named || (!panels[i].IsRaw ? panels[i].Emotes[k].replace('sollace.github.io','www.github.com') + panels[i].EmoteTitles[k].replace(/\:/g,'') : panels[i].EmoteTitles[k]).toLowerCase().match(terms)) {
                     results.push({
                       raw: panels[i].IsRaw,
                       emote: panels[i].Emotes[k] + '|' + (panels[i].Id == null || panels[i].IsRaw ? '' : panels[i].Id) + panels[i].EmoteTitles[k]
@@ -408,7 +407,7 @@ if (isJQuery()) {
                   }
                 }
               }
-              if (contains(name, 'social') || contains(name, 'media')) {
+              if (name.indexOf('social') != -1 || name.indexOf('media') != -1) {
                 group.title.push('!autoFilled$social');
                 group.type.push('url');
               }
@@ -446,9 +445,7 @@ if (isJQuery()) {
           },
           'refreshSearch': function (term) {
             this.search.html('');
-            while (contains(term, '  ')) {
-              term = term.replace('  ', ' ');
-            }
+            term = cleanse(term);
 
             var results = this.findMatchingEmotes(term);
             logger.Log('Refresh search: terms="' + term + '" ' + results.length + ' results',4);
@@ -484,10 +481,10 @@ if (isJQuery()) {
               }
             }
           },
-          'addEmoticons': function (id, name, title, emotes, normalize) {
+          'addEmoticons': function (id, name, title, emotes, normalize, buttonImage) {
             var holder = this.makeEmotesPanel(id, name, normalize);
             var me = this;
-            this.makeButton(name, title, emotes[emotes.length - 1], function() {
+            this.makeButton(name, title, buttonImage ? buttonImage : emotes[emotes.length - 1], function() {
               me.addImagesToPanel(id, holder, emotes);
             }).append(holder);
           },
@@ -519,11 +516,12 @@ if (isJQuery()) {
           },
         //==API FUNCTION==//
         //Adds a collection of image emoticons
-          'addEmoticons': function (id, name, title, emotes, normalize) {
+          //Optional: buttonImage
+          'addEmoticons': function (id, name, title, emotes, normalize, buttonImage) {
             for (var i = 0; i < this.modules.length; i++) {
-              this.modules[i].addEmoticons(id, name, title, emotes, normalize);
+              this.modules[i].addEmoticons(id, name, title, emotes, normalize, buttonImage);
             }
-            recordEmotesPanel(false, id, name, title, emotes, emotes[emotes.length - 1], normalize);
+            recordEmotesPanel(false, id, name, title, emotes, buttonImage, normalize);
             logger.Log('addEmoticons: finalizing...',11);
           },
         //==API FUNCTION==//
@@ -534,6 +532,11 @@ if (isJQuery()) {
             }
             recordEmotesPanel(true, id, name, title, emotes, buttonImage, false);
             logger.Log('addRaw: finalizing...',11);
+          },
+        //==API FUNCTION==//
+        //Adds a matching function to identify emoticon images by url
+          'addUrlMatcher': function(matcher) {
+            addMatcher(matcher);
           },
           'getVersion': function() {
             function parseVersion(s) {
@@ -578,6 +581,10 @@ if (isJQuery()) {
                 return this.valueOf() - a.valueOf();
               }
             };
+          },
+          'valueOf': function valueOf() { return this.toString(); },
+          'toString': function toString() {
+            return '[object API] {\n  getLogger() -> [Object Logger]\n  addEmoticons(id, name, title, emotes, normalize [, buttonImage])\n  addRaw(id, name, title, emotes, buttonImage)\n  addUrlMatcher(matcher (url, emoticon) -> Boolean)';
           }
         };
         
@@ -591,30 +598,28 @@ if (isJQuery()) {
         } else {
           logger.Log('no mainHook found, creating dummy object',20);
           win.ExtraEmotes = {
-            addEmoticons: function (id, name, title, emotes, normalize) {},
+            addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {},
             addRaw: function (id, name, title, emotes, buttonImage) { },
             getLogger: function () { return logger; }
           };
         }
-
-        win.ExtraEmotes.toString = function toString() {
-          return '[object API] {\ngetLogger() -> Object\naddEmoticons(id, name, title, emotes, normalize)\naddRaw(id, name, title, emotes, buttonImage)\n}';
-        }
+        
         lockDown(win.ExtraEmotes);
         logger.Log('setup completed succesfully',20);
       }
 
       if (win != window) {
         window.ExtraEmotes = lockDown({
-          'addEmoticons': function(id, name, title, emotes, normalize) {win.ExtraEmotes.addEmoticons(id, name, title, emotes, normalize);},
+          'addEmoticons': function(id, name, title, emotes, normalize, buttonImage) {win.ExtraEmotes.addEmoticons(id, name, title, emotes, normalize, buttonImage);},
           'addRaw': function(id, name, title, emotes, buttonImage) {win.ExtraEmotes.addRaw(id, name, title, emotes, buttonImage);},
           'getLogger': function() {return win.ExtraEmotes.getLogger();},
           'getVersion': function() {return win.ExtraEmotes.getVersion();},
+          'valueOf': function valueOf() { return this.toString(); },
           'toString': function toString() {return win.ExtraEmotes.toString();}
         });
+        logger.Log('created proxy to unsafeWindow',20);
       }
-      logger.Log('created proxy to unsafeWindow',20);
-
+      
       //--------------------------------------------------------------------------------------------------
       //----------------------------------------FUNCTIONS-------------------------------------------------
       //--------------------------------------------------------------------------------------------------
@@ -674,7 +679,7 @@ if (isJQuery()) {
           'getFavicon': function (id) {
             id = this.getDomain(id);
             if (id == null) return null;
-            if (!startsWith(id, '*')) id = 'www.' + id;
+            if (id.indexOf('*') != 0) id = 'www.' + id;
             return '//' + id.replace(/\*/g, '') + (endsWith(id, '*') ? '' : '/favicon.ico');
           },
           'getSocial': function() {
@@ -732,7 +737,7 @@ if (isJQuery()) {
       }
 
       function cleanse(s) {
-        while (contains(s, '  ')) {
+        while (s.indexOf('  ') != -1) {
           s = s.replace(/  /g, ' ');
         }
         return s;
@@ -805,17 +810,13 @@ if (isJQuery()) {
       var AllEmotes = null;
       function EmoteType(url) {
         var mustWrap = false;
-
+        
         if (url != null && url != undefined) {
           var questionStart = url.indexOf('?');
           if (questionStart != -1) {
             var splitten = url.substring(questionStart + 1, url.length);
             if (splitten.indexOf('isEmote=true') != -1) {
-              return {
-                result: 2,
-                lim: true,
-                wrap: mustWrap
-              };
+              return { result: 2, url: CutProto(url), lim: true, wrap: mustWrap };
             } else if (splitten.indexOf('wrap=true') != -1) {
               url = url.split('?')[0];
               mustWrap = true;
@@ -829,10 +830,11 @@ if (isJQuery()) {
           for (var i = 0; i < AllEmotes.length; i++) {
             if (!AllEmotes[i].External) {
               for (var k = 0; k < AllEmotes[i].Emotes.length; k++) {
-                if (url == AllEmotes[i].Emotes[k]) {
+                if (matchUrls(url, AllEmotes[i].Emotes[k])) {
                   logger.Log('EmoteType: true');
                   return {
                     result: 1,
+                    url: AllEmotes[i].Emotes[k],
                     lim: AllEmotes[i].Normalized,
                     wrap: mustWrap
                   };
@@ -844,7 +846,32 @@ if (isJQuery()) {
         logger.Log('EmoteType: false');
         return { result: 0, lim: true, wrap: false };
       }
-
+      
+      function matchUrls(one, two) {
+        return one == two || (urlMatcher ? urlMatcher(one, two) : false);
+      }
+      
+      var urlMatcher = null;
+      function addMatcher(matcher) {
+        var parentMatcher = urlMatcher;
+        if (parentMatcher) {
+          urlMatcher = function (one, two) {
+            return matcher(one, two) || parentMatcher(one, two);
+          }
+        } else {
+          urlMatcher = matcher;
+        }
+      }
+      
+      addMatcher(function(url, match) {
+        if (url.indexOf('.deviantart.') != -1) {
+          url = url.split('-').reverse()[0].split('.')[0];
+          match = match.split('/').reverse()[0].split('-').reverse()[0].split('.')[0];
+          return url == match;
+        }
+        return false;
+      });
+      
       function getAllEmotes() {
         var result = [];
         var panels = getVirtualEmotes();
@@ -859,9 +886,7 @@ if (isJQuery()) {
       var virtualEmotes;
       var _defaultEmotes;
       function getVirtualEmotes() {
-        if (!virtualEmotes) {
-          virtualEmotes = [];
-        }
+        if (!virtualEmotes) virtualEmotes = [];
         return virtualEmotes;
       }
       function getDefaultEmotes() {
@@ -899,20 +924,17 @@ if (isJQuery()) {
         this.IsRaw = israw;
         this.External = ext == true;
         
-        this.Image = null;
-        if (this.IsRaw) {
-          this.Image = img;
-        } else {
-          this.Image = emotes[emotes.length - 1];
-        }
-
+        this.Image = this.IsRaw || img ? img : emotes[emotes.length - 1];
+        
         this.Emotes = [];
         this.EmoteTitles = [];
         this.rawEmotes = emotes;
 
         for (var k = 0; k < emotes.length; k++) {
-          if (contains(emotes[k], '|')) {
-            var item = emotes[k].split('|');
+          var emote = emotes[k];
+          if (emote.indexOf('http') == 0) emote = CutProto(emote);
+          if (emote.indexOf('|') != -1) {
+            var item = emote.split('|');
             if (item.length > 2) {
               item[item.length - 1] = '';
               this.Emotes.push(item.join('|'));
@@ -920,12 +942,12 @@ if (isJQuery()) {
               this.Emotes.push(item[0]);
             }
           } else {
-            this.Emotes.push(emotes[k]);
+            this.Emotes.push(emote);
           }
           if (this.IsRaw) {
-            this.EmoteTitles.push(SplitTitle(emotes[k])[1]);
+            this.EmoteTitles.push(SplitTitle(emote)[1]);
           } else {
-            this.EmoteTitles.push(getTitle(emotes[k]));
+            this.EmoteTitles.push(getTitle(emote));
           }
         }
       }
@@ -970,13 +992,11 @@ if (isJQuery()) {
         $('.comment .data .comment_data .user_image:not(.done').each(emotify);
       }
       function emotify() {
-        var url = $(this).attr('src').replace('https:','http:');
-        if (!url.indexOf('http:')) {
-          url = 'http:' + url;
-        }
+        var url = CutProto($(this).attr('src'));
         var type = EmoteType(url);
         if (type.result == 1) {
-          var tit = Name(url);
+          var tit = Name(type.url);
+          $(this).attr('src', type.url);
           $(this).attr('alt', tit);
           $(this).attr('title', tit);
           $(this).addClass('emoticon').removeClass('user_image');
@@ -992,21 +1012,18 @@ if (isJQuery()) {
         $('.comment .data .comment_data .user_image_link:not(.dontUnspoiler)').each(unspoilerSibling);
       }
       function unspoilerSibling() {
-        var url = $(this).attr('href').replace('https:','http:');
-        if (!url.indexOf('http:') == 0) {
-          url = 'http:' + url;
-        }
+        var url = CutProto($(this).attr('href'));
         var type = EmoteType(url);
         var img;
         if (type.result > 0) {
           if (type.result == 2) {
-            img = $('<img class="user_image" src="' + $(this).attr('href') + '" />');
+            img = $('<img class="user_image" src="' + type.url + '" />');
             $(this).parent().after(img).remove();
           } else {
-            var tit = Name(url);
-            img = $('<img class="emoticon" alt="' + tit + '" title="' + tit + '" src="' + url + '" />');
+            var tit = Name(type.url);
+            img = $('<img class="emoticon" alt="' + tit + '" title="' + tit + '" src="' + type.url + '" />');
             if (type.lim) $(img).css('max-height', '27px');
-
+            
             var p = $(this).parent().prev();
             if (p.prop('tagName') != 'P') {
               if (p.prop('tagName') == 'BR') {
@@ -1044,7 +1061,7 @@ if (isJQuery()) {
             instance.toolbar.insertBefore(emoteExtenderOtp, ExtraEmotes.emotesTypes)
           }
           logger.Log('refreshComments');
-          if (!startsWith(document.location.href, 'http://www.fimfiction.net/manage_user/messages/')) {
+          if (document.location.href.replace(/http(s|):/,'').indexOf('//www.fimfiction.net/manage_user/messages/') != 0) {
             var temp = setInterval(refreshComments, 500);
             var tempb = setInterval(refreshEmotePanels, 1000);
             $.ajaxSetup({catch: true});
@@ -1249,7 +1266,7 @@ background: none repeat scroll 0% 0% #FFF;}\
           for (var i = 0; i < panels.length; i++) {
             var mat = panels[i].Name;
             if (mat != null) {
-              if (contains(terms[path].toLowerCase(), mat.toLowerCase())) {
+              if (terms[path].toLowerCase().indexOf(mat.toLowerCase()) != -1) {
                 if (result.title.indexOf(mat) == -1) {
                   result.title.push(mat);
                   result.type.push('panel');
@@ -1271,11 +1288,11 @@ background: none repeat scroll 0% 0% #FFF;}\
       }
       
       function getTitle(raw) {
-        if (contains(raw, '|')) {
+        if (raw.indexOf('|') != -1) {
           var spl = raw.split('|');
           if (spl.length > 0 && spl[spl.length - 1] != '') {
             var result = spl[spl.length - 1];
-            if (!startsWith(result, ':'))
+            if (result.indexOf(':') != 0)
               result = ':' + result;
             if (!endsWith(result, ':'))
               result += ':';
@@ -1283,19 +1300,23 @@ background: none repeat scroll 0% 0% #FFF;}\
           }
         }
         raw = replaceAll(' ', '_', raw.split('/').reverse()[0].split('.')[0]);
-        if (contains(raw, '_by_')) {
+        if (raw.indexOf('_by_') != -1) {
           raw = raw.split('_by_')[0];
         }
-        while (contains(raw, '__')) {
-          raw = raw.replace('__', '_');
+        while (raw.indexOf('__') != -1) {
+          raw = raw.replace(/__/g, '_');
         }
         return ':' + raw.replace('clapping_pony_icon_', '') + ':';
+      }
+      
+      function CutProto(url) {
+        return url && (url.indexOf('http') == 0) ? url.replace(/http(s|):/,'') : url;
       }
 
       function SplitTitle(text) {
         var result = ['', ''];
         var name = true;
-        if (contains(text, '|')) {
+        if (text.indexOf('|') != -1) {
           for (var i = text.length - 1; i >= 0; i--) {
             if (name) {
               if (text[i] == '|' && (i < text.length - 1 ? text[i + 1] != '|' : true) && (i > 0 ? text[i - 1] != '|' : true)) {
