@@ -7,7 +7,7 @@
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Logger.js
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
-// @version     5.5.1
+// @version     5.5.2
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -600,7 +600,7 @@ if (isJQuery()) {
           win.ExtraEmotes = {
             addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {},
             addRaw: function (id, name, title, emotes, buttonImage) { },
-			addUrlMatcher: function(matcher) {},
+            addUrlMatcher: function(matcher) {},
             getLogger: function () { return logger; }
           };
         }
@@ -613,7 +613,7 @@ if (isJQuery()) {
         window.ExtraEmotes = lockDown({
           'addEmoticons': function(id, name, title, emotes, normalize, buttonImage) {win.ExtraEmotes.addEmoticons(id, name, title, emotes, normalize, buttonImage);},
           'addRaw': function(id, name, title, emotes, buttonImage) {win.ExtraEmotes.addRaw(id, name, title, emotes, buttonImage);},
-		  'addUrlMatcher': function(matcher) {win.ExtraEmotes.addUrlMatcher(matcher);},
+          'addUrlMatcher': function(matcher) {win.ExtraEmotes.addUrlMatcher(matcher);},
           'getLogger': function() {return win.ExtraEmotes.getLogger();},
           'getVersion': function() {return win.ExtraEmotes.getVersion();},
           'valueOf': function valueOf() { return this.toString(); },
@@ -712,7 +712,7 @@ if (isJQuery()) {
           if (vpanels[i].Name != 'default' && !vpanels[i].IsRaw && !vpanels[i].External) {
             for (var k = 0; k < vpanels[i].Emotes.length; k++) {
               var tit = ':' + vpanels[i].Id + vpanels[i].EmoteTitles[k];
-              var emote = '[img]' + vpanels[i].Emotes[k] + '[/img]';
+              var emote = '[img]http:' + vpanels[i].Emotes[k] + '[/img]';
               txt = replaceAll(emote, tit, txt);
             }
           }
@@ -728,8 +728,8 @@ if (isJQuery()) {
           if (vpanels[i].Name != 'default' && !vpanels[i].IsRaw && !vpanels[i].External) {
             for (var k = 0; k < vpanels[i].Emotes.length; k++) {
               var tit = ':' + vpanels[i].Id + vpanels[i].EmoteTitles[k];
-              var emote = ' [img]' + vpanels[i].Emotes[k] + '[/img]';
-              txt = replaceAll('\n' + tit, '\n [img]' + vpanels[i].Emotes[k] + '?wrap=true[/img]', txt);
+              var emote = ' [img]http:' + vpanels[i].Emotes[k] + '[/img]';
+              txt = replaceAll('\n' + tit, '\n [img]http:' + vpanels[i].Emotes[k] + '?wrap=true[/img]', txt);
               txt = replaceAll(tit, emote, txt);
             }
           }
