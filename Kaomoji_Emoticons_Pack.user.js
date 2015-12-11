@@ -3,7 +3,7 @@
 // @description Adds all japanese smilies as emoticons
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.2
+// @version     2.2.1
 // @icon        http://www.chatslang.com/images/main/kaomoji.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
