@@ -600,6 +600,7 @@ if (isJQuery()) {
           win.ExtraEmotes = {
             addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {},
             addRaw: function (id, name, title, emotes, buttonImage) { },
+			addUrlMatcher: function(matcher) {},
             getLogger: function () { return logger; }
           };
         }
@@ -612,6 +613,7 @@ if (isJQuery()) {
         window.ExtraEmotes = lockDown({
           'addEmoticons': function(id, name, title, emotes, normalize, buttonImage) {win.ExtraEmotes.addEmoticons(id, name, title, emotes, normalize, buttonImage);},
           'addRaw': function(id, name, title, emotes, buttonImage) {win.ExtraEmotes.addRaw(id, name, title, emotes, buttonImage);},
+		  'addUrlMatcher': function(matcher) {win.ExtraEmotes.addUrlMatcher(matcher);},
           'getLogger': function() {return win.ExtraEmotes.getLogger();},
           'getVersion': function() {return win.ExtraEmotes.getVersion();},
           'valueOf': function valueOf() { return this.toString(); },
