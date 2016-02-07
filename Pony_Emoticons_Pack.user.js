@@ -3,7 +3,7 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.5.1
+// @version     2.5.2
 // @icon        http://sollace.github.io/emoticons/fimfic/nerdgasm-d72140i.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -14,7 +14,7 @@
 // ==/UserScript==
 
 ExtraEmotes.addUrlMatcher(function(url, match) {
-  if (url.indexOf('i.imgurg.com') != -1) {
+  if (url.indexOf('i.imgur.com') != -1) {
     url = url.split('/').reverse()[0].split('.')[0];
     match = match.split('_').reverse()[0].split('.')[0];
     return url == match;
