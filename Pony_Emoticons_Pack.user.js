@@ -3,7 +3,7 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.5
+// @version     2.5.1
 // @icon        http://sollace.github.io/emoticons/fimfic/nerdgasm-d72140i.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -12,6 +12,16 @@
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
 // ==/UserScript==
+
+ExtraEmotes.addUrlMatcher(function(url, match) {
+  if (url.indexOf('i.imgurg.com') != -1) {
+    url = url.split('/').reverse()[0].split('.')[0];
+    match = match.split('_').reverse()[0].split('.')[0];
+    return url == match;
+  }
+  return false;
+});
+
 
 ExtraEmotes.addEmoticons("x", "Dropbox", "Extra", ([
 "http://sollace.github.io/emoticons/fimfic/nerdgasm-d72140i.png|nerdgasm",
@@ -118,10 +128,10 @@ ExtraEmotes.addEmoticons("x", "Dropbox", "Extra", ([
 "http://dl.dropbox.com/u/31471793/FiMFiction/eenope.png",
 "http://dl.dropbox.com/u/31471793/FiMFiction/Mr_Cake.png",
 "http://dl.dropbox.com/u/31471793/FiMFiction/discord.png",
-"http://i.imgur.com/J8FwB24.png|twiscepter",
-"http://i.imgur.com/CjCo3YR.png|bloomsceptr",
-"http://i.imgur.com/IFkl4RG.png|sweetiescepter",
-"http://i.imgur.com/j0bYpQa.png|scootscepter",
+"http://sollace.github.io/emoticons/fimfic/twiscepter_J8FwB24.png|twiscepter",
+"http://sollace.github.io/emoticons/fimfic/bloomscepter_CjCo3YR.png|bloomsceptr",
+"http://sollace.github.io/emoticons/fimfic/sweetiescepter_IFkl4RG.png|sweetiescepter",
+"http://sollace.github.io/emoticons/fimfic/scootscepter_j0bYpQa.png|scootscepter",
 "http://sollace.github.io/emoticons/fimfic/hoof_up-d6z0jqb.png|hoof_up",
 "http://sollace.github.io/emoticons/fimfic/hoof_down-d6z0jqf.png|hoof_down",
 "http://sollace.github.io/emoticons/fimfic/2_hoofs_up-d6z0lto.png|2_hoofs_up",
