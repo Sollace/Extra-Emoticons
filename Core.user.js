@@ -7,7 +7,7 @@
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Logger.js
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
-// @version     5.5.2
+// @version     5.5.3
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ if (isJQuery()) {
   //==================================================================================================
   try {
     (function (win) {
-      var version = '5.5';
+      var version = '5.53';
       var siteMapping = SiteMapping();
       siteMapping.registerMapping('fav', true);
       siteMapping.registerMapping('thumb', true);
@@ -314,7 +314,7 @@ if (isJQuery()) {
             return innerPannel;
           },
           'addRawsToPanel': function (holder, emotes) {
-            for (var i = emotes.length - 1; i > -1; i--) {
+            for (var i = emotes.length; i--;) {
               this.addRawToPanel(holder, emotes[i]);
             }
           },
@@ -337,10 +337,8 @@ if (isJQuery()) {
             $(holder).append(newA);
           },
           'addImagesToPanel': function (id, holder, emotes) {
-            if (id != '') {
-              id = ':' + id;
-            }
-            for (var i = emotes.length - 1; i > -1; i--) {
+            if (id != '') id = ':' + id;
+            for (var i = emotes.length; i--;) {
               this.addImageToPanel(id, holder, emotes[i]);
             }
           },
@@ -354,7 +352,7 @@ if (isJQuery()) {
               
               if (data && data.trim().indexOf('[') == 0) {
                 data = data.split('\n');
-                for (var i = 0; i < data.length; i++) {
+                for (var i = data.length; i--;) {
                   data[i] = data[i].trim().replace(/\[/g, '').replace(/\]/g, '');
                 }
                 event.originalEvent.dataTransfer.setData('Text/plain', data.join(''));
@@ -393,12 +391,12 @@ if (isJQuery()) {
               }
 
               terms = new RegExp(terms);
-              for (var i = 0; i < panels.length; i++) {
+              for (var i = panels.length; i--;) {
                 var named = false;
-                for (var k = group.title.length - 1; k >= 0; k--) {
+                for (var k = group.title.length; k--;) {
                   if (group.title[k] == panels[i].Name) named = true;
                 }
-                for (var k = panels[i].Emotes.length - 1; k >= 0; k--) {
+                for (var k = panels[i].Emotes.length; k--;) {
                   if (named || (!panels[i].IsRaw ? panels[i].Emotes[k].replace('sollace.github.io','www.github.com') + panels[i].EmoteTitles[k].replace(/\:/g,'') : panels[i].EmoteTitles[k]).toLowerCase().match(terms)) {
                     results.push({
                       raw: panels[i].IsRaw,
@@ -419,7 +417,7 @@ if (isJQuery()) {
             if (groups.title.length > 0) {
               this.search_Tag.removeClass('hide');
               this.search_Tag.find('.emote-groups').html('');
-              for (var i = 0; i < groups.title.length; i++) {
+              for (var i = groups.title.length; i--;) {
                 var g = groups.title[i];
                 var tag = $('<div class="search_tag" />');
                 tag.append('<img src="' + this.getGroupButtonIcon(g) + '" />');
@@ -450,7 +448,7 @@ if (isJQuery()) {
             var results = this.findMatchingEmotes(term);
             logger.Log('Refresh search: terms="' + term + '" ' + results.length + ' results',4);
             if (results.length > 0) {
-              for (var i = 0; i < results.length; i++) {
+              for (var i = results.length; i--;) {
                 logger.Log('raw="' + results[i].raw + '" item="' + results[i].emote + '"');
                 if (results[i].raw) {
                   logger.Log('Adding RAW to panel',3);
@@ -474,7 +472,7 @@ if (isJQuery()) {
               }
             }
             var buttons = this.emotesTypes.children();
-            for (var i = 0; i < buttons.length; i++) {
+            for (var i = buttons.length; i--;) {
               var link = $(buttons[i]).find('button');
               if (link.attr('data-panel').toLowerCase() == name.toLowerCase()) {
                 return link.find('img').attr('src');
@@ -502,7 +500,7 @@ if (isJQuery()) {
         
         function ExtraEmotesAPI(hooks) {
           this.modules = [];
-          for (var i = 0; i < hooks.length; i++) {
+          for (var i = hooks.length; i--;) {
             var module = new ExtraEmoticons(hooks[i]);
             module.init();
             this.modules.push(module);
@@ -518,7 +516,7 @@ if (isJQuery()) {
         //Adds a collection of image emoticons
           //Optional: buttonImage
           'addEmoticons': function (id, name, title, emotes, normalize, buttonImage) {
-            for (var i = 0; i < this.modules.length; i++) {
+            for (var i = this.modules.length; i--;) {
               this.modules[i].addEmoticons(id, name, title, emotes, normalize, buttonImage);
             }
             recordEmotesPanel(false, id, name, title, emotes, buttonImage, normalize);
@@ -527,7 +525,7 @@ if (isJQuery()) {
         //==API FUNCTION==//
         //Adds a collection of text emoticons
           'addRaw': function (id, name, title, emotes, buttonImage) {
-            for (var i = 0; i < this.modules.length; i++) {
+            for (var i = this.modules.length; i--;) {
               this.modules[i].addRaw(id, name, title, emotes, buttonImage);
             }
             recordEmotesPanel(true, id, name, title, emotes, buttonImage, false);
@@ -600,7 +598,6 @@ if (isJQuery()) {
           win.ExtraEmotes = {
             addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {},
             addRaw: function (id, name, title, emotes, buttonImage) { },
-            addUrlMatcher: function(matcher) {},
             getLogger: function () { return logger; }
           };
         }
@@ -613,7 +610,6 @@ if (isJQuery()) {
         window.ExtraEmotes = lockDown({
           'addEmoticons': function(id, name, title, emotes, normalize, buttonImage) {win.ExtraEmotes.addEmoticons(id, name, title, emotes, normalize, buttonImage);},
           'addRaw': function(id, name, title, emotes, buttonImage) {win.ExtraEmotes.addRaw(id, name, title, emotes, buttonImage);},
-          'addUrlMatcher': function(matcher) {win.ExtraEmotes.addUrlMatcher(matcher);},
           'getLogger': function() {return win.ExtraEmotes.getLogger();},
           'getVersion': function() {return win.ExtraEmotes.getVersion();},
           'valueOf': function valueOf() { return this.toString(); },
@@ -653,7 +649,7 @@ if (isJQuery()) {
               Mapping[name] = domain;
               aliased[name.toLowerCase()] = name;
               if (aliases != null) {
-                for (var i = 0; i < aliases.length; i++) {
+                for (var i = aliases.length; i--;) {
                   aliased[aliases[i].toLowerCase()] = name;
                 }
               }
@@ -693,7 +689,7 @@ if (isJQuery()) {
       function Name(url) {
         url = url.split('?')[0];
         var panels = getVirtualEmotes();
-        for (var i = 0; i < panels.length; i++) {
+        for (var i = panels.length; i--;) {
           if (!panels[i].IsRaw) {
             for (var k = 0; k < panels[i].Emotes.length; k++) {
               if (url == panels[i].Emotes[k]) {
@@ -704,29 +700,39 @@ if (isJQuery()) {
         }
         return url;
       }
+
+      function getUrls(txt) {
+        txt = txt.match(/\[img\]([^\s]+)\[\/img\]/ig);
+        for (var i = txt.length; i--;) {
+          txt[i] = {thin: txt[i].replace(/\[[\/]?img\](http[s]?:)?/ig,''), thick: txt[i]};
+        }
+        return txt;
+      }
       
       function returnAliases(txt) {
         txt = replaceAll('?wrap=true', '', txt);
+        var urls = getUrls(txt);
         var vpanels = getVirtualEmotes();
-        for (var i = 0; i < vpanels.length; i++) {
+        for (var i = vpanels.length; i--;) {
           if (vpanels[i].Name != 'default' && !vpanels[i].IsRaw && !vpanels[i].External) {
-            for (var k = 0; k < vpanels[i].Emotes.length; k++) {
+            for (var k = vpanels[i].Emotes.length; k--;) {
               var tit = ':' + vpanels[i].Id + vpanels[i].EmoteTitles[k];
-              var emote = '[img]http:' + vpanels[i].Emotes[k] + '[/img]';
-              txt = replaceAll(emote, tit, txt);
+              for (var j = urls.length; j--;) {
+                if (matchUrls(urls[j].thin,''), vpanels[i].Emotes[k])) {
+                  txt = replaceAll(urls[j].thick, tit, txt);
+                }
+              }
             }
           }
         }
-
         return cleanse(txt);
       }
 
       function replaceAliases(txt) {
         var vpanels = getVirtualEmotes();
-
-        for (var i = 0; i < vpanels.length; i++) {
+        for (var i = vpanels.length; i--;) {
           if (vpanels[i].Name != 'default' && !vpanels[i].IsRaw && !vpanels[i].External) {
-            for (var k = 0; k < vpanels[i].Emotes.length; k++) {
+            for (var k = vpanels[i].Emotes.length; k--;) {
               var tit = ':' + vpanels[i].Id + vpanels[i].EmoteTitles[k];
               var emote = ' [img]http:' + vpanels[i].Emotes[k] + '[/img]';
               txt = replaceAll('\n' + tit, '\n [img]http:' + vpanels[i].Emotes[k] + '?wrap=true[/img]', txt);
@@ -734,7 +740,6 @@ if (isJQuery()) {
             }
           }
         }
-
         return cleanse(txt);
       }
 
@@ -791,7 +796,7 @@ if (isJQuery()) {
 
       function restoreFromRecord(hook) {
         var store = getVirtualEmotes();
-        for (var i = 0; i < store.length; i++) {
+        for (var i = store.length; i--;) {
           if (!store[i].External) {
             restoreEmotes(hook, store[i]);
           }
@@ -829,9 +834,9 @@ if (isJQuery()) {
             AllEmotes = getVirtualEmotes();
           }
           logger.Log('EmoteType: ' + url);
-          for (var i = 0; i < AllEmotes.length; i++) {
+          for (var i = AllEmotes.length; i--;) {
             if (!AllEmotes[i].External) {
-              for (var k = 0; k < AllEmotes[i].Emotes.length; k++) {
+              for (var k = AllEmotes[i].Emotes.length; k--;) {
                 if (matchUrls(url, AllEmotes[i].Emotes[k])) {
                   logger.Log('EmoteType: true');
                   return {
@@ -877,8 +882,8 @@ if (isJQuery()) {
       function getAllEmotes() {
         var result = [];
         var panels = getVirtualEmotes();
-        for (var i = 0; i < panels.length; i++) {
-          for (var j = 0; j < panels[i].Emotes.length; j++) {
+        for (var i = panels.length; i--;) {
+          for (var j = panels[i].Emotes.length; j--;) {
             result.push(panels[i].Emotes[j]);
           }
         }
@@ -888,8 +893,7 @@ if (isJQuery()) {
       var virtualEmotes;
       var _defaultEmotes;
       function getVirtualEmotes() {
-        if (!virtualEmotes) virtualEmotes = [];
-        return virtualEmotes;
+        return virtualEmotes || (virtualEmotes = []);
       }
       function getDefaultEmotes() {
         if (!_defaultEmotes) {
@@ -902,7 +906,7 @@ if (isJQuery()) {
             EmoteTitles: []
           }
           var def = ['ajbemused','ajsleepy','ajsmug','applejackconfused','applejackunsure','applecry','eeyup','fluttercry','flutterrage','fluttershbad','fluttershyouch','fluttershysad','yay','heart','pinkiecrazy','pinkiegasp','pinkiehappy','pinkiesad2','pinkiesmile','pinkiesick','twistnerd','rainbowderp','rainbowdetermined2','rainbowhuh','rainbowkiss','rainbowlaugh','rainbowwild','scootangel','raritycry','raritydespair','raritystarry','raritywink','duck','unsuresweetie','coolphoto','twilightangry2','twilightoops','twilightblush','twilightsheepish','twilightsmile','facehoof','moustache','trixieshiftleft','trixieshiftright','derpyderp1','derpyderp2','derpytongue2','trollestia'];
-          for (var i = def.length - 1; i >= 0; i--) {
+          for (var i = def.length; i--;) {
             _defaultEmotes.Emotes.push(getDefaultEmoteUrl(def[i]));
             _defaultEmotes.EmoteTitles.push(':' + def[i] + ':');
           }
@@ -932,7 +936,7 @@ if (isJQuery()) {
         this.EmoteTitles = [];
         this.rawEmotes = emotes;
 
-        for (var k = 0; k < emotes.length; k++) {
+        for (var k = emotes.length; k--;) {
           var emote = emotes[k];
           if (emote.indexOf('http') == 0) emote = CutProto(emote);
           if (emote.indexOf('|') != -1) {
@@ -1264,8 +1268,8 @@ background: none repeat scroll 0% 0% #FFF;}\
 
       function isGroupSearch(terms, panels) {
         var result = {'title':[],'type':[]};
-        for (var path = 0; path < terms.length; path++) {
-          for (var i = 0; i < panels.length; i++) {
+        for (var path = terms.length; path--;) {
+          for (var i = panels.length; i--;) {
             var mat = panels[i].Name;
             if (mat != null) {
               if (terms[path].toLowerCase().indexOf(mat.toLowerCase()) != -1) {
@@ -1277,7 +1281,7 @@ background: none repeat scroll 0% 0% #FFF;}\
             }
           }
         }
-        for (var path = 0; path < terms.length; path++) {
+        for (var path = terms.length; path--;) {
           if (siteMapping.getIsSite(terms[path])) {
             var site = siteMapping.getName(terms[path]);
             if (result.title.indexOf(site) == -1) {
@@ -1319,7 +1323,7 @@ background: none repeat scroll 0% 0% #FFF;}\
         var result = ['', ''];
         var name = true;
         if (text.indexOf('|') != -1) {
-          for (var i = text.length - 1; i >= 0; i--) {
+          for (var i = text.length; i--;) {
             if (name) {
               if (text[i] == '|' && (i < text.length - 1 ? text[i + 1] != '|' : true) && (i > 0 ? text[i - 1] != '|' : true)) {
                 name = false
@@ -1336,8 +1340,8 @@ background: none repeat scroll 0% 0% #FFF;}\
           }
         }
         var reversed = ['', ''];
-        for (var i = 0; i < result.length; i++) {
-          for (var c = result[i].length - 1; c >= 0; c--) {
+        for (var i = result.length; i--;) {
+          for (var c = result[i].length; c--;) {
             reversed[i] += result[i][c];
           }
         }
