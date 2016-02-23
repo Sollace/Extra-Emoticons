@@ -7,7 +7,7 @@
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Logger.js
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
-// @version     5.5.3
+// @version     5.5.4
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ if (isJQuery()) {
   //==================================================================================================
   try {
     (function (win) {
-      var version = '5.53';
+      var version = '5.54';
       var siteMapping = SiteMapping();
       siteMapping.registerMapping('fav', true);
       siteMapping.registerMapping('thumb', true);
@@ -718,7 +718,7 @@ if (isJQuery()) {
             for (var k = vpanels[i].Emotes.length; k--;) {
               var tit = ':' + vpanels[i].Id + vpanels[i].EmoteTitles[k];
               for (var j = urls.length; j--;) {
-                if (matchUrls(urls[j].thin,''), vpanels[i].Emotes[k])) {
+                if (matchUrls(urls[j].thin,'', vpanels[i].Emotes[k])) {
                   txt = replaceAll(urls[j].thick, tit, txt);
                 }
               }
