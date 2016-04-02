@@ -7,7 +7,7 @@
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Logger.js
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
-// @version     5.5.4
+// @version     5.5.5
 // @grant       none
 // ==/UserScript==
 //--------------------------------------------------------------------------------------------------
@@ -703,6 +703,7 @@ if (isJQuery()) {
 
       function getUrls(txt) {
         txt = txt.match(/\[img\]([^\s]+)\[\/img\]/ig);
+        if (!txt) return [];
         for (var i = txt.length; i--;) {
           txt[i] = {thin: txt[i].replace(/\[[\/]?img\](http[s]?:)?/ig,''), thick: txt[i]};
         }
