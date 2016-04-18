@@ -22,7 +22,7 @@ if (isJQuery()) {
   //==================================================================================================
   try {
     (function (win) {
-      var version = '5.54';
+      var version = '5.55';
       var siteMapping = SiteMapping();
       siteMapping.registerMapping('fav', true);
       siteMapping.registerMapping('thumb', true);
