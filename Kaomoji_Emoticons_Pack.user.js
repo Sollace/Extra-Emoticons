@@ -4,7 +4,7 @@
 // @author      Sollace
 // @namespace   fimfiction-sollace
 // @version     2.2.1
-// @icon        http://www.chatslang.com/images/main/kaomoji.png
+// @icon        https://github.com/Sollace/Extra-Emoticons/raw/master/kaomoji.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
@@ -450,4 +450,4 @@ ExtraEmotes.addRaw("jp", "Japan", "Kaomoji", ([
 "(っ˘ڡ˘ς)|Yummy",
 "(V) (°,,,,°) (V)|Zoidberg",
 "[¬º-°]¬|Zombie"
-]).reverse(), "http://www.chatslang.com/images/main/kaomoji.png", false);
+]).reverse(), "//github.com/Sollace/Extra-Emoticons/raw/master/kaomoji.png", false);
