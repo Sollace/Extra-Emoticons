@@ -7,620 +7,29 @@
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Logger.js
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
-// @version     5.5.5
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
+// @version     5.5.6
 // @grant       none
 // ==/UserScript==
-//--------------------------------------------------------------------------------------------------
-//==================================================================================================
 if (isJQuery()) {
-  function reverse(me) { return me.split('').reverse().join() }
-  function contains(me, it) { return me.indexOf(it) != -1 }
-  function endsWith(me, it) { return reverse(me).indexOf(reverse(it)) == 0; }
-  function replaceAll(find, replace, str) { return str.replace(new RegExp(find.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'g'), replace); }
-  
+  var version = 5.56;
   var logger = new Logger('Extra Emoticons', 6);
-  //==================================================================================================
   try {
     (function (win) {
-      var version = '5.55';
-      var siteMapping = SiteMapping();
-      siteMapping.registerMapping('fav', true);
-      siteMapping.registerMapping('thumb', true);
-      siteMapping.registerMapping('Imgur', 'imgur.com');
-      siteMapping.registerMapping('Google', 'google.com',true);
-      siteMapping.registerMapping('Twitter', 'twitter.com',true);
-      siteMapping.registerMapping('Facebook', 'facebook.com',true);
-      siteMapping.registerMapping('FimFiction', 'fimfiction.net');
-      siteMapping.registerMapping('FanFiction', 'fanfiction.net');
-      siteMapping.registerMapping('DeviantArt', 'deviantart.com',['DA']);
-      siteMapping.registerMapping('Tumblr', 'tumblr.com',true);
-      siteMapping.registerMapping('MyLittleFaceWhen', 'mylittlefacewhen.com');
-      siteMapping.registerMapping('Amazon', 'amazon.com', ['Amazonaws']);
-      siteMapping.registerMapping('PhotoBucket', 'photobucket.com');
-      siteMapping.registerMapping('Disqus', 'disqus.com',true);
-      siteMapping.registerMapping('MySpace', '*x.myspacecdn.com/new/common/images/favicons',true);
-      siteMapping.registerMapping('Blogger', 'blogger.com',true);
-      siteMapping.registerMapping('Pinterist', 'pinterest.com',true);
-      siteMapping.registerMapping('Reddit', 'reddit.com',true);
-      siteMapping.registerMapping('GitHub', 'github.com');
-      siteMapping.registerMapping('EquestriaDaily', 'equestriadaily.com');
-      siteMapping.registerMapping('YouTube', true);
-      siteMapping.registerMapping('LinkedIn', true);
-      siteMapping.registerMapping('WordPress', true);
-      siteMapping.registerMapping('IntenseDebate', true);
-      siteMapping.registerMapping('DropBox', '*dt8kf6553cww8.cloudfront.net/static/images/favicon-vflk5FiAC.ico*');
-
-      if (typeof (win.ExtraEmotes) === 'undefined') {
-        //--------------------------------------------------------------------------------------------------
-        //---------------------------------EXTRA EMOTICONS MODULE-------------------------------------------
-        //--------------------------------------------------------------------------------------------------
-        function ExtraEmoticons(hook) {
-          this.region = $(hook);
-          this.childGuest;
-          this.previewButton;
-          this.submitButton;
-          this.textArea;
-          this.backupText;
-          this.toolbar;
-          this.emotesTypes;
-          this.search;
-          this.search_Tag;
-          this.panelholder;
-        }
-        ExtraEmoticons.prototype = {
-          'init': function () {
-            logger.Log('ExtraEmoticons.init: start', 9);
-            this.mod();
-            this.setupGUI();
-            logger.Log('ExtraEmoticons.init: end', 9);
-          },
-          'mod': function() {
-            if (this.previewButton == null) {
-              if (this.region.attr('id') == 'add_comment_box') {
-                this.previewButton = $('#preview_comment');
-              } else if (this.region.attr('id') == 'edit_story_form') {
-                this.previewButton = this.region.find('td').last().find('.fa.fa-save').parent().next();
-              }
-              if (this.previewButton != null) {
-                var me = this;
-                this.previewButton.on('mousedown.extraemotes', function () {
-                  logger.Log('PREVIEW',20);
-                  handleSubmit(me);
-                });
-                setTimeout(function () {
-                  if (emoteExtenderIsRunning()) {
-                    me.submitButton.on('mousedown.extraemotes', function () {
-                      logger.Log('SUBMIT (EE)',20);
-                      handleSubmit(me);
-                    });
-                    me.previewButton.on('mousedown.extraemotes',function () {
-                      logger.Log('PREVIEW (EE)',20);
-                      handleSubmit(me);
-                    });
-                    recordExtraEmotesPanels();
-                  }
-                }, 1300);
-              }
-            }
-          },
-          'setupGUI': function () {
-            logger.Log('ExtraEmoticons.setupGUI: start',10);
-            var me = this;
-            this.region.attr('data-init', 'true');
-
-            this.submitButton = this.getSubmitButton();
-            logger.Log('SubmitButton:' + this.submitButton.length, 20);
-            this.textArea = this.getTextArea();
-            this.childGuest = this.getEmotesButton();
-            this.toolbar = this.getToolbar();
-
-            this.submitButton.on('mousedown.extraemotes', function () {
-              logger.Log('SUBMIT',20);
-              handleSubmit(me);
-            });
-
-            if (me.textArea.val() != '') {
-              $(document).on('ready', function() {
-                me.textArea.val(returnAliases(me.textArea.val()));
-              });
-            }
-
-            this.backupText = $('<textarea style="display:none;" />');
-            this.textArea.parent().append(this.backupText);
-
-            this.emotesTypes = makeToolbar('emotes_type_switch');
-            this.toolbar.append(this.emotesTypes);
-            this.emotesTypes.append(this.childGuest.parent());
-
-            this.makeSearch('search');
-
-            this.childGuest.attr('data-function', '');
-            this.childGuest.attr('data-panel', 'default');
-            this.childGuest.addClass('emoticon-expander');
-            this.childGuest.on('click', function() {
-              var space_left = $(this).offset().left - me.toolbar.offset().left;
-              if (space_left < 300) {
-                $(this).parent().find('.drop-down').addClass('reverse');
-              } else {
-                $(this).parent().find('.drop-down').removeClass('reverse');
-              }
-            });
-            var img = $('<img class="emote-button" src="' + getDefaultEmoteUrl('twilightsmile') + '"></img>');
-            this.childGuest.find('i').after(img).remove();
-            if (!img[0].complete) {
-              $(img).css('display', 'none');
-              var spin = $('<i class="fa fa-spinner fa-spin emote-loading" />');
-              $(img).after(spin);
-              $(img).on('load error', function () {
-                $(img).css('display', '');
-                spin.remove();
-              });
-            }
-
-            var def = getDefaultEmotes();
-            var holder = this.makeEmotesPanel('', 'default', true);
-
-            var button = $(this.childGuest);
-            button.one('click', function() {
-              me.addImagesToPanel(def.Id, holder, def.Emotes, true);
-            });
-            var dropTipHolder = this.openEmoticonsPanel(button);
-            dropTipHolder.append(holder);
-            /*var legacy = $(getLegacyEmotes());
-          legacy.css('display', 'none');
-          legacy.attr('data-hash', legacy.html().length);
-          dropTipHolder.parent().before(legacy);*/
-
-            logger.Log('ExtraEmoticons.setupGUI: end',10);
-          },
-          'makeDropTip': function(button) {
-            var holder = $('<div class="drop-down drop-down-emotes"><div class="arrow" /></div>');
-            $(button).after(holder);
-            return holder;
-          },
-          'openEmoticonsPanel': function(button) {
-            var holder = $('<div data-id="' + $(button).attr('data-panel') + '" class="extra_emoticons_panel" />');;
-            this.makeDropTip(button).append(holder);
-            return holder;
-          },
-          'getTextArea': function () {
-            return this.region.find('textarea').first();
-          },
-          'getEmotesButton': function () {
-            return $(this.region).find('.drop-down-expander[data-function="emoticons-picker"]');
-          },
-          'getSubmitButton': function () {
-            if (this.region.hasClass('edit_area') || this.region.attr('id') == 'add_comment_box' || this.region.hasClass('form-send-pm')) {
-              return this.region.find('.button-submit').first();// add comment, edit comment, send pm
-            } else if (this.region.attr('id') == 'send_pm_form') {
-              return $('#message_box_container #popup_accept').first();// popup send pm
-            } else if (this.region.attr('id') == 'new_thread') {
-              return this.region.find('.add_comment_toolbar button').first();// create thread
-            } else if (this.region.hasClass('module_editing_form')) {
-              return this.region.find('.drop-down-pop-up-footer button').first();// edit module
-            } else if (this.region.attr('id') == 'edit_story_form') {
-              return this.region.find('td').last().find('.fa.fa-save').parent();// edit blog post
-            } else if (this.region.hasClass('bbcode-editor')) {
-              return $('#chapter_edit_form button[data-function="save"]');// edit chapter
-            }
-            return this.region.find('.form_submitter').first();// default
-          },
-          'getToolbar': function () {
-            return this.region.find('.format-toolbar').first();
-          },
-          'makeSearch': function (label) {
-            logger.Log('ExtraEmoticons.makeSearch: start',8);
-            var searchbar = makeToolbar('emotes_search_toolbar');
-            $(this.toolbar).append(searchbar);
-            var li = $('<li class="button-group" />');
-            $(searchbar).append(li);
-            var button = $('<button class="emoticon-expander" data-panel="search" style="font-family:FontAwesome;"></button>');
-            li.append(button);
-            button.click(function(e) {
-              e.stopPropagation();
-              var a = $(this).parent();
-              if (a.hasClass("drop-down-show")) {
-                $(document).trigger('click');
-                a.removeClass("drop-down-show");
-              } else {
-                $(document).trigger('click');
-                a.addClass("drop-down-show");
-                var space_left = $(this).offset().left - me.toolbar.offset().left;
-                if (space_left < 300) {
-                  a.find('.drop-down').addClass('reverse');
-                } else {
-                  a.find('.drop-down').removeClass('reverse');
-                }
-                var c;
-                c = function() {
-                  $(document).off("click close-dropdown", c);
-                  a.removeClass("drop-down-show");
-                };
-                $(document).on("click close-dropdowns", c);
-              }
-              e.preventDefault();
-            });
-            var me = this;
-            button.one('click', function() {
-              var box = $('<input id="search_emotes_input" placeholder="search emoticons" autocomplete="off" type="text" />');
-
-              me.search_Tag = me.makeDropTip(button);
-              me.search_Tag.addClass('drop-up').addClass('hide');
-              me.search_Tag.append('<div class="emote-groups" />');
-
-              me.search = me.makeEmotesPanel('', 'search', true);
-              var panel = me.openEmoticonsPanel(button);
-              panel.append(box);
-              panel.append(me.search);
-
-              box.on('input', function (e) {
-                if (this.value == '') {
-                  me.search_Tag.addClass('hide');
-                  me.search.html('');
-                } else {
-                  me.refreshSearch(this.value);
-                }
-              });
-              box.on('keydown', function(e) {
-                if (e.keyCode == 13) {
-                  e.preventDefault();
-                }
-              });
-              box.click(function(e) {
-                e.stopPropagation();
-              });
-
-            });
-            logger.Log('ExtraEmoticons.makeSearch: end',8);
-          },
-          'makeButton': function (name, label, image, callBack) {
-            logger.Log('ExtraEmoticons.makeButton: {0}:{1}', 7, name, label);
-            var link = $('<button class="drop-down-expander emoticon-expander" data-panel="' + name + '" title="' + label + ' Emoticons" />');
-            var me = this;
-            link.on('click', function() {
-              var space_left = $(this).offset().left - me.toolbar.offset().left;
-              if (space_left < 300) {
-                $(this).parent().find('.drop-down').addClass('reverse');
-              } else {
-                $(this).parent().find('.drop-down').removeClass('reverse');
-              }
-            });
-            link.one('click', callBack);
-            var img = $('<img class="emote-button" src="' + image.split('|')[0] + '"></img>');
-            link.append(img);
-            if (!img[0].complete) {
-              $(img).css('display', 'none');
-              var spin = $('<i style="line-height:18px;" class="fa fa-spinner fa-spin" />');
-              $(img).after(spin);
-              $(img).on('load error', function () {
-                $(img).css('display', '');
-                spin.remove();
-              });
-            }
-            var li = $('<li class="button-group" />');
-            $(li).append(link);
-            $(this.emotesTypes).append(li);
-            logger.Log('ExtraEmoticons.makeButton: end', 7);
-            return this.openEmoticonsPanel(link);
-          },
-          'makeEmotesPanel': function (id, name, norma) {
-            logger.Log('ExtraEmoticons.makeEmotesPanel: start',5);
-            var innerPannel = $('<div domain="' + id + '" extraemotes="' + name + '" />');
-            if (norma != false) {
-              $(innerPannel).addClass('extra_emoticons_normalized');
-            }
-            $(this.panelholder).append(innerPannel);
-            logger.Log('ExtraEmoticons.makeEmotesPanel: end',5);
-            return innerPannel;
-          },
-          'addRawsToPanel': function (holder, emotes) {
-            for (var i = emotes.length; i--;) {
-              this.addRawToPanel(holder, emotes[i]);
-            }
-          },
-          'addRawToPanel': function (holder, item) {
-            var title = item;
-            if (item.indexOf('|') != -1) {
-              var splitten = SplitTitle(item);
-              if (splitten[1] != '') {
-                item = splitten[0];
-                title = item + '\n ' + splitten[1];
-              } else if (splitten[0] != '') {
-                title = splitten[0];
-              }
-            }
-            if (item.indexOf('\'') != -1) {
-              item = item.replace('\'', '\\\'');
-            }
-            var newA = $('<a data-function="emoticon" data-emoticon="' + item + '" />');
-            $(newA).append('<div class="raw_emote" isRaw="true" title="' + title + '">' + item + '</div>');
-            $(holder).append(newA);
-          },
-          'addImagesToPanel': function (id, holder, emotes) {
-            if (id != '') id = ':' + id;
-            for (var i = emotes.length; i--;) {
-              this.addImageToPanel(id, holder, emotes[i]);
-            }
-          },
-          'addImageToPanel': function (id, holder, item) {
-            var title = getTitle(item);
-            var mote = $('<div class="extra_emote"></div>');
-            var img = $('<img title="' + id + title + '" src="' + CutProto(item).split('|')[0].split('?')[0] + '" />');
-            mote.append(img);
-            img.on('dragstart', function(event) {
-              var data = event.originalEvent.dataTransfer.getData('Text/plain');
-              
-              if (data && data.trim().indexOf('[') == 0) {
-                data = data.split('\n');
-                for (var i = data.length; i--;) {
-                  data[i] = data[i].trim().replace(/\[/g, '').replace(/\]/g, '');
-                }
-                event.originalEvent.dataTransfer.setData('Text/plain', data.join(''));
-              } else {
-                event.originalEvent.dataTransfer.setData('Text/plain', id + title);
-              }
-
-            });
-            if (!img[0].complete) {
-              img.css('display', 'none');
-              var spin = $('<i class="fa fa-spinner fa-spin emote-loading" />');
-              mote.append(spin);
-              img.on('load error', function () {
-                img.css('display', '');
-                spin.remove();
-              });
-            }
-            
-            var newA = $('<a data-function="emoticon" data-emoticon="' + (id + title) + '" />');
-            newA.append(mote);
-            $(holder).append(newA);
-          },
-          'findMatchingEmotes': function (name) {
-            var terms = $.grep(name.toLowerCase().split(' '), function (v) {
-              return v != '';
-            });
-            var results = [];
-
-            if (terms.length > 0) {
-              var panels = getVirtualEmotes();
-              var group = isGroupSearch(terms, panels);
-
-              terms = '(' + terms.join(' ') + ')';
-              if (name.indexOf('social') != -1 || name.indexOf('media') != -1) {
-                terms += '|(' + siteMapping.getSocial().join(')|(') + ')';
-              }
-
-              terms = new RegExp(terms);
-              for (var i = panels.length; i--;) {
-                var named = false;
-                for (var k = group.title.length; k--;) {
-                  if (group.title[k] == panels[i].Name) named = true;
-                }
-                for (var k = panels[i].Emotes.length; k--;) {
-                  if (named || (!panels[i].IsRaw ? panels[i].Emotes[k].replace('sollace.github.io','www.github.com') + panels[i].EmoteTitles[k].replace(/\:/g,'') : panels[i].EmoteTitles[k]).toLowerCase().match(terms)) {
-                    results.push({
-                      raw: panels[i].IsRaw,
-                      emote: panels[i].Emotes[k] + '|' + (panels[i].Id == null || panels[i].IsRaw ? '' : panels[i].Id) + panels[i].EmoteTitles[k]
-                    });
-                  }
-                }
-              }
-              if (name.indexOf('social') != -1 || name.indexOf('media') != -1) {
-                group.title.push('!autoFilled$social');
-                group.type.push('url');
-              }
-              this.DisplayGroupIcons(group);
-            }
-            return results;
-          },
-          'DisplayGroupIcons': function (groups) {
-            if (groups.title.length > 0) {
-              this.search_Tag.removeClass('hide');
-              this.search_Tag.find('.emote-groups').html('');
-              for (var i = groups.title.length; i--;) {
-                var g = groups.title[i];
-                var tag = $('<div class="search_tag" />');
-                tag.append('<img src="' + this.getGroupButtonIcon(g) + '" />');
-                tag.children().first().load(function () {
-                  $(this).css('height', '15px');
-                });
-                tag.append('<i class="fa fa-spinner fa-spin" />');
-
-                if (g == '!autoFilled$social') {
-                  tag.attr('title', 'Media search\n Icons relating to social networks ');
-                } else {
-                  if (groups.type[i] == 'url') {
-                    tag.attr('title', 'Url search\n Icons hosted by ' + g);
-                  } else {
-                    tag.attr('title', 'Emoticon search\n Icons from ' + g);
-                  }
-                }
-                this.search_Tag.find('.emote-groups').append(tag);
-              }
-            } else {
-              this.search_Tag.addClass('hide');
-            }
-          },
-          'refreshSearch': function (term) {
-            this.search.html('');
-            term = cleanse(term);
-
-            var results = this.findMatchingEmotes(term);
-            logger.Log('Refresh search: terms="' + term + '" ' + results.length + ' results',4);
-            if (results.length > 0) {
-              for (var i = results.length; i--;) {
-                logger.Log('raw="' + results[i].raw + '" item="' + results[i].emote + '"');
-                if (results[i].raw) {
-                  logger.Log('Adding RAW to panel',3);
-                  this.addRawToPanel(this.search, results[i].emote);
-                } else {
-                  logger.Log('Adding IMG to panel',3);
-                  this.addImageToPanel('', this.search, results[i].emote);
-                }
-              }
-            } else {
-              this.search.html('<span class="extra_emoticons_message">0 results found</span>');
-            }
-          },
-          'getGroupButtonIcon': function (name) {
-            if (name == '!autoFilled$social') {
-              return 'http://static.fimfiction.net/images/icons/quote.png';
-            } else {
-              var icon = siteMapping.getFavicon(name);
-              if (icon != null) {
-                return icon;
-              }
-            }
-            var buttons = this.emotesTypes.children();
-            for (var i = buttons.length; i--;) {
-              var link = $(buttons[i]).find('button');
-              if (link.attr('data-panel').toLowerCase() == name.toLowerCase()) {
-                return link.find('img').attr('src');
-              }
-            }
-          },
-          'addEmoticons': function (id, name, title, emotes, normalize, buttonImage) {
-            var holder = this.makeEmotesPanel(id, name, normalize);
-            var me = this;
-            this.makeButton(name, title, buttonImage ? buttonImage : emotes[emotes.length - 1], function() {
-              me.addImagesToPanel(id, holder, emotes);
-            }).append(holder);
-          },
-          'addRaw': function (id, name, title, emotes, buttonImage) {
-            if (buttonImage == null) {
-              buttonImage = 'http://static.fimfiction.net/images/icons/quote.png'
-            }
-            var holder = this.makeEmotesPanel(id, name, false);
-            var me = this;
-            this.makeButton(name, title, buttonImage, function() {
-              me.addRawsToPanel(holder, emotes);
-            }).append(holder);
-          }
-        };
-        
-        function ExtraEmotesAPI(hooks) {
-          this.modules = [];
-          for (var i = hooks.length; i--;) {
-            var module = new ExtraEmoticons(hooks[i]);
-            module.init();
-            this.modules.push(module);
-          }
-        }
-        ExtraEmotesAPI.prototype = {
-        //==API FUNCTION==//
-        //Gets the logging object
-          'getLogger': function () {
-            return logger;
-          },
-        //==API FUNCTION==//
-        //Adds a collection of image emoticons
-          //Optional: buttonImage
-          'addEmoticons': function (id, name, title, emotes, normalize, buttonImage) {
-            for (var i = this.modules.length; i--;) {
-              this.modules[i].addEmoticons(id, name, title, emotes, normalize, buttonImage);
-            }
-            recordEmotesPanel(false, id, name, title, emotes, buttonImage, normalize);
-            logger.Log('addEmoticons: finalizing...',11);
-          },
-        //==API FUNCTION==//
-        //Adds a collection of text emoticons
-          'addRaw': function (id, name, title, emotes, buttonImage) {
-            for (var i = this.modules.length; i--;) {
-              this.modules[i].addRaw(id, name, title, emotes, buttonImage);
-            }
-            recordEmotesPanel(true, id, name, title, emotes, buttonImage, false);
-            logger.Log('addRaw: finalizing...',11);
-          },
-        //==API FUNCTION==//
-        //Adds a matching function to identify emoticon images by url
-          'addUrlMatcher': function(matcher) {
-            addMatcher(matcher);
-          },
-          'getVersion': function() {
-            function parseVersion(s) {
-              var num = 0;
-              var highest = 0;
-              var broken = s.split('.');
-              for (var i = 0; i < broken.length; i++) {
-                broken[i] = parseInt(broken[i]);
-                var adjusted = broken[i];
-                for (var j = 0; j < i; j++) {
-                  adjusted /= 10;
-                }
-                if (j > highest) highest = j;
-                num+= adjusted;
-              }
-              return {
-                number: num,
-                raw: broken,
-                high: highest
-              }
-            }
-            var parsed = parseVersion(version);
-            return {
-              number: parsed.number,
-              version: version,
-              string: 'Extra Emoticons ' + version,
-              full: parsed.raw,
-              toString: function() {
-                return this.string;
-              },
-              valueOf: function() {
-                return parsed.number;
-              },
-              equals: function(a) {
-                if (typeof(a) == 'string') {
-                  return this.version == a || this.string == a;
-                }
-                return this.valueOf() == a.valueOf();
-              },
-              compare: function(a) {
-                if (typeof(a) == 'string') a = parseVersion(a).number;
-                return this.valueOf() - a.valueOf();
-              }
-            };
-          },
-          'valueOf': function valueOf() { return this.toString(); },
-          'toString': function toString() {
-            return '[object API] {\n  getLogger() -> [Object Logger]\n  addEmoticons(id, name, title, emotes, normalize [, buttonImage])\n  addRaw(id, name, title, emotes, buttonImage)\n  addUrlMatcher(matcher (url, emoticon) -> Boolean)';
-          }
-        };
-        
-        var modules = [];
-        var mainHook = $('#add_comment_box, #edit_story_form, .edit_area, #chapter_edit_form .bbcode-editor, .form-send-pm, #new_thread');
-        
-        if (mainHook.length) {
-          logger.Log('mainHook created succesfully',20);
-          win.ExtraEmotes = new ExtraEmotesAPI(mainHook);
-          finalInit(win.ExtraEmotes);
-        } else {
-          logger.Log('no mainHook found, creating dummy object',20);
-          win.ExtraEmotes = {
-            addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {},
-            addRaw: function (id, name, title, emotes, buttonImage) { },
-            getLogger: function () { return logger; }
-          };
-        }
-        
-        lockDown(win.ExtraEmotes);
-        logger.Log('setup completed succesfully',20);
-      }
-
-      if (win != window) {
+      if (win != window && !window.ExtraEmotes && win.ExtraEmotes.getVersion().compare(version) < 0) {
         window.ExtraEmotes = lockDown({
-          'addEmoticons': function(id, name, title, emotes, normalize, buttonImage) {win.ExtraEmotes.addEmoticons(id, name, title, emotes, normalize, buttonImage);},
-          'addRaw': function(id, name, title, emotes, buttonImage) {win.ExtraEmotes.addRaw(id, name, title, emotes, buttonImage);},
-          'getLogger': function() {return win.ExtraEmotes.getLogger();},
-          'getVersion': function() {return win.ExtraEmotes.getVersion();},
-          'valueOf': function valueOf() { return this.toString(); },
-          'toString': function toString() {return win.ExtraEmotes.toString();}
+          addEmoticons: function(id, name, title, emotes, normalize, buttonImage) {win.ExtraEmotes.addEmoticons(id, name, title, emotes, normalize, buttonImage);},
+          addRaw: function(id, name, title, emotes, buttonImage) {win.ExtraEmotes.addRaw(id, name, title, emotes, buttonImage);},
+          getLogger: function() {return win.ExtraEmotes.getLogger();},
+          getVersion: function() {return win.ExtraEmotes.getVersion();},
+          valueOf: function() {return this.toString();},
+          toString: function() {return win.ExtraEmotes.toString();}
         });
         logger.Log('created proxy to unsafeWindow',20);
       }
-      
-      //--------------------------------------------------------------------------------------------------
-      //----------------------------------------FUNCTIONS-------------------------------------------------
-      //--------------------------------------------------------------------------------------------------
+      if (typeof (win.ExtraEmotes) !== 'undefined' && win.ExtraEmotes.getVersion().compare(version) >= 0) {
+          return;
+      }
       
       function lockDown(obj) {
         var result = function toString() {
@@ -631,12 +40,548 @@ if (isJQuery()) {
         return obj;
       }
       
-      function SiteMapping() {
+      //--------------------------------------------------------------------------------------------------
+      //---------------------------------EXTRA EMOTICONS MODULE-------------------------------------------
+      //--------------------------------------------------------------------------------------------------
+      var modules = [];
+      var mainHook = $('#add_comment_box, #edit_story_form, .edit_area, #chapter_edit_form .bbcode-editor, .form-send-pm, #new_thread');
+      var siteMapping = SiteMapping([
+        ['fav', true],
+        ['thumb', true],
+        ['Imgur', 'imgur.com'],
+        ['Google', 'google.com',true],
+        ['Twitter', 'twitter.com',true],
+        ['Facebook', 'facebook.com',true],
+        ['FimFiction', 'fimfiction.net'],
+        ['FanFiction', 'fanfiction.net'],
+        ['DeviantArt', 'deviantart.com',['DA']],
+        ['Tumblr', 'tumblr.com',true],
+        ['MyLittleFaceWhen', 'mylittlefacewhen.com'],
+        ['Amazon', 'amazon.com', ['Amazonaws']],
+        ['PhotoBucket', 'photobucket.com'],
+        ['Disqus', 'disqus.com',true],
+        ['MySpace', '*x.myspacecdn.com/new/common/images/favicons',true],
+        ['Blogger', 'blogger.com',true],
+        ['Pinterist', 'pinterest.com',true],
+        ['Reddit', 'reddit.com',true],
+        ['GitHub', 'github.com'],
+        ['EquestriaDaily', 'equestriadaily.com'],
+        ['YouTube', true],
+        ['LinkedIn', true],
+        ['WordPress', true],
+        ['IntenseDebate', true],
+        ['DropBox', '*dt8kf6553cww8.cloudfront.net/static/images/favicon-vflk5FiAC.ico*']
+      ]);
+      
+      function ExtraEmoticons(hook) {
+        this.region = $(hook);
+      }
+      ExtraEmoticons.prototype = {
+        init: function () {
+          logger.Log('ExtraEmoticons.init: start', 9);
+          this.mod();
+          this.setupGUI();
+          logger.Log('ExtraEmoticons.init: end', 9);
+        },
+        mod: function() {
+          if (!this.previewButton) {
+            if (this.region.attr('id') == 'add_comment_box') {
+              this.previewButton = $('#preview_comment');
+            } else if (this.region.attr('id') == 'edit_story_form') {
+              this.previewButton = this.region.find('td').last().find('.fa.fa-save').parent().next();
+            }
+            if (this.previewButton) {
+              var me = this;
+              this.previewButton.on('mousedown.extraemotes', function () {
+                logger.Log('PREVIEW',20);
+                handleSubmit(me);
+              });
+            }
+          }
+        },
+        setupGUI: function () {
+          logger.Log('ExtraEmoticons.setupGUI: start',10);
+          var me = this;
+          this.region.attr('data-init', 'true');
+
+          this.submitButton = this.getSubmitButton();
+          logger.Log('SubmitButton:' + this.submitButton.length, 20);
+          this.textArea = this.getTextArea();
+          this.childGuest = this.getEmotesButton();
+          this.toolbar = this.getToolbar();
+
+          this.submitButton.on('mousedown.extraemotes', function () {
+            logger.Log('SUBMIT',20);
+            handleSubmit(me);
+          });
+
+          if (me.textArea.val() != '') {
+            $(document).on('ready', function() {
+              me.textArea.val(returnAliases(me.textArea.val()));
+            });
+          }
+
+          this.backupText = $('<textarea style="display:none;" />');
+          this.textArea.parent().append(this.backupText);
+
+          this.emotesTypes = makeToolbar('emotes_type_switch');
+          this.toolbar.children().last().after(this.emotesTypes);
+          this.emotesTypes.append(this.childGuest.parent());
+
+          this.makeSearch('search');
+
+          this.childGuest.attr('data-function', '');
+          this.childGuest.attr('data-panel', 'default');
+          this.childGuest.addClass('emoticon-expander');
+          this.childGuest.on('click', function() {
+            var space_left = $(this).offset().left - me.toolbar.offset().left;
+            if (space_left < 300) {
+              $(this).parent().find('.drop-down').addClass('reverse');
+            } else {
+              $(this).parent().find('.drop-down').removeClass('reverse');
+            }
+          });
+          var img = $('<img class="emote-button" src="' + getDefaultEmoteUrl('twilightsmile') + '"></img>');
+          this.childGuest.find('i').after(img).remove();
+          if (!img[0].complete) {
+            $(img).css('display', 'none');
+            var spin = $('<i class="fa fa-spinner fa-spin emote-loading" />');
+            $(img).after(spin);
+            $(img).on('load error', function () {
+              $(img).css('display', '');
+              spin.remove();
+            });
+          }
+
+          var def = getDefaultEmotes();
+          var holder = this.makeEmotesPanel('', 'default', true);
+
+          var button = $(this.childGuest);
+          button.one('click', function() {
+            me.addImagesToPanel(def.Id, holder, def.Emotes, true);
+          });
+          var dropTipHolder = this.openEmoticonsPanel(button);
+          dropTipHolder.append(holder);
+          logger.Log('ExtraEmoticons.setupGUI: end',10);
+        },
+        makeDropTip: function(button) {
+          var holder = $('<div class="drop-down drop-down-emotes"><div class="arrow" /></div>');
+          $(button).after(holder);
+          return holder;
+        },
+        openEmoticonsPanel: function(button) {
+          var holder = $('<div data-id="' + $(button).attr('data-panel') + '" class="extra_emoticons_panel" />');;
+          this.makeDropTip(button).append(holder);
+          return holder;
+        },
+        getTextArea: function () {
+          return this.region.find('textarea').first();
+        },
+        getEmotesButton: function () {
+          return $(this.region).find('.drop-down-expander[data-function="emoticons-picker"]');
+        },
+        getSubmitButton: function () {
+          if (this.region.hasClass('edit_area') || this.region.attr('id') == 'add_comment_box' || this.region.hasClass('form-send-pm')) {
+            return this.region.find('.button-submit').first();// add comment, edit comment, send pm
+          } else if (this.region.attr('id') == 'send_pm_form') {
+            return $('#message_box_container #popup_accept').first();// popup send pm
+          } else if (this.region.attr('id') == 'new_thread') {
+            return this.region.find('.add_comment_toolbar button').first();// create thread
+          } else if (this.region.hasClass('module_editing_form')) {
+            return this.region.find('.drop-down-pop-up-footer button').first();// edit module
+          } else if (this.region.attr('id') == 'edit_story_form') {
+            return this.region.find('td').last().find('.fa.fa-save').parent();// edit blog post
+          } else if (this.region.hasClass('bbcode-editor')) {
+            return $('#chapter_edit_form button[data-function="save"]');// edit chapter
+          }
+          return this.region.find('.form_submitter').first();// default
+        },
+        getToolbar: function () {
+          return this.region.find('.format-toolbar').first();
+        },
+        makeSearch: function (label) {
+          logger.Log('ExtraEmoticons.makeSearch: start',8);
+          var searchbar = makeToolbar('emotes_search_toolbar');
+          this.toolbar.children().last().after(searchbar);
+          var li = $('<li class="button-group" />');
+          $(searchbar).append(li);
+          var button = $('<button class="emoticon-expander" data-panel="search" style="font-family:FontAwesome;"></button>');
+          li.append(button);
+          button.click(function(e) {
+            e.stopPropagation();
+            var a = $(this).parent();
+            if (a.hasClass("drop-down-show")) {
+              $(document).trigger('click');
+              a.removeClass("drop-down-show");
+            } else {
+              $(document).trigger('click');
+              a.addClass("drop-down-show");
+              var space_left = $(this).offset().left - me.toolbar.offset().left;
+              a.find('.drop-down')[space_left < 300 ? 'addClass' : 'removeClass']('reverse');
+              var c;
+              c = function() {
+                $(document).off("click close-dropdown", c);
+                a.removeClass("drop-down-show");
+              };
+              $(document).on("click close-dropdowns", c);
+            }
+            e.preventDefault();
+          });
+          var me = this;
+          button.one('click', function() {
+            var box = $('<input id="search_emotes_input" placeholder="search emoticons" autocomplete="off" type="text" />');
+            me.search_Tag = me.makeDropTip(button);
+            me.search_Tag.addClass('drop-up').addClass('hide');
+            me.search_Tag.append('<div class="emote-groups" />');
+            me.search = me.makeEmotesPanel('', 'search', true);
+            var panel = me.openEmoticonsPanel(button);
+            panel.append(box);
+            panel.append(me.search);
+            box.on('input', function (e) {
+              if (this.value == '') {
+                me.search_Tag.addClass('hide');
+                me.search.html('');
+              } else {
+                me.refreshSearch(this.value);
+              }
+            });
+            box.on('keydown', function(e) {
+              if (e.keyCode == 13) {
+                e.preventDefault();
+              }
+            });
+            box.click(function(e) {
+              e.stopPropagation();
+            });
+
+          });
+          logger.Log('ExtraEmoticons.makeSearch: end',8);
+        },
+        makeButton: function (name, label, image, callBack) {
+          logger.Log('ExtraEmoticons.makeButton: {0}:{1}', 7, name, label);
+          var link = $('<button class="drop-down-expander emoticon-expander" data-panel="' + name + '" title="' + label + ' Emoticons" />');
+          var me = this;
+          link.on('click', function() {
+            var space_left = $(this).offset().left - me.toolbar.offset().left;
+            if (space_left < 300) {
+              $(this).parent().find('.drop-down').addClass('reverse');
+            } else {
+              $(this).parent().find('.drop-down').removeClass('reverse');
+            }
+          });
+          link.one('click', callBack);
+          var img = $('<img class="emote-button" src="' + image.split('|')[0] + '"></img>');
+          link.append(img);
+          if (!img[0].complete) {
+            $(img).css('display', 'none');
+            var spin = $('<i style="line-height:18px;" class="fa fa-spinner fa-spin" />');
+            $(img).after(spin);
+            $(img).on('load error', function () {
+              $(img).css('display', '');
+              spin.remove();
+            });
+          }
+          var li = $('<li class="button-group" />');
+          $(li).append(link);
+          $(this.emotesTypes).append(li);
+          logger.Log('ExtraEmoticons.makeButton: end', 7);
+          return this.openEmoticonsPanel(link);
+        },
+        makeEmotesPanel: function (id, name, norma) {
+          logger.Log('ExtraEmoticons.makeEmotesPanel: start',5);
+          var innerPannel = $('<div domain="' + id + '" extraemotes="' + name + '" />');
+          if (norma != false) {
+            $(innerPannel).addClass('extra_emoticons_normalized');
+          }
+          $(this.panelholder).append(innerPannel);
+          logger.Log('ExtraEmoticons.makeEmotesPanel: end',5);
+          return innerPannel;
+        },
+        addRawsToPanel: function (holder, emotes) {
+          for (var i = emotes.length; i--;) {
+            this.addRawToPanel(holder, emotes[i]);
+          }
+        },
+        addRawToPanel: function (holder, item) {
+          var title = item;
+          if (item.indexOf('|') != -1) {
+            var splitten = SplitTitle(item);
+            if (splitten[1] != '') {
+              item = splitten[0];
+              title = item + '\n ' + splitten[1];
+            } else if (splitten[0] != '') {
+              title = splitten[0];
+            }
+          }
+          if (item.indexOf('\'') != -1) {
+            item = item.replace('\'', '\\\'');
+          }
+          var newA = $('<a data-function="emoticon" data-emoticon="' + item + '" />');
+          $(newA).append('<div class="raw_emote" isRaw="true" title="' + title + '">' + item + '</div>');
+          $(holder).append(newA);
+        },
+        addImagesToPanel: function (id, holder, emotes) {
+          if (id != '') id = ':' + id;
+          for (var i = emotes.length; i--;) {
+            this.addImageToPanel(id, holder, emotes[i]);
+          }
+        },
+        addImageToPanel: function (id, holder, item) {
+          var title = getTitle(item);
+          var mote = $('<div class="extra_emote"></div>');
+          var img = $('<img title="' + id + title + '" src="' + CutProto(item).split('|')[0].split('?')[0] + '" />');
+          mote.append(img);
+          img.on('dragstart', function(event) {
+            var data = event.originalEvent.dataTransfer.getData('Text/plain');
+
+            if (data && data.trim().indexOf('[') == 0) {
+              data = data.split('\n');
+              for (var i = data.length; i--;) {
+                data[i] = data[i].trim().replace(/\[/g, '').replace(/\]/g, '');
+              }
+              event.originalEvent.dataTransfer.setData('Text/plain', data.join(''));
+            } else {
+              event.originalEvent.dataTransfer.setData('Text/plain', id + title);
+            }
+
+          });
+          if (!img[0].complete) {
+            img.css('display', 'none');
+            var spin = $('<i class="fa fa-spinner fa-spin emote-loading" />');
+            mote.append(spin);
+            img.on('load error', function () {
+              img.css('display', '');
+              spin.remove();
+            });
+          }
+
+          var newA = $('<a data-function="emoticon" data-emoticon="' + (id + title) + '" />');
+          newA.append(mote);
+          $(holder).append(newA);
+        },
+        findMatchingEmotes: function (name) {
+          var terms = $.grep(name.toLowerCase().split(' '), function (v) {
+            return v != '';
+          });
+          var results = [];
+
+          if (terms.length > 0) {
+            var panels = getVirtualEmotes();
+            var group = isGroupSearch(terms, panels);
+
+            terms = '(' + terms.join(' ') + ')';
+            if (name.indexOf('social') != -1 || name.indexOf('media') != -1) {
+              terms += '|(' + siteMapping.getSocial().join(')|(') + ')';
+            }
+
+            terms = new RegExp(terms);
+            for (var i = panels.length; i--;) {
+              var named = false;
+              for (var k = group.title.length; k--;) {
+                if (group.title[k] == panels[i].Name) named = true;
+              }
+              for (var k = panels[i].Emotes.length; k--;) {
+                if (named || (!panels[i].IsRaw ? panels[i].Emotes[k].replace('sollace.github.io','www.github.com') + panels[i].EmoteTitles[k].replace(/\:/g,'') : panels[i].EmoteTitles[k]).toLowerCase().match(terms)) {
+                  results.push({
+                    raw: panels[i].IsRaw,
+                    emote: panels[i].Emotes[k] + '|' + (panels[i].Id == null || panels[i].IsRaw ? '' : panels[i].Id) + panels[i].EmoteTitles[k]
+                  });
+                }
+              }
+            }
+            if (name.indexOf('social') != -1 || name.indexOf('media') != -1) {
+              group.title.push('!autoFilled$social');
+              group.type.push('url');
+            }
+            this.displayGroupIcons(group);
+          }
+          return results;
+        },
+        displayGroupIcons: function (groups) {
+          if (groups.title.length > 0) {
+            this.search_Tag.removeClass('hide');
+            this.search_Tag.find('.emote-groups').html('');
+            for (var i = groups.title.length; i--;) {
+              var g = groups.title[i];
+              var tag = $('<div class="search_tag" />');
+              tag.append('<img src="' + this.getGroupButtonIcon(g) + '" />');
+              tag.children().first().load(function () {
+                $(this).css('height', '15px');
+              });
+              tag.append('<i class="fa fa-spinner fa-spin" />');
+
+              if (g == '!autoFilled$social') {
+                tag.attr('title', 'Media search\n Icons relating to social networks ');
+              } else {
+                if (groups.type[i] == 'url') {
+                  tag.attr('title', 'Url search\n Icons hosted by ' + g);
+                } else {
+                  tag.attr('title', 'Emoticon search\n Icons from ' + g);
+                }
+              }
+              this.search_Tag.find('.emote-groups').append(tag);
+            }
+          } else {
+            this.search_Tag.addClass('hide');
+          }
+        },
+        refreshSearch: function (term) {
+          this.search.html('');
+          term = cleanse(term);
+          var results = this.findMatchingEmotes(term);
+          logger.Log('Refresh search: terms="' + term + '" ' + results.length + ' results',4);
+          if (results.length > 0) {
+            for (var i = results.length; i--;) {
+              logger.Log('raw="' + results[i].raw + '" item="' + results[i].emote + '"');
+              if (results[i].raw) {
+                logger.Log('Adding RAW to panel',3);
+                this.addRawToPanel(this.search, results[i].emote);
+              } else {
+                logger.Log('Adding IMG to panel',3);
+                this.addImageToPanel('', this.search, results[i].emote);
+              }
+            }
+          } else {
+            this.search.html('<span class="extra_emoticons_message">0 results found</span>');
+          }
+        },
+        getGroupButtonIcon: function (name) {
+          if (name == '!autoFilled$social') {
+            return 'http://static.fimfiction.net/images/icons/quote.png';
+          } else {
+            var icon = siteMapping.getFavicon(name);
+            if (icon != null) {
+              return icon;
+            }
+          }
+          var buttons = this.emotesTypes.children();
+          for (var i = buttons.length; i--;) {
+            var link = $(buttons[i]).find('button');
+            if (link.attr('data-panel').toLowerCase() == name.toLowerCase()) {
+              return link.find('img').attr('src');
+            }
+          }
+        },
+        addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {
+          var holder = this.makeEmotesPanel(id, name, normalize);
+          var me = this;
+          this.makeButton(name, title, buttonImage ? buttonImage : emotes[emotes.length - 1], function() {
+            me.addImagesToPanel(id, holder, emotes);
+          }).append(holder);
+        },
+        addRaw: function (id, name, title, emotes, buttonImage) {
+          if (buttonImage == null) {
+            buttonImage = 'http://static.fimfiction.net/images/icons/quote.png'
+          }
+          var holder = this.makeEmotesPanel(id, name, false);
+          var me = this;
+          this.makeButton(name, title, buttonImage, function() {
+            me.addRawsToPanel(holder, emotes);
+          }).append(holder);
+        }
+      };
+      
+      function ExtraEmotesAPI(hooks) {
+        this.modules = [];
+        for (var i = hooks.length; i--;) {
+          var module = new ExtraEmoticons(hooks[i]);
+          module.init();
+          this.modules.push(module);
+        }
+      }
+      ExtraEmotesAPI.prototype = {
+        //==API FUNCTION==//
+        //Gets the logging object
+        getLogger: function () {
+          return logger;
+        },
+        //==API FUNCTION==//
+        //Adds a collection of image emoticons
+        //Optional: buttonImage
+        addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {
+          for (var i = this.modules.length; i--;) {
+            this.modules[i].addEmoticons(id, name, title, emotes, normalize, buttonImage);
+          }
+          recordEmotesPanel(false, id, name, title, emotes, buttonImage, normalize);
+          logger.Log('addEmoticons: finalizing...',11);
+        },
+        //==API FUNCTION==//
+        //Adds a collection of text emoticons
+        addRaw: function (id, name, title, emotes, buttonImage) {
+          for (var i = this.modules.length; i--;) {
+            this.modules[i].addRaw(id, name, title, emotes, buttonImage);
+          }
+          recordEmotesPanel(true, id, name, title, emotes, buttonImage, false);
+          logger.Log('addRaw: finalizing...',11);
+        },
+        //==API FUNCTION==//
+        //Adds a matching function to identify emoticon images by url
+        addUrlMatcher: function(matcher) {
+          addMatcher(matcher);
+        },
+        getVersion: function() {
+          return {
+            number: version,
+            version: version,
+            string: 'Extra Emoticons ' + version,
+            full: parsed.raw,
+            toString: function() {
+              return this.string;
+            },
+            valueOf: function() {
+              return this.number;
+            },
+            equals: function(a) {
+              if (typeof(a) == 'string') {
+                return this.version == a || this.string == a;
+              }
+              return this.valueOf() == a.valueOf();
+            },
+            compare: function(a) {
+              if (typeof(a) == 'string') a = parseFloat(a);
+              return this.valueOf() - a.valueOf();
+            }
+          };
+        },
+        valueOf: function valueOf() { return this.toString(); },
+        toString: function toString() {
+          return '[object API] {\n  getLogger() -> [Object Logger]\n  addEmoticons(id, name, title, emotes, normalize [, buttonImage])\n  addRaw(id, name, title, emotes, buttonImage)\n  addUrlMatcher(matcher (url, emoticon) -> Boolean)';
+        }
+      };
+      
+      
+      if (mainHook.length) {
+        logger.Log('mainHook created succesfully',20);
+        win.ExtraEmotes = new ExtraEmotesAPI(mainHook);
+        finalInit(win.ExtraEmotes);
+      } else {
+        logger.Log('no mainHook found, creating dummy object',20);
+        win.ExtraEmotes = {
+          addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {},
+          addRaw: function (id, name, title, emotes, buttonImage) { },
+          getLogger: function () { return logger; }
+        };
+      }
+      
+      lockDown(win.ExtraEmotes);
+      logger.Log('setup completed succesfully',20);
+      
+      //--------------------------------------------------------------------------------------------------
+      //----------------------------------------FUNCTIONS-------------------------------------------------
+      //--------------------------------------------------------------------------------------------------
+      
+      function SiteMapping(loaded) {
         var Mapping = {};
         var aliased = {};
         var socialMapping = [];
-        return {
-          'registerMapping': function(name, domain, aliases, social) {
+        return ({
+          registerMappings: function(mappings) {
+            for (var i = mappings.length; i--;) {
+              this.registerMapping.apply(this, mappings[i]);
+            }
+            return this;
+          },
+          registerMapping: function(name, domain, aliases, social) {
             if (typeof domain == 'boolean') {
               social = domain;
               domain = null;
@@ -656,34 +601,34 @@ if (isJQuery()) {
             }
             if (social) socialMapping.push(name.toLowerCase());
           },
-          'getMapped': function(id) {
+          getMapped: function(id) {
             var name = this.getName(id);
             if (name == null) return null;
             return {'name': name, 'domain': Mapping[name]};
           },
-          'getName': function(id) {
+          getName: function(id) {
             id = aliased[id.toLowerCase()];
             if (id == undefined) return null;
             return id;
           },
-          'getDomain': function(id) {
+          getDomain: function(id) {
             id = this.getName(id);
             if (id == null) return null;
             return Mapping[id];
           },
-          'getIsSite': function(id) {
+          getIsSite: function(id) {
             return aliased[id.toLowerCase()] != undefined;
           },
-          'getFavicon': function (id) {
+          getFavicon: function (id) {
             id = this.getDomain(id);
             if (id == null) return null;
             if (id.indexOf('*') != 0) id = 'www.' + id;
-            return '//' + id.replace(/\*/g, '') + (endsWith(id, '*') ? '' : '/favicon.ico');
+            return '//' + id.replace(/\*$/g, '/favicon.ico');
           },
-          'getSocial': function() {
+          getSocial: function() {
             return socialMapping;
           }
-        }
+        }).registerMappings(loaded);
       }
 
       function Name(url) {
@@ -781,20 +726,7 @@ if (isJQuery()) {
           });
         }
       }
-
-
-      //==API FUNCTION==//
-      var emoteExtenderIsNull = false;
-      var emoteExtenderFF;
-      //Returns true if FimFiction Emote extender is running on the current page
-      function emoteExtenderIsRunning() {
-        if (emoteExtenderFF == null && !emoteExtenderIsNull) {
-          emoteExtenderFF = $('span[id="emoteAPI_Table:FF"]');
-          emoteExtenderIsNull = emoteExtenderFF.length == 0;
-        }
-        return !emoteExtenderIsNull;
-      }
-
+      
       function restoreFromRecord(hook) {
         var store = getVirtualEmotes();
         for (var i = store.length; i--;) {
@@ -892,51 +824,43 @@ if (isJQuery()) {
       }
 
       var virtualEmotes;
-      var _defaultEmotes;
+      var defaultEmotes;
       function getVirtualEmotes() {
         return virtualEmotes || (virtualEmotes = []);
       }
       function getDefaultEmotes() {
-        if (!_defaultEmotes) {
-          _defaultEmotes = {
+        return defaultEmotes || (function() {
+          getVirtualEmotes().push(defaultEmotes = {
             Name: 'default',
             External: true,
             IsRaw: false,
             Id: '',
             Emotes: [],
             EmoteTitles: []
-          }
+          });
           var def = ['ajbemused','ajsleepy','ajsmug','applejackconfused','applejackunsure','applecry','eeyup','fluttercry','flutterrage','fluttershbad','fluttershyouch','fluttershysad','yay','heart','pinkiecrazy','pinkiegasp','pinkiehappy','pinkiesad2','pinkiesmile','pinkiesick','twistnerd','rainbowderp','rainbowdetermined2','rainbowhuh','rainbowkiss','rainbowlaugh','rainbowwild','scootangel','raritycry','raritydespair','raritystarry','raritywink','duck','unsuresweetie','coolphoto','twilightangry2','twilightoops','twilightblush','twilightsheepish','twilightsmile','facehoof','moustache','trixieshiftleft','trixieshiftright','derpyderp1','derpyderp2','derpytongue2','trollestia'];
           for (var i = def.length; i--;) {
-            _defaultEmotes.Emotes.push(getDefaultEmoteUrl(def[i]));
-            _defaultEmotes.EmoteTitles.push(':' + def[i] + ':');
+            defaultEmotes.Emotes.push(getDefaultEmoteUrl(def[i]));
+            defaultEmotes.EmoteTitles.push(':' + def[i] + ':');
           }
-          if (virtualEmotes == null) {
-            virtualEmotes = [];
-          }
-          virtualEmotes.push(_defaultEmotes);
-        }
-
-        return _defaultEmotes;
-      }
-      function getLegacyEmotes() {
-        return '<div class="drop-down drop-down-emoticons"><div class="arrow"></div><ul><li><a data-function="emoticon" data-emoticon=":ajbemused:"><img src="//static.fimfiction.net/images/emoticons/ajbemused.png"></a></li><li><a data-function="emoticon" data-emoticon=":ajsleepy:"><img src="//static.fimfiction.net/images/emoticons/ajsleepy.png"></a></li><li><a data-function="emoticon" data-emoticon=":ajsmug:"><img src="//static.fimfiction.net/images/emoticons/ajsmug.png"></a></li><li><a data-function="emoticon" data-emoticon=":applecry:"><img src="//static.fimfiction.net/images/emoticons/applecry.png"></a></li><li><a data-function="emoticon" data-emoticon=":applejackconfused:"><img src="//static.fimfiction.net/images/emoticons/applejackconfused.png"></a></li><li><a data-function="emoticon" data-emoticon=":applejackunsure:"><img src="//static.fimfiction.net/images/emoticons/applejackunsure.png"></a></li><li><a data-function="emoticon" data-emoticon=":coolphoto:"><img src="//static.fimfiction.net/images/emoticons/coolphoto.png"></a></li><li><a data-function="emoticon" data-emoticon=":derpyderp1:"><img src="//static.fimfiction.net/images/emoticons/derpyderp1.png"></a></li><li><a data-function="emoticon" data-emoticon=":derpyderp2:"><img src="//static.fimfiction.net/images/emoticons/derpyderp2.png"></a></li><li><a data-function="emoticon" data-emoticon=":derpytongue2:"><img src="//static.fimfiction.net/images/emoticons/derpytongue2.png"></a></li><li><a data-function="emoticon" data-emoticon=":fluttercry:"><img src="//static.fimfiction.net/images/emoticons/fluttercry.png"></a></li><li><a data-function="emoticon" data-emoticon=":flutterrage:"><img src="//static.fimfiction.net/images/emoticons/flutterrage.png"></a></li><li><a data-function="emoticon" data-emoticon=":fluttershbad:"><img src="//static.fimfiction.net/images/emoticons/fluttershbad.png"></a></li><li><a data-function="emoticon" data-emoticon=":fluttershyouch:"><img src="//static.fimfiction.net/images/emoticons/fluttershyouch.png"></a></li><li><a data-function="emoticon" data-emoticon=":fluttershysad:"><img src="//static.fimfiction.net/images/emoticons/fluttershysad.png"></a></li><li><a data-function="emoticon" data-emoticon=":heart:"><img src="//static.fimfiction.net/images/emoticons/heart.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiecrazy:"><img src="//static.fimfiction.net/images/emoticons/pinkiecrazy.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiegasp:"><img src="//static.fimfiction.net/images/emoticons/pinkiegasp.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiehappy:"><img src="//static.fimfiction.net/images/emoticons/pinkiehappy.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiesad2:"><img src="//static.fimfiction.net/images/emoticons/pinkiesad2.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiesick:"><img src="//static.fimfiction.net/images/emoticons/pinkiesick.png"></a></li><li><a data-function="emoticon" data-emoticon=":pinkiesmile:"><img src="//static.fimfiction.net/images/emoticons/pinkiesmile.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowderp:"><img src="//static.fimfiction.net/images/emoticons/rainbowderp.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowdetermined2:"><img src="//static.fimfiction.net/images/emoticons/rainbowdetermined2.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowhuh:"><img src="//static.fimfiction.net/images/emoticons/rainbowhuh.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowkiss:"><img src="//static.fimfiction.net/images/emoticons/rainbowkiss.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowlaugh:"><img src="//static.fimfiction.net/images/emoticons/rainbowlaugh.png"></a></li><li><a data-function="emoticon" data-emoticon=":rainbowwild:"><img src="//static.fimfiction.net/images/emoticons/rainbowwild.png"></a></li><li><a data-function="emoticon" data-emoticon=":raritycry:"><img src="//static.fimfiction.net/images/emoticons/raritycry.png"></a></li><li><a data-function="emoticon" data-emoticon=":raritydespair:"><img src="//static.fimfiction.net/images/emoticons/raritydespair.png"></a></li><li><a data-function="emoticon" data-emoticon=":raritystarry:"><img src="//static.fimfiction.net/images/emoticons/raritystarry.png"></a></li><li><a data-function="emoticon" data-emoticon=":raritywink:"><img src="//static.fimfiction.net/images/emoticons/raritywink.png"></a></li><li><a data-function="emoticon" data-emoticon=":scootangel:"><img src="//static.fimfiction.net/images/emoticons/scootangel.png"></a></li><li><a data-function="emoticon" data-emoticon=":trixieshiftleft:"><img src="//static.fimfiction.net/images/emoticons/trixieshiftleft.png"></a></li><li><a data-function="emoticon" data-emoticon=":trixieshiftright:"><img src="//static.fimfiction.net/images/emoticons/trixieshiftright.png"></a></li><li><a data-function="emoticon" data-emoticon=":twilightangry2:"><img src="//static.fimfiction.net/images/emoticons/twilightangry2.png"></a></li><li><a data-function="emoticon" data-emoticon=":twilightblush:"><img src="//static.fimfiction.net/images/emoticons/twilightblush.png"></a></li><li><a data-function="emoticon" data-emoticon=":twilightoops:"><img src="//static.fimfiction.net/images/emoticons/twilightoops.png"></a></li><li><a data-function="emoticon" data-emoticon=":twilightsheepish:"><img src="//static.fimfiction.net/images/emoticons/twilightsheepish.png"></a></li><li><a data-function="emoticon" data-emoticon=":twilightsmile:"><img src="//static.fimfiction.net/images/emoticons/twilightsmile.png"></a></li><li><a data-function="emoticon" data-emoticon=":twistnerd:"><img src="//static.fimfiction.net/images/emoticons/twistnerd.png"></a></li><li><a data-function="emoticon" data-emoticon=":unsuresweetie:"><img src="//static.fimfiction.net/images/emoticons/unsuresweetie.png"></a></li><li><a data-function="emoticon" data-emoticon=":yay:"><img src="//static.fimfiction.net/images/emoticons/yay.png"></a></li><li><a data-function="emoticon" data-emoticon=":trollestia:"><img src="//static.fimfiction.net/images/emoticons/trollestia.png"></a></li><li><a data-function="emoticon" data-emoticon=":moustache:"><img src="//static.fimfiction.net/images/emoticons/moustache.png"></a></li><li><a data-function="emoticon" data-emoticon=":facehoof:"><img src="//static.fimfiction.net/images/emoticons/facehoof.png"></a></li><li><a data-function="emoticon" data-emoticon=":eeyup:"><img src="//static.fimfiction.net/images/emoticons/eeyup.png"></a></li><li><a data-function="emoticon" data-emoticon=":duck:"><img src="//static.fimfiction.net/images/emoticons/duck.png"></a></li></ul></div>';
+          return defaultEmotes;
+        })();
       }
       
-      function VirtualEmotePanel(israw, id, name, title, emotes, img, norm, ext) {
-        this.Normalized = norm != false;
-        this.Title = title;
-        this.Name = name;
-        this.Id = id;
-        this.IsRaw = israw;
-        this.External = ext == true;
+      function recordEmotesPanel(isRaw, id, name, title, emotes, img, norm, ext) {
+        var panel = {
+          Normalized: norm != false,
+          Title: title,
+          Name: name,
+          Id: id,
+          IsRaw: isRaw,
+          External: !!ext,
+          Image: isRaw || img ? img : emotes[emotes.length - 1],
+          Emotes: [],
+          EmoteTitles: [],
+          rawEmotes: emotes
+        }
         
-        this.Image = this.IsRaw || img ? img : emotes[emotes.length - 1];
-        
-        this.Emotes = [];
-        this.EmoteTitles = [];
-        this.rawEmotes = emotes;
-
         for (var k = emotes.length; k--;) {
           var emote = emotes[k];
           if (emote.indexOf('http') == 0) emote = CutProto(emote);
@@ -944,29 +868,22 @@ if (isJQuery()) {
             var item = emote.split('|');
             if (item.length > 2) {
               item[item.length - 1] = '';
-              this.Emotes.push(item.join('|'));
+              panel.Emotes.push(item.join('|'));
             } else {
-              this.Emotes.push(item[0]);
+              panel.Emotes.push(item[0]);
             }
           } else {
-            this.Emotes.push(emote);
+            panel.Emotes.push(emote);
           }
-          if (this.IsRaw) {
-            this.EmoteTitles.push(SplitTitle(emote)[1]);
+          if (isRaw) {
+            panel.EmoteTitles.push(SplitTitle(emote)[1]);
           } else {
-            this.EmoteTitles.push(getTitle(emote));
+            panel.EmoteTitles.push(getTitle(emote));
           }
         }
+        getVirtualEmotes().push(panel);
       }
-
-      function recordEmotesPanel(isRaw, id, name, title, emotes, img, norm) {
-        virtualEmotes.push(new VirtualEmotePanel(isRaw, id, name, title, emotes, img, norm, false));
-      }
-
-      function recordExternalEmotesPanel(name, emotes) {
-        virtualEmotes.push(new VirtualEmotePanel(false, '', name, '', emotes, '', false, true));
-      }
-
+      
       function recordExtraEmotesPanels() {
         $('.emoteTable').each(function () {
           var name = $(this).attr('id').split(':')[1].split('_Area')[0];
@@ -974,64 +891,56 @@ if (isJQuery()) {
           $(this).find('.customEmote').each(function () {
             emotes.push($(this).attr('id') + '|' + $(this).attr('title'));
           });
-          recordExternalEmotesPanel(name, emotes);
+          recordEmotesPanel(false, '', name, '', emotes, '', false, true);
         });
       }
-
+      
       function UnspoilerEmoticons() {
         var comments = $('.comment .data .comment_data');
         if (comments.length == 0) {
           logger.Log("unspoiler: abort", 10);
           return false;
         }
-        emotifyImg();
-        unspoilerSiblings();
-        comments.find('img:not(.done)').each(function () {
-          $(this).attr('title', $(this).attr('alt'));
-          $(this).addClass('done');
+        comments.find('img.user_image:not(.done)').each(emotify);
+        comments.find('.user_image_link:not(.dontUnspoiler)').each(unspoilerSibling);
+        comments.find('img.emoticon:not(.done)').each(function () {
+          var me = $(this);
+          me.attr('title', me.attr('alt')).addClass('done');
         });
-
         logger.Log("unspoiler: complete", 10);
         return true;
       }
       
-      function emotifyImg() {
-        $('.comment .data .comment_data .user_image:not(.done').each(emotify);
-      }
       function emotify() {
-        var url = CutProto($(this).attr('src'));
+        var me = $(this);
+        var url = CutProto(me.attr('src'));
         var type = EmoteType(url);
         if (type.result == 1) {
           var tit = Name(type.url);
-          $(this).attr('src', type.url);
-          $(this).attr('alt', tit);
-          $(this).attr('title', tit);
-          $(this).addClass('emoticon').removeClass('user_image');
+          me.attr('src', type.url);
+          me.attr('alt', tit).attr('title', tit);
+          me.addClass('emoticon').removeClass('user_image');
           if (type.lim) {
-            $(this).css('max-height', '27px');
+            me.css('max-height', '27px');
           }
-        } else {
-          $(this).addClass('done');
         }
+        me.addClass('done');
       }
-
-      function unspoilerSiblings() {
-        $('.comment .data .comment_data .user_image_link:not(.dontUnspoiler)').each(unspoilerSibling);
-      }
+      
       function unspoilerSibling() {
-        var url = CutProto($(this).attr('href'));
+        var me = $(this);
+        var url = CutProto(me.attr('href'));
         var type = EmoteType(url);
         var img;
         if (type.result > 0) {
           if (type.result == 2) {
             img = $('<img class="user_image" src="' + type.url + '" />');
-            $(this).parent().after(img).remove();
+            me.parent().after(img).remove();
           } else {
             var tit = Name(type.url);
             img = $('<img class="emoticon" alt="' + tit + '" title="' + tit + '" src="' + type.url + '" />');
             if (type.lim) $(img).css('max-height', '27px');
-            
-            var p = $(this).parent().prev();
+            var p = me.parent().prev();
             if (p.prop('tagName') != 'P') {
               if (p.prop('tagName') == 'BR') {
                 p = p.prev();
@@ -1039,59 +948,33 @@ if (isJQuery()) {
               }
             }
             if (type.wrap || p.length == 0 || p.prop('tagName') != 'P') {
-              $(this).parent().attr('style', 'display: inline;');
-              $(this).after(img);
-              $(this).remove();
+              me.parent().attr('style', 'display: inline;');
+              me.after(img).remove();
             } else {
-              $(this).parent().remove();
+              me.parent().remove();
               p.append(img);
             }
           }
           img.parent().find('i').remove();
           logger.Log("unspoilerSiblings: " + url);
         } else {
-          $(this).addClass('dontUnspoiler');
-          $(this).parent().after('<br />');
+          me.addClass('dontUnspoiler');
+          me.parent().after('<br />');
         }
       }
-      function isSpoileredImg(item) {
-        return item.tagName == 'DIV' && item.children[0] != undefined && item.children[0].tagName == 'A';
-      }
-
+      
       function finalInit(instance) {
         logger.Log('finalInit: beginning init...');
-        setTimeout(function () {
-          logger.Log('finalInit: document ready');
-          var emoteExtenderOtp = $('a[title="Emote Script Settings"]');
-          if (emoteExtenderOtp.length) {
-            emoteExtenderOtp = emoteExtenderOtp.parent().parent()[0];
-            instance.toolbar.insertBefore(emoteExtenderOtp, ExtraEmotes.emotesTypes)
-          }
-          logger.Log('refreshComments');
-          if (document.location.href.replace(/http(s|):/,'').indexOf('//www.fimfiction.net/manage_user/messages/') != 0) {
-            var temp = setInterval(refreshComments, 500);
-            var tempb = setInterval(refreshEmotePanels, 1000);
-            $.ajaxSetup({catch: true});
-            $.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js", function() {
-              clearInterval(tempb);
-              FimFicEvents.on('afterpagechange aftercomposepm', refreshEmotePanels);
-              if (isMyPage()) FimFicEvents.on('aftereditmodule', function() {
-                refreshEmotePanels();
-                $('.module_editing_form textarea').each(function() {
-                  $(this).val(returnAliases($(this).val()));
-                });
-              });
-              clearInterval(temp);
-              FimFicEvents.on('afterpagechange aftereditcomment afteraddcomment afterpreviewcomment', refreshComments);
+        if (document.location.href.replace(/http(s|):/,'').indexOf('//www.fimfiction.net/manage_user/messages/') != 0) {
+          FimFicEvents.on('afterpagechange aftercomposepm', refreshEmotePanels);
+          if (isMyPage()) FimFicEvents.on('aftereditmodule', function() {
+            refreshEmotePanels();
+            $('.module_editing_form textarea').each(function() {
+              $(this).val(returnAliases($(this).val()));
             });
-            $.getScript("https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js", function() {
-              SpecialTitles.setUpSpecialTitles();
-              FimFicEvents.on('afterpagechange aftereditcomment afteraddcomment afterpreviewcomment', function() {
-                SpecialTitles.setUpSpecialTitles();
-              });
-            });
-          }
-        }, 200);
+          });
+          FimFicEvents.on('afterpagechange aftereditcomment afteraddcomment afterpreviewcomment', refreshComments);
+        }
         makeStyle('\
 .extra_emoticons_normalized .emote-loading {\
   position: absolute;\
@@ -1299,10 +1182,8 @@ background: none repeat scroll 0% 0% #FFF;}\
           var spl = raw.split('|');
           if (spl.length > 0 && spl[spl.length - 1] != '') {
             var result = spl[spl.length - 1];
-            if (result.indexOf(':') != 0)
-              result = ':' + result;
-            if (!endsWith(result, ':'))
-              result += ':';
+            if (result.indexOf(':') != 0) result = ':' + result;
+            if (result[result.length - 1] != ':') result += ':';
             return result
           }
         }
@@ -1318,6 +1199,10 @@ background: none repeat scroll 0% 0% #FFF;}\
       
       function CutProto(url) {
         return url && (url.indexOf('http') == 0) ? url.replace(/http(s|):/,'') : url;
+      }
+      
+      function replaceAll(find, replace, str) {
+        return str.replace(new RegExp(find.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'g'), replace);
       }
 
       function SplitTitle(text) {
