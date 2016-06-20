@@ -16,19 +16,25 @@ if (isJQuery()) {
   var logger = new Logger('Extra Emoticons', 6);
   try {
     (function (win) {
-      if (win != window && !window.ExtraEmotes && win.ExtraEmotes.getVersion().compare(version) < 0) {
-        window.ExtraEmotes = lockDown({
-          addEmoticons: function(id, name, title, emotes, normalize, buttonImage) {win.ExtraEmotes.addEmoticons(id, name, title, emotes, normalize, buttonImage);},
-          addRaw: function(id, name, title, emotes, buttonImage) {win.ExtraEmotes.addRaw(id, name, title, emotes, buttonImage);},
-          getLogger: function() {return win.ExtraEmotes.getLogger();},
-          getVersion: function() {return win.ExtraEmotes.getVersion();},
-          valueOf: function() {return this.toString();},
-          toString: function() {return win.ExtraEmotes.toString();}
-        });
-        logger.Log('created proxy to unsafeWindow',20);
+      if (win != window) {
+        if (!window.ExtraEmotes || window.ExtraEmotes.getVersion().compare(version) < 0) {
+          createProxy(window, win.ExtraEmotes);
+        }
       }
       if (typeof (win.ExtraEmotes) !== 'undefined' && win.ExtraEmotes.getVersion().compare(version) >= 0) {
           return;
+      }
+      
+      function createProxy(target, ee) {
+        target.ExtraEmotes = lockDown({
+          addEmoticons: function(id, name, title, emotes, normalize, buttonImage) {ee.addEmoticons(id, name, title, emotes, normalize, buttonImage);},
+          addRaw: function(id, name, title, emotes, buttonImage) {ee.addRaw(id, name, title, emotes, buttonImage);},
+          getLogger: function() {return ee.getLogger();},
+          getVersion: function() {return ee.getVersion();},
+          valueOf: function() {return ee.toString();},
+          toString: function() {return ee.toString();}
+        });
+        logger.Log('created proxy to unsafeWindow',20);
       }
       
       function lockDown(obj) {
@@ -524,7 +530,7 @@ if (isJQuery()) {
             number: version,
             version: version,
             string: 'Extra Emoticons ' + version,
-            full: parsed.raw,
+            full: version,
             toString: function() {
               return this.string;
             },
@@ -559,7 +565,8 @@ if (isJQuery()) {
         win.ExtraEmotes = {
           addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {},
           addRaw: function (id, name, title, emotes, buttonImage) { },
-          getLogger: function () { return logger; }
+          getLogger: function () { return logger; },
+          getVersion: ExtraEmotesAPI.getVersion
         };
       }
       
