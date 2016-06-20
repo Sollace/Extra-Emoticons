@@ -566,7 +566,7 @@ if (isJQuery()) {
           addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {},
           addRaw: function (id, name, title, emotes, buttonImage) { },
           getLogger: function () { return logger; },
-          getVersion: ExtraEmotesAPI.getVersion
+          getVersion: ExtraEmotesAPI.prototype.getVersion
         };
       }
       
