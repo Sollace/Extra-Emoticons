@@ -8,11 +8,11 @@
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Logger.js
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
-// @version     5.5.6
+// @version     5.5.7
 // @grant       none
 // ==/UserScript==
 if (isJQuery()) {
-  var version = 5.56;
+  var version = 5.57;
   var logger = new Logger('Extra Emoticons', 6);
   try {
     (function (win) {
@@ -509,6 +509,7 @@ if (isJQuery()) {
             this.modules[i].addEmoticons(id, name, title, emotes, normalize, buttonImage);
           }
           recordEmotesPanel(false, id, name, title, emotes, buttonImage, normalize);
+          refreshComments();
           logger.Log('addEmoticons: finalizing...',11);
         },
         //==API FUNCTION==//
