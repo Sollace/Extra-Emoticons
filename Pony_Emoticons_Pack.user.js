@@ -3,8 +3,8 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.6.1
-// @icon        http://sollace.github.io/emoticons/fimfic/nerdgasm-d72140i.png
+// @version     2.7
+// @icon        http://sollace.github.io/emoticons/default/rainbowexcited.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
@@ -25,39 +25,50 @@ ExtraEmotes.addUrlMatcher(function(url, match) {
 });
 
 
+ExtraEmotes.addEmoticons("x", "Default", "Extra", ([
+  "http://sollace.github.io/emoticons/default/rainbowexcited.png",
+  "http://sollace.github.io/emoticons/fimfic/nerdgasm-d72140i.png|nerdgasm",
+  "http://sollace.github.io/emoticons/fimfic/twieww-d72140f.png|twieww",
+  "http://sollace.github.io/emoticons/fimfic/fitwi-d7252jt.png|fitwi",
+  "http://sollace.github.io/emoticons/fimfic/plotpie-d7251q8.png|plotpie",
+  "http://sollace.github.io/emoticons/fimfic/plotpie2-d7251q5.png|plotpie2",
+  "http://sollace.github.io/emoticons/fimfic/flirtypie-d7251py.png|flitrypie",
+  "http://sollace.github.io/emoticons/fimfic/nompie-d7251pu.png|nompie",
+  "http://sollace.github.io/emoticons/fimfic/piegasm-d7251pn.png|piegasm",
+  "http://sollace.github.io/emoticons/fimfic/hapie-d7251pk.png|hapie",
+  "http://sollace.github.io/emoticons/fimfic/pinkieplot-d7251pb.png|pinkieplot",
+  "http://sollace.github.io/emoticons/fimfic/meaniepie-d7259oq.png|meaniepie",
+  "http://sollace.github.io/emoticons/fimfic/maud-d7eb0mc.png|maud",
+  "http://sollace.github.io/emoticons/fimfic/loves_rocks-d7eb3je.png|loves_rocks",
+  "http://sollace.github.io/emoticons/fimfic/cslyra-d7220ek.png|cslyra",
+  "http://sollace.github.io/emoticons/fimfic/schmoopie-d7213zs.png|schmoopie",
+  "http://sollace.github.io/emoticons/fimfic/lovelee-d72141j.png|lovelee",
+  "http://sollace.github.io/emoticons/fimfic/confusedlee-d72141b.png|confusedlee",
+  "http://sollace.github.io/emoticons/fimfic/80slee-d72140p.png|80slee",
+  "http://sollace.github.io/emoticons/fimfic/smilee-d72145b.png|smilee",
+  "http://sollace.github.io/emoticons/fimfic/cheersilee-d72140d.png|cheersilee",
+  "http://sollace.github.io/emoticons/fimfic/derpilee-d7213zo.png|derpilee",
+  "http://sollace.github.io/emoticons/fimfic/naughtilee-d7213zj.png|naughtilee",
+  "http://sollace.github.io/emoticons/fimfic/pisst-d7213zv.png|pisst",
+  "http://sollace.github.io/emoticons/fimfic/dawwtwist-d72140m.png|dawwtwist",
+  "http://sollace.github.io/emoticons/fimfic/thpring-d721404.png|thpring",
+  "http://sollace.github.io/emoticons/fimfic/sorrytwist-d721405.png|sorrytwist",
+  "http://sollace.github.io/emoticons/fimfic/madtwist-d721409.png|madtwist",
+  "http://sollace.github.io/emoticons/fimfic/ootwist-d7213zw.png|ootwist",
+  "http://sollace.github.io/emoticons/fimfic/kissaloo-d7lso4c.png|kissaloo",
+  "http://sollace.github.io/emoticons/fimfic/roseluck-d7wi620.png|roseluck",
+  "http://sollace.github.io/emoticons/fimfic/flitter-d7wi62v.png|flitter_blush",
+  "http://sollace.github.io/emoticons/fimfic/starlighttriggered.png",
+  "http://sollace.github.io/emoticons/default/trixie.png",
+  "http://sollace.github.io/emoticons/default/twilightwat.png",
+  "http://sollace.github.io/emoticons/fimfic/twiscepter_J8FwB24.png|twiscepter",
+  "http://sollace.github.io/emoticons/fimfic/bloomscepter_CjCo3YR.png|bloomsceptr",
+  "http://sollace.github.io/emoticons/fimfic/sweetiescepter_IFkl4RG.png|sweetiescepter",
+  "http://sollace.github.io/emoticons/fimfic/scootscepter_j0bYpQa.png|scootscepter",
+  "http://sollace.github.io/emoticons/fimfic/molestia-d71qbk9.png|molestia"
+]).reverse());
+
 ExtraEmotes.addEmoticons("x", "Dropbox", "Extra", ([
-"http://sollace.github.io/emoticons/fimfic/nerdgasm-d72140i.png|nerdgasm",
-"http://sollace.github.io/emoticons/fimfic/twieww-d72140f.png|twieww",
-"http://sollace.github.io/emoticons/fimfic/fitwi-d7252jt.png|fitwi",
-"http://sollace.github.io/emoticons/fimfic/plotpie-d7251q8.png|plotpie",
-"http://sollace.github.io/emoticons/fimfic/plotpie2-d7251q5.png|plotpie2",
-"http://sollace.github.io/emoticons/fimfic/flirtypie-d7251py.png|flitrypie",
-"http://sollace.github.io/emoticons/fimfic/nompie-d7251pu.png|nompie",
-"http://sollace.github.io/emoticons/fimfic/piegasm-d7251pn.png|piegasm",
-"http://sollace.github.io/emoticons/fimfic/hapie-d7251pk.png|hapie",
-"http://sollace.github.io/emoticons/fimfic/pinkieplot-d7251pb.png|pinkieplot",
-"http://sollace.github.io/emoticons/fimfic/meaniepie-d7259oq.png|meaniepie",
-"http://sollace.github.io/emoticons/fimfic/maud-d7eb0mc.png|maud",
-"http://sollace.github.io/emoticons/fimfic/loves_rocks-d7eb3je.png|loves_rocks",
-"http://sollace.github.io/emoticons/fimfic/cslyra-d7220ek.png|cslyra",
-"http://sollace.github.io/emoticons/fimfic/schmoopie-d7213zs.png|schmoopie",
-"http://sollace.github.io/emoticons/fimfic/lovelee-d72141j.png|lovelee",
-"http://sollace.github.io/emoticons/fimfic/confusedlee-d72141b.png|confusedlee",
-"http://sollace.github.io/emoticons/fimfic/80slee-d72140p.png|80slee",
-"http://sollace.github.io/emoticons/fimfic/smilee-d72145b.png|smilee",
-"http://sollace.github.io/emoticons/fimfic/cheersilee-d72140d.png|cheersilee",
-"http://sollace.github.io/emoticons/fimfic/derpilee-d7213zo.png|derpilee",
-"http://sollace.github.io/emoticons/fimfic/naughtilee-d7213zj.png|naughtilee",
-"http://sollace.github.io/emoticons/fimfic/pisst-d7213zv.png|pisst",
-"http://sollace.github.io/emoticons/fimfic/dawwtwist-d72140m.png|dawwtwist",
-"http://sollace.github.io/emoticons/fimfic/thpring-d721404.png|thpring",
-"http://sollace.github.io/emoticons/fimfic/sorrytwist-d721405.png|sorrytwist",
-"http://sollace.github.io/emoticons/fimfic/madtwist-d721409.png|madtwist",
-"http://sollace.github.io/emoticons/fimfic/ootwist-d7213zw.png|ootwist",
-"http://sollace.github.io/emoticons/fimfic/kissaloo-d7lso4c.png|kissaloo",
-"http://sollace.github.io/emoticons/fimfic/roseluck-d7wi620.png|roseluck",
-"http://sollace.github.io/emoticons/fimfic/flitter-d7wi62v.png|flitter_blush",
-"http://sollace.github.io/emoticons/fimfic/starlighttriggered.png",
 "http://i453.photobucket.com/albums/qq260/spacewings/EmoteDimondMad_zps1373258d.png|dtiara_mad",
 "http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Redheart_gasp.png",
 "http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Redheart_smile.png",
@@ -130,17 +141,7 @@ ExtraEmotes.addEmoticons("x", "Dropbox", "Extra", ([
 "http://dl.dropbox.com/u/31471793/FiMFiction/emoticons/misc_YouDontSay2.png",
 "http://dl.dropbox.com/u/31471793/FiMFiction/eenope.png",
 "http://dl.dropbox.com/u/31471793/FiMFiction/Mr_Cake.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/discord.png",
-"http://sollace.github.io/emoticons/fimfic/twiscepter_J8FwB24.png|twiscepter",
-"http://sollace.github.io/emoticons/fimfic/bloomscepter_CjCo3YR.png|bloomsceptr",
-"http://sollace.github.io/emoticons/fimfic/sweetiescepter_IFkl4RG.png|sweetiescepter",
-"http://sollace.github.io/emoticons/fimfic/scootscepter_j0bYpQa.png|scootscepter",
-"http://sollace.github.io/emoticons/fimfic/hoof_up-d6z0jqb.png|hoof_up",
-"http://sollace.github.io/emoticons/fimfic/hoof_down-d6z0jqf.png|hoof_down",
-"http://sollace.github.io/emoticons/fimfic/2_hoofs_up-d6z0lto.png|2_hoofs_up",
-"http://sollace.github.io/emoticons/fimfic/fave-d6z0jqh.png|faved",
-"http://sollace.github.io/emoticons/fimfic/later-d6z0jq9.png|read_later",
-"http://sollace.github.io/emoticons/fimfic/molestia-d71qbk9.png|molestia"
+"http://dl.dropbox.com/u/31471793/FiMFiction/discord.png"
 ]).reverse());
 
 ExtraEmotes.addEmoticons("c", "Clap", "Clap", [
@@ -188,34 +189,3 @@ ExtraEmotes.addEmoticons("c", "Clap", "Clap", [
 "http://orig07.deviantart.net/0145/f/2012/363/7/9/clapping_pony_icon___rarity_by_taritoons-d5pksh9.gif",
 "http://orig04.deviantart.net/3db3/f/2012/363/1/e/clapping_pony_icon___twilight_sparkle_by_taritoons-d5pkpl8.gif"
 ], false);
-
-ExtraEmotes.addEmoticons("s", "Sexy", "Sexy Pony", [
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteTwilightWet_zps61ffef2a.png|twilight",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmotePinkieWet_zps32fea050.png|pinkie_pie",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteFluttershyWet_zpsea1c8bcc.png|fluttershy",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteApplejackWet_zps7c07ac53.png|applejack",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteRarityWet_zpsccdf0ccd.png|rarity",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteDashWet_zps24095993.png|rainbow_dash",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteApplebloomWet_zps748a6d82.png|apple_bloom",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteScootalooWet_zps5f2070e9.png|scootaloo",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteSweetieWet_zpsdc3945e2.png|sweetie_belle",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteNyxWet_zps8e840827.png|nyx",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteDerpyWet_zps033d2371.png|derpy",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteOctaviaWet_zps7127dafd.png|octavia",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteVinylWet_zps61262968.png|vinyl_scratch",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteLyraWet_zps22067d40.png|lyra",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteBonBonWet_zps9d8d557f.png|bonbon",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteTrixieWet_zps25f2546e.png|trixie",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteSpitfireWet_zps4192ddd5.png|spitfire",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteCelestiaWet_zps97a59249.png|celestia",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteLunaWet_zps2a650793.png|luna",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteCadenceWet_zps38b84bee.png|cadence",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteChrysalisWet_zps4d3ac114.png|crysalis",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteBMacWet_zps3058c380.png|b_mac",
-"http://i453.photobucket.com/albums/qq260/spacewings/ThunderlaneWet_zpsf0b0d1a5.png|thunderlane",
-"http://i453.photobucket.com/albums/qq260/spacewings/Soarin_zps4b9cfb20.png|soaren",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteDrWhoovesWet_zps3eb37554.png|dr_hooves",
-"http://i453.photobucket.com/albums/qq260/spacewings/ShiningAWet_zps2369479a.png|shining",
-"http://i453.photobucket.com/albums/qq260/spacewings/RumbleWet_zps6564ca82.png|rumble",
-"http://i453.photobucket.com/albums/qq260/spacewings/SpikeWet_zps1fb14f95.png|spike"
-].reverse(), false);
