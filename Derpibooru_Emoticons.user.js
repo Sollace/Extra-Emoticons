@@ -293,7 +293,7 @@ CommentBox.prototype = {
 var ExtraEmotes = (function(win) {
   var modules = [];
   try {
-    each(document.querySelectorAll('#comment_body, #post_body, #description, #image_description'), function() {
+    each(document.querySelectorAll('#comment_body, #post_body, #description, #image_description, #topic_posts_attributes_0_body'), function() {
       modules.push(new CommentBox(this));
     });
   } catch (e) {
