@@ -4,7 +4,7 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^http?[s]://(derpi|trixie)boo(\.ru|ru\.org).*/
-// @version     1
+// @version     1.1
 // @grant       none
 // ==/UserScript==
 
@@ -14,10 +14,20 @@ var emoticons = [];
 
 var make = (function() {
   var div = document.createElement('DIV');
-  return function make(htm) {
-    div.innerHTML = htm;
-    return div.childNodes;
+  function make(htm, context) {
+    context = context || div;
+    context.innerHTML = htm;
+    htm = [].slice.apply(context.childNodes);
+    context.innerhHTMl = '';
+    return htm;
+  }
+  make.in = function(holder) {
+    holder = make(holder, div)[0];
+    return function(htm) {
+      return make(htm, holder);
+    };
   };
+  return make;
 })();
 function each(arr, func) {
   for (var i = arr.length; i--;) func.apply(arr[i], [arr, i]);
@@ -30,11 +40,16 @@ function timeoutOn(sender, func, time) {
 }
 
 function Emoticon(htm, item, name, id) {
-  var name_d = ':' + Emoticon.resolve((id ? id + ':' : '') + name) + ':';
+  var name_d = ':' + Emoticon.resolve(name) + ':';
   taken.push(name_d);
   this.html = '<a class="emote" title="' + name_d + '" style="background-image:url(' + item.split('|')[0] + ');" ><img title=":' + name + ':" src="' + item.split('|')[0] + '"></img></a>'
+  this.category = id;
   this.from = name_d;
-  this.to = '!' + item.split('|')[0] + '!';
+  //if (item.indexOf('derpicdn.') != -1) {
+  //  this.to = '>>' + item.split('/').reverse()[0].split(/[^0-9]/)[0] + 't';
+  //} else {
+    this.to = '!' + item.split('|')[0] + '!';
+  //}
   htm.push(this.html);
   emoticons.push(this);
 }
@@ -79,9 +94,32 @@ function configToHtm(config) {
     });
   } else {
     each(config.emotes, function() {
-      new Emoticon(htm, config.url.replace('{name}', this), this, config.id);
+      new Emoticon(htm, config.url.replace('{name}', this), this);
     });
   }
+  return htm.join('');
+}
+
+function complexConfigToHtm(config) {
+  var htm = [];
+  each(config, function() {
+    var url = this.url || '{name}';
+    if (this.cases) {
+      each(this.cases, function() {
+        var cas = this.case || false;
+        each(this.emotes || this, function() {
+          var splitten = (this.emote || this).split('|');
+          new Emoticon(htm, url.replace('{name}', splitten[0]), splitten.reverse()[0], this.case || cas);
+        });
+      });
+    } else {
+      var cas = this.case || false;
+      each(this.emotes || this, function() {
+        var splitten = (this.emote || this).split('|');
+        new Emoticon(htm, url.replace('{name}', splitten[0]), splitten.reverse()[0], this.case || cas);
+      });
+    }
+  });
   return htm.join('');
 }
 
@@ -293,7 +331,7 @@ CommentBox.prototype = {
 var ExtraEmotes = (function(win) {
   var modules = [];
   try {
-    each(document.querySelectorAll('#comment_body, #post_body, #description, #image_description, #topic_posts_attributes_0_body'), function() {
+    each(document.querySelectorAll('#comment_body, #post_body, #description, #image_description, #message_body, #topic_posts_attributes_0_body, textarea#body'), function() {
       modules.push(new CommentBox(this));
     });
   } catch (e) {
@@ -303,6 +341,13 @@ var ExtraEmotes = (function(win) {
     addEmoticons: function(id, name, title, emotes, normalize, buttonImage) {
       if (!this.ready()) return;
       var htm = configToHtm(name ? { id: id, emotes: emotes } : id);
+      each(modules, function() {
+        this.addEmoticons(htm);
+      });
+    },
+    load: function(config) {
+      if (!this.ready()) return;
+      var htm = complexConfigToHtm(config);
       each(modules, function() {
         this.addEmoticons(htm);
       });
@@ -389,7 +434,76 @@ a.emote:nth-child(odd):active {\
 </style>')[0]);
 }
 
-ExtraEmotes.addEmoticons({
-  url: '//sollace.github.io/emoticons/default/{name}.png',
-  emotes: ['ajbemused','ajsleepy','ajsmug','applejackconfused','applejackunsure','applecry','eeyup','fluttercry','flutterrage','fluttershbad','fluttershyouch','fluttershysad','yay','heart','pinkiecrazy','pinkiegasp','pinkiehappy','pinkiesad2','pinkiesmile','pinkiesick','twistnerd','twistoo','rainbowderp','rainbowdetermined2','rainbowhuh','rainbowkiss','rainbowlaugh','rainbowwild','rainbowexcited','scootangel','raritycry','raritydespair','raritystarry','raritywink','duck','unsuresweetie','coolphoto','twilightangry2','twilightoops','twilightblush','twilightsheepish','twilightsmile','facehoof','moustache','trixie','trixieshiftleft','trixieshiftright','derpyderp1','derpyderp2','derpytongue2','trollestia','cheericonfused','cheerismile','cheeriderp','redheartgasp','zecora']
-});
+ExtraEmotes.load([
+  {
+    url: '//derpicdn.net/img/view/2016/11/10/{name}.png',
+    emotes: [
+      '1292828|ajbemused',
+      '1292829|ajsleepy',
+      '1292830|ajsmug',
+      '1292831|applejackconfused',
+      '1292834|applejackunsure'
+    ]
+  },
+  {
+    url: '//derpicdn.net/img/view/2016/11/14/{name}.png',
+    emotes: [
+      '1295600|applecry',
+      '1295601|eeyup',
+      '1295602|fluttercry',
+      '1295603|flutterrage',
+      '1295604|fluttershbad',
+      '1295606|fluttershyouch',
+      '1295607|fluttershysad',
+      '1295608|yay',
+      '1295631|heart',
+      '1295632|pinkiecrazy',
+      '1295633|pinkiegasp',
+      '1295634|pinkiehappy',
+      '1295635|pinkiesad2',
+      '1295636|pinkiesmile',
+      '1295637|pinkiesick',
+      '1295735|twistnerd',
+      '1295736|twistoo',
+      '1295737|rainbowderp',
+      '1295746|rainbowdetermined2',
+      '1295747|rainbowhuh',
+      '1295738|rainbowkiss',
+      '1295739|rainbowlaugh',
+      '1295741|rainbowwild',
+      '1295742|rainbowexcited',
+      '1295743|scootangel',
+      '1295752|raritycry',
+      '1295753|raritydespair',
+      '1295751|raritystarry',
+      '1295754|raritywink',
+      '1295756|duck',
+      '1295757|unsuresweetie',
+      '1295811|coolphoto',
+      '1295812|twilightangry2',
+      '1295813|twilightoops',
+      '1295814|twilightblush',
+      '1295815|twilightsheepish',
+      '1295816|twilightsmile',
+      '1295817|facehoof',
+      '1295818|moustache'
+    ]
+  },
+  {
+    url: '//derpicdn.net/img/view/2016/11/15/{name}.png',
+    emotes: [
+      '1296259|trixie',
+      '1296260|trixieshiftleft',
+      '1296261|trixieshiftright',
+      '1296262|derpyderp1',
+      '1296263|derpyderp2',
+      '1296264|derpytongue2',
+      '1296265|trollestia',
+      '1296267|cheericonfused',
+      '1296268|cheerismile',
+      '1296269|cheeriderp',
+      '1296270|redheartgasp',
+      '1296271|zecora'
+    ]
+  }
+]);
