@@ -4,7 +4,7 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^http?[s]://(derpi|trixie)boo(\.ru|ru\.org).*/
-// @version     1.1
+// @version     1.2
 // @grant       none
 // ==/UserScript==
 
@@ -100,6 +100,10 @@ function configToHtm(config) {
   return htm.join('');
 }
 
+function emotesOf(obj) {
+  return obj.emotes || (typeof obj === 'string' || Object.prototype.toString.apply(obj) === '[object String]' ? [obj] : obj);
+}
+
 function complexConfigToHtm(config) {
   var htm = [];
   each(config, function() {
@@ -107,14 +111,14 @@ function complexConfigToHtm(config) {
     if (this.cases) {
       each(this.cases, function() {
         var cas = this.case || false;
-        each(this.emotes || this, function() {
+        each(emotesOf(this), function() {
           var splitten = (this.emote || this).split('|');
           new Emoticon(htm, url.replace('{name}', splitten[0]), splitten.reverse()[0], this.case || cas);
         });
       });
     } else {
       var cas = this.case || false;
-      each(this.emotes || this, function() {
+      each(emotesOf(this), function() {
         var splitten = (this.emote || this).split('|');
         new Emoticon(htm, url.replace('{name}', splitten[0]), splitten.reverse()[0], this.case || cas);
       });
@@ -338,12 +342,8 @@ var ExtraEmotes = (function(win) {
     console.log(e);
   }
   return win.ExtraEmotes = {
-    addEmoticons: function(id, name, title, emotes, normalize, buttonImage) {
-      if (!this.ready()) return;
-      var htm = configToHtm(name ? { id: id, emotes: emotes } : id);
-      each(modules, function() {
-        this.addEmoticons(htm);
-      });
+    addEmoticons: function(id, name, _title_, emotes, _normalize_, _buttonImage_) {
+      this.load(name ? { id: id, emotes: emotes } : id)
     },
     load: function(config) {
       if (!this.ready()) return;
@@ -373,7 +373,7 @@ if (ExtraEmotes.ready()) {
   display: inline-block;\
   overflow-y: auto;\
   width: 36.666%;\
-  height: 300px;\
+  height: 330px;\
   vertical-align: top;\
   border: 1px solid #cdcdcd;\
   border-left: none;\
@@ -383,7 +383,7 @@ if (ExtraEmotes.ready()) {
 .comment_box, .comment_box + textarea {\
   display: inline-block;\
   max-width: 60%;\
-  min-height: 300px;\
+  min-height: 330px;\
 }\
 form[data-submitting="true"] .comment_box,\
 .comment_box + textarea {\
@@ -405,6 +405,7 @@ a.emote img {\
   opacity: 0;\
 }\
 a.emote {\
+  vertical-align: top;\
   display: inline-block;\
   padding: 6px;\
   border-radius: 100%;\
@@ -413,6 +414,18 @@ a.emote {\
   transition: background 0.2s ease, transform 0.1s ease;\
   background: no-repeat center;\
   transform: scale(1,1) rotate(0) translateZ(0);\
+}\
+a.emote {\
+  image-rendering: optimizeSpeed;             /*                     */\
+  image-rendering: -moz-crisp-edges;          /* Firefox             */\
+  image-rendering: -o-crisp-edges;            /* Opera               */\
+  image-rendering: -webkit-optimize-contrast; /* Chrome (and Safari) */\
+  image-rendering: optimize-contrast;         /* CSS3 Proposed       */\
+  -ms-interpolation-mode: nearest-neighbor;   /* IE8+                */\
+}\
+a.emote:hover img {\
+  opacity: 0.7 !important;\
+  filter: blur(0.3px);\
 }\
 a.emote:hover, a.emote.selection-start, a.emote.selection-start ~ a {\
   background-color: rgba(220,220,220,0.4);\
@@ -472,6 +485,18 @@ ExtraEmotes.load([
       '1295739|rainbowlaugh',
       '1295741|rainbowwild',
       '1295742|rainbowexcited',
+      ]
+  },
+  {
+    url: '//derpicdn.net/img/view/2016/12/11/{name}.png',
+    emotes: [
+      '1314940|rainbowexcited',
+      '1314939|iwtcird'
+    ]
+  },
+  {
+    url: '//derpicdn.net/img/view/2016/11/14/{name}.png',
+    emotes: [
       '1295743|scootangel',
       '1295752|raritycry',
       '1295753|raritydespair',
@@ -490,6 +515,14 @@ ExtraEmotes.load([
     ]
   },
   {
+    url: '//derpicdn.net/img/view/2016/12/11/{name}.png',
+    emotes: [
+      '1314942|starlightsmile',
+      '1314941|starlighttriggered',
+      '1314943|sunset'
+    ]
+  },
+  {
     url: '//derpicdn.net/img/view/2016/11/15/{name}.png',
     emotes: [
       '1296259|trixie',
@@ -505,5 +538,7 @@ ExtraEmotes.load([
       '1296270|redheartgasp',
       '1296271|zecora'
     ]
-  }
+  },
+  '//derpicdn.net/img/view/2016/7/7/1195553.png|quack',
+  '//derpicdn.net/media/2015/07/06/23_34_55_336_squirrelbadge2.png|squirrel'
 ]);
