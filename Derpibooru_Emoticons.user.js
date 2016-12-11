@@ -4,7 +4,7 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^http?[s]://(derpi|trixie)boo(\.ru|ru\.org).*/
-// @version     1.2
+// @version     1.2.1
 // @grant       none
 // ==/UserScript==
 
@@ -483,8 +483,7 @@ ExtraEmotes.load([
       '1295747|rainbowhuh',
       '1295738|rainbowkiss',
       '1295739|rainbowlaugh',
-      '1295741|rainbowwild',
-      '1295742|rainbowexcited',
+      '1295741|rainbowwild'
       ]
   },
   {
