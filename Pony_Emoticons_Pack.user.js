@@ -3,7 +3,7 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.7
+// @version     2.8
 // @icon        http://sollace.github.io/emoticons/default/rainbowexcited.png
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
@@ -15,6 +15,79 @@
 // @grant       none
 // ==/UserScript==
 
+var dead_links = {
+  '//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Redheart_gasp.png': '//sollace.github.io/emoticons/default/redheartgasp.png',
+  "//i453.photobucket.com/albums/qq260/spacewings/EmoteDimondMad_zps1373258d.png": "//sollace.github.io/emoticons/extended/dtmad.png",
+  "//i453.photobucket.com/albums/qq260/spacewings/EmoteNyxUMad_zps22ef3b78.png": "//sollace.github.io/emoticons/nyxumad.png",
+  "//i453.photobucket.com/albums/qq260/spacewings/EmoteNyxSly_zps98fe4bc2.png": "//sollace.github.io/emoticons/nyxsly.png",
+  "//i453.photobucket.com/albums/qq260/spacewings/EmoteNyxHappy_zpse69a4147.png": "//sollace.github.io/emoticons/nyxhappy.png",
+  "//i453.photobucket.com/albums/qq260/spacewings/EmoteSnowflakeYeah_zps44f65a3f.png": "//sollace.github.io/emoticons/yeah.png",
+  "//i453.photobucket.com/albums/qq260/spacewings/ButtonStache_zps2e28ea66.png": "//sollace.github.io/emoticons/buttonstache.png",
+  "//i453.photobucket.com/albums/qq260/spacewings/EmoteTom_zps20851d31.png": "//sollace.github.io/emoticons/extended/tom.png",
+  "//i453.photobucket.com/albums/qq260/spacewings/EmoteTom2_zps51c59779.png": "//sollace.github.io/emoticons/extended/mandy.png",
+  "//i453.photobucket.com/albums/qq260/spacewings/EmZecora_zpscd7ac24a.png": "//sollace.github.io/emoticons/default/zecora.png"
+}
+var removed_links = [
+  "//dl.dropbox.com/u/31471793/FiMFiction/Derpy_Hooves_lolface.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/lolface_Queen_Chrysalis.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/lolface_Celestia.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Scootaloo_lolface.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Sweetie_Belle_lolface.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Pinkie_Pie_lolface.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Vinyl_Scratch_lolface.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Luna_lolface.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Twilight_Sparkle_lolface.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Rainbow_Dash_lolface.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Fluttershy_lolface.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Rarity_lolface.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Trixie_lolface_2.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Spike_lolface.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Redheart_smile.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Soarin_Dayum.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Spit_Dayum.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Spit_rape.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Spit_sad.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Spit_sexy.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Lyra.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Lyra_happy.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Lyra_oohh.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Lyra_dealwithit.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/emoticons/misc_Lyra_cry.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Bonbon_gaze.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Bon_gawk.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Bon_grin.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Bonbon_OMG_LOVE.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Octavia.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Octy_cake.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Octy_chair.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Octy_something.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Octy_rape.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Octy_plot.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Octavia_O_O.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Viny_glare.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Viny_mad.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Viny_sad.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Viny.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/sillyfilly_Derpy_Hooves.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/shrug_Derpy_Hooves.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/sillyfilly_Scootaloo.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/sillyfilly_Sweetie_Belle.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_TwilightWut.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Pinkie_loool.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Cloudchaser_glasses.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Colgate_beam.png",
+  "//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Colgate_gaze.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/sillyfilly_Rainbow_Dash.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/shrug_Luna_apple.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/shrug_Queen_Chrysalis.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/shrug_Twilight_Sparkle.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Twilight_crazy.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/emoticons/misc_Fluttershy.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/emoticons/misc_Fluttershy_umad.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/Mr_Cake.png",
+  "//dl.dropbox.com/u/31471793/FiMFiction/discord.png"
+]
+
 ExtraEmotes.addUrlMatcher(function(url, match) {
   if (url.indexOf('i.imgur.com') != -1) {
     url = url.split('/').reverse()[0].split('.')[0];
@@ -23,10 +96,14 @@ ExtraEmotes.addUrlMatcher(function(url, match) {
   }
   return false;
 });
-
+ExtraEmotes.addUrlMatcher(function(url, match) {
+  if (removed_links.indexOf(url) > -1) return match.indexOf('tom.png') > -1;
+  return dead_links[url] == match;
+});
 
 ExtraEmotes.addEmoticons("x", "Default", "Extra", ([
   "http://sollace.github.io/emoticons/default/rainbowexcited.png",
+  "http://sollace.github.io/emoticons/default/rainbowcat2.png",
   "http://sollace.github.io/emoticons/fimfic/nerdgasm-d72140i.png|nerdgasm",
   "http://sollace.github.io/emoticons/fimfic/twieww-d72140f.png|twieww",
   "http://sollace.github.io/emoticons/fimfic/fitwi-d7252jt.png|fitwi",
@@ -62,86 +139,20 @@ ExtraEmotes.addEmoticons("x", "Default", "Extra", ([
   "http://sollace.github.io/emoticons/default/trixie.png",
   "http://sollace.github.io/emoticons/default/twilightwat.png",
   "http://sollace.github.io/emoticons/fimfic/twiscepter_J8FwB24.png|twiscepter",
-  "http://sollace.github.io/emoticons/fimfic/bloomscepter_CjCo3YR.png|bloomsceptr",
+  "http://sollace.github.io/emoticons/fimfic/bloomscepter_CjCo3YR.png|bloomscepter",
   "http://sollace.github.io/emoticons/fimfic/sweetiescepter_IFkl4RG.png|sweetiescepter",
   "http://sollace.github.io/emoticons/fimfic/scootscepter_j0bYpQa.png|scootscepter",
-  "http://sollace.github.io/emoticons/fimfic/molestia-d71qbk9.png|molestia"
-]).reverse());
-
-ExtraEmotes.addEmoticons("x", "Dropbox", "Extra", ([
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteDimondMad_zps1373258d.png|dtiara_mad",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Redheart_gasp.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Redheart_smile.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Soarin_Dayum.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Spit_Dayum.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Spit_rape.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Spit_sad.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Spit_sexy.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Lyra.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Lyra_happy.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Lyra_oohh.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Lyra_dealwithit.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/emoticons/misc_Lyra_cry.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Bonbon_gaze.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Bon_gawk.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Bon_grin.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Bonbon_OMG_LOVE.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Octavia.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Octy_cake.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Octy_chair.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Octy_something.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Octy_rape.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Octy_plot.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Octavia_O_O.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Viny_glare.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Viny_mad.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Viny_sad.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Viny.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/sillyfilly_Derpy_Hooves.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/shrug_Derpy_Hooves.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Derpy_Hooves_lolface.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/sillyfilly_Scootaloo.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/sillyfilly_Sweetie_Belle.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/lolface_Queen_Chrysalis.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/lolface_Celestia.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_TwilightWut.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_RageFace.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Pinkie_loool.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Scootaloo_lolface.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Sweetie_Belle_lolface.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Pinkie_Pie_lolface.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Vinyl_Scratch_lolface.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Luna_lolface.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Twilight_Sparkle_lolface.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Rainbow_Dash_lolface.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Fluttershy_lolface.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Rarity_lolface.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Trixie_lolface_2.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Spike_lolface.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/emoticons/misc_rainbowkiss_flip.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_rainbowderp_flip.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Cloudchaser_glasses.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Colgate_beam.png",
-"http://dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Colgate_gaze.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/sillyfilly_Rainbow_Dash.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/shrug_Luna_apple.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/shrug_Queen_Chrysalis.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/shrug_Twilight_Sparkle.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Emoticons/misc_Twilight_crazy.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/emoticons/misc_Fluttershy.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/emoticons/misc_Fluttershy_umad.png",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteNyxUMad_zps22ef3b78.png|nyx_umad",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteNyxSly_zps98fe4bc2.png|nyx_sly",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteNyxHappy_zpse69a4147.png|nyx_happy",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteSnowflakeYeah_zps44f65a3f.png|snowflake_yeah",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmZecora_zpscd7ac24a.png|zecora",
-"http://i453.photobucket.com/albums/qq260/spacewings/ButtonStache_zps2e28ea66.png|button_stache",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteTom_zps20851d31.png|tom",
-"http://i453.photobucket.com/albums/qq260/spacewings/EmoteTom2_zps51c59779.png|mandy",
-"http://dl.dropbox.com/u/31471793/FiMFiction/emoticons/misc_YouDontSay2.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/eenope.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/Mr_Cake.png",
-"http://dl.dropbox.com/u/31471793/FiMFiction/discord.png"
+  "http://sollace.github.io/emoticons/fimfic/molestia-d71qbk9.png|molestia",
+  "http://sollace.github.io/emoticons/extended/dtmad.png",
+  "http://sollace.github.io/emoticons/default/redheartgasp.png",
+  "http://sollace.github.io/emoticons/extended/nyxumad.png",
+  "http://sollace.github.io/emoticons/extended/nyxsly.png",
+  "http://sollace.github.io/emoticons/extended/nyxhappy.png",
+  "http://sollace.github.io/emoticons/extended/yeah.png",
+  "http://sollace.github.io/emoticons/extended/buttonstache.png",
+  "http://sollace.github.io/emoticons/default/zecora.png",
+  "http://sollace.github.io/emoticons/extended/tom.png",
+  "http://sollace.github.io/emoticons/extended/mandy.png"
 ]).reverse());
 
 ExtraEmotes.addEmoticons("c", "Clap", "Clap", [
