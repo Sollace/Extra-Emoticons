@@ -9,11 +9,11 @@
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
-// @version     5.5.7
+// @version     5.6
 // @grant       none
 // ==/UserScript==
 if (isJQuery()) {
-  var version = 5.57;
+  var version = 5.6;
   var logger = new Logger('Extra Emoticons', 6);
   try {
     (function (win) {
@@ -30,6 +30,7 @@ if (isJQuery()) {
         target.ExtraEmotes = lockDown({
           addEmoticons: function(id, name, title, emotes, normalize, buttonImage) {ee.addEmoticons(id, name, title, emotes, normalize, buttonImage);},
           addRaw: function(id, name, title, emotes, buttonImage) {ee.addRaw(id, name, title, emotes, buttonImage);},
+          addUrlMatcher: function(matcher) {return ee.addUrlMatcher(matcher);},
           getLogger: function() {return ee.getLogger();},
           getVersion: function() {return ee.getVersion();},
           valueOf: function() {return ee.toString();},
@@ -110,7 +111,6 @@ if (isJQuery()) {
           logger.Log('ExtraEmoticons.setupGUI: start',10);
           var me = this;
           this.region.attr('data-init', 'true');
-
           this.submitButton = this.getSubmitButton();
           logger.Log('SubmitButton:' + this.submitButton.length, 20);
           this.textArea = this.getTextArea();
@@ -136,7 +136,6 @@ if (isJQuery()) {
           this.emotesTypes.append(this.childGuest.parent());
 
           this.makeSearch('search');
-
           this.childGuest.attr('data-function', '');
           this.childGuest.attr('data-panel', 'default');
           this.childGuest.addClass('emoticon-expander');
@@ -153,9 +152,9 @@ if (isJQuery()) {
           if (!img[0].complete) {
             $(img).css('display', 'none');
             var spin = $('<i class="fa fa-spinner fa-spin emote-loading" />');
-            $(img).after(spin);
-            $(img).on('load error', function () {
-              $(img).css('display', '');
+            img.after(spin);
+            img.on('load error', function () {
+              img.css('display', '');
               spin.remove();
             });
           }
@@ -340,7 +339,6 @@ if (isJQuery()) {
           mote.append(img);
           img.on('dragstart', function(event) {
             var data = event.originalEvent.dataTransfer.getData('Text/plain');
-
             if (data && data.trim().indexOf('[') == 0) {
               data = data.split('\n');
               for (var i = data.length; i--;) {
@@ -350,7 +348,6 @@ if (isJQuery()) {
             } else {
               event.originalEvent.dataTransfer.setData('Text/plain', id + title);
             }
-
           });
           if (!img[0].complete) {
             img.css('display', 'none');
@@ -673,7 +670,7 @@ if (isJQuery()) {
             for (var k = vpanels[i].Emotes.length; k--;) {
               var tit = ':' + vpanels[i].Id + vpanels[i].EmoteTitles[k];
               for (var j = urls.length; j--;) {
-                if (matchUrls(urls[j].thin,'', vpanels[i].Emotes[k])) {
+                if (matchUrls(urls[j].thin, vpanels[i].Emotes[k])) {
                   txt = replaceAll(urls[j].thick, tit, txt);
                 }
               }
@@ -751,7 +748,7 @@ if (isJQuery()) {
           if (data.IsRaw) {
             hook.addRawsToPanel(holder, data.rawEmotes);
           } else {
-            hook.addImagesToPanel(data.id, holder, data.rawEmotes, data.Normalized);
+            hook.addImagesToPanel(data.Id, holder, data.rawEmotes, data.Normalized);
           }
         }).append(holder);
       }
@@ -910,8 +907,8 @@ if (isJQuery()) {
           logger.Log("unspoiler: abort", 10);
           return false;
         }
-        comments.find('img.user_image:not(.done)').each(emotify);
         comments.find('.user_image_link:not(.dontUnspoiler)').each(unspoilerSibling);
+        comments.find('img.user_image:not(.done)').each(emotify);
         comments.find('img.emoticon:not(.done)').each(function () {
           var me = $(this);
           me.attr('title', me.attr('alt')).addClass('done');
@@ -922,7 +919,7 @@ if (isJQuery()) {
       
       function emotify() {
         var me = $(this);
-        var url = CutProto(me.attr('src'));
+        var url = CutProto(debooru(me.attr('src')));
         var type = EmoteType(url);
         if (type.result == 1) {
           var tit = Name(type.url);
@@ -936,9 +933,17 @@ if (isJQuery()) {
         me.addClass('done');
       }
       
+      function debooru(url) {
+        if (url.indexOf('camo.derpicdn') != -1) {
+          url = decodeURIComponent(url.split('url=')[1].split('&')[0]);
+          console.log(url);
+        }
+        return url;
+      }
+      
       function unspoilerSibling() {
         var me = $(this);
-        var url = CutProto(me.attr('href'));
+        var url = CutProto(debooru(me.attr('href')));
         var type = EmoteType(url);
         var img;
         if (type.result > 0) {
@@ -949,7 +954,9 @@ if (isJQuery()) {
             var tit = Name(type.url);
             img = $('<img class="emoticon" alt="' + tit + '" title="' + tit + '" src="' + type.url + '" />');
             if (type.lim) $(img).css('max-height', '27px');
+            this.parentNode.normalize();
             var p = me.parent().prev();
+            var after = this.parentNode.nextSibling;
             if (p.prop('tagName') != 'P') {
               if (p.prop('tagName') == 'BR') {
                 p = p.prev();
@@ -963,8 +970,10 @@ if (isJQuery()) {
               me.parent().remove();
               p.append(img);
             }
+            if (after && after.nodeType == 3) {
+              img[0].parentNode.insertBefore(after, img[0].nextSibling);
+            }
           }
-          img.parent().find('i').remove();
           logger.Log("unspoilerSiblings: " + url);
         } else {
           me.addClass('dontUnspoiler');
