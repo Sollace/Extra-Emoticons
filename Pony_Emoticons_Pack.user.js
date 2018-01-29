@@ -15,7 +15,7 @@
 // @grant       none
 // ==/UserScript==
 
-var dead_links = {
+const dead_links = {
   '//dl.dropbox.com/u/21167245/FiMFiction/Emoticons/misc_Redheart_gasp.png': '//sollace.github.io/emoticons/default/redheartgasp.png',
   "//i453.photobucket.com/albums/qq260/spacewings/EmoteDimondMad_zps1373258d.png": "//sollace.github.io/emoticons/extended/dtmad.png",
   "//i453.photobucket.com/albums/qq260/spacewings/EmoteNyxUMad_zps22ef3b78.png": "//sollace.github.io/emoticons/nyxumad.png",
@@ -27,7 +27,7 @@ var dead_links = {
   "//i453.photobucket.com/albums/qq260/spacewings/EmoteTom2_zps51c59779.png": "//sollace.github.io/emoticons/extended/mandy.png",
   "//i453.photobucket.com/albums/qq260/spacewings/EmZecora_zpscd7ac24a.png": "//sollace.github.io/emoticons/default/zecora.png"
 }
-var removed_links = [
+const removed_links = [
   "//dl.dropbox.com/u/31471793/FiMFiction/Derpy_Hooves_lolface.png",
   "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/lolface_Queen_Chrysalis.png",
   "//dl.dropbox.com/u/31471793/FiMFiction/Emoticons/lolface_Celestia.png",
