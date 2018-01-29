@@ -1,11 +1,12 @@
 ﻿// ==UserScript==
-// @name Extra Emoticons 2
+// @name        Extra Emoticons Redux
+// @description Allows additional emoticons to be added to FimFiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
 // @include     /^http?[s]://www.fimfiction.net/.*/
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
-// @grant none
+// @grant       none
 // @run-at      document-start
 // ==/UserScript==
 
@@ -34,10 +35,7 @@ function ExtraEmoticons() {
   }
 
   function debooru(url) {
-    if (url.indexOf('camo.derpicdn') > -1) {
-      return decodeURIComponent(url.split('url=')[1].split('&')[0]);
-    }
-    return url;
+    return url.indexOf('camo.derpicdn') > -1 ? decodeURIComponent(url.split('url=')[1].split('&')[0]) : url;
   }
 
   function replaceAll(find, replace, str) {
@@ -49,16 +47,60 @@ function ExtraEmoticons() {
     obj[member] = new_func;
   }
 
+  function search(array, func, result) {
+    array.find((a, i, ar) => !!(result = func(a, i, ar)));
+    return result;
+  }
+  
   function newEl(html) {
     const div = document.createElement('DIV');
     div.innerHTML = html;
     return div.firstChild;
   }
-
-  const ExtraEmojiSets = [];
-
+  
+  function extend(onto, offof) {
+    Object.keys(offof).forEach(key => onto[key] = offof[key]);
+    return onto;
+  }
+  
+  const ExtraEmotesRegistry = (_ => {
+    const sets = [], imgs = [], setsObj = {};
+    
+    function registerSet(set, emoji) {
+      setsObj[set.category] = set;
+      sets.push(set);
+      if (emoji) imgs.push(set);
+      return set;
+    }
+    
+    return {
+      imgs: _ => imgs,
+      cats: setsin => sets.length ? {
+        keys: ['Ponies'].concat(sets.map(i => i.category), Object.keys(setsin).filter(a => a != 'Ponies')),
+        values: extend(extend({}, setsin), setsObj)
+      } : {
+        keys: Object.keys(setsin),
+        values: extend({}, setsin)
+      },
+      EmojiSet: (id, name, title, emotes, normalize, buttonImage) => registerSet({
+        element: newEl(`<li class="emoji-selector__header" data-category="${name}">${title}</li>`),
+        button: `<li data-click="jumpTo" data-category="${name}"><img src="${buttonImage || emoteUrlFor(emotes[0])}"></img></li>`,
+        category: name,
+        normalize: normalize,
+        emojis: emotes.map(emote => Emoticon(emoteUrlFor(emote), emoteNameFor(emote), `:${id}:${emoteNameFor(emote)}:`, true))
+      }, true),
+      TextSet: (id, name, title, emotes, buttonImage) => registerSet({
+        element: newEl(`<li class="emoji-selector__header" data-category="${name}">${title}</li>`),
+        button: `<li data-click="jumpTo" data-category="${name}"><img src="${buttonImage}"></img></li>`,
+        category: name,
+        normalize: false,
+        emojis: emotes.map(emote => Emoticon(emote, emoteNameFor(emote), code, false))
+      });
+    };
+  })();
+  
   const urlMatcher = (root => {
-    const self = {
+    return {
       match: (one, two) => one == two || (root ? root(one, two) : false),
       add: (matcher) => {
         const parent = root;
@@ -68,18 +110,14 @@ function ExtraEmoticons() {
         return root = matcher;
       }
     };
-
-    self.add((url, match) => {
-      if (url.indexOf('.deviantart.') != -1) {
-        url = url.split('-').reverse()[0].split('.')[0];
-        match = match.split('/').reverse()[0].split('-').reverse()[0].split('.')[0];
-        return url == match;
-      }
-      return false;
-    });
-
-    return self;
-  })();
+  })((url, match) => {
+    if (url.indexOf('.deviantart.') != -1) {
+      url = url.split('-').reverse()[0].split('.')[0];
+      match = match.split('/').reverse()[0].split('-').reverse()[0].split('.')[0];
+      return url == match;
+    }
+    return false;
+  });
 
   const unspoiler = (_ => {
     function emotify(me) {
@@ -125,9 +163,8 @@ function ExtraEmoticons() {
       const wrap = type.wrap || !p.length || p.tagName != 'P';
 
       me.insertAdjacentHtml(wrap ? 'afterend' : 'beforeend', `<img class="emoticon${type.lim ? ' limited' : ''}" alt="${type.name}" title="${type.name}" src="${type.url}"></img>`);
-      let img;
       if (wrap) me.parentNode.style.display = 'inline';
-
+      
       me.parentNode.parentNode.removeChild(me.parentNode);
       if (after && after.nodeType == 3) {
         const img = wrap ? me.nextSibling : p.lastChild;
@@ -148,26 +185,20 @@ function ExtraEmoticons() {
           }
           if (mustWrap) url = url.split('?')[0];
         }
-
-        for (let i = 0; i < ExtraEmojiSets.length; i++) {
-          const category = ExtraEmojiSets[i];
-          for (let j = 0; j < category.emojis.length; j++) {
-            if (urlMatcher.match(url, category.emojis[j])) {
-              return {
-                result: 1,
-                url: category.emojis[j].url,
-                name: category.emojis[j].name,
-                lim: category.normalize,
-                wrap: mustWrap
-              };
-            }
-          }
-        }
-      }
-
-      return { result: 0, lim: true, wrap: mustWrap };
+        
+        return search(ExtraEmotesRegistry.imgs(), category => {
+          return search(category.emojis, emoji => {
+            if (urlMatcher.match(url, emoji.url)) return {
+              result: 1,
+              url: emoji.url,
+              name: emoji.name,
+              lim: category.normalize,
+              wrap: mustWrap
+            };
+          });
+        }, { result: 0, lim: true, wrap: mustWrap });
     }
-
+    
     return _ => {
       all('.comment_data .user_image_link:not(.dontUnspoiler)', unspoilerSibling);
       all('.comment_data img.user_image:not(.done)', emotify);
@@ -329,8 +360,8 @@ img.limited { max-height: 27px}`);
   
   
   function rebuildEmojiSets(controller) {
-    if (!controller.extraEmotes) {
-      controller.extraEmotes = parseKniggySets(controller);
+    if (!controller.emotes) {
+      controller.emotes = parseKniggySets(controller);
      // controller.extraEmotes['Ponies'].emojis = defaultEmojis.map(emoji => Emoticon(`//static.fimfiction.net/images/emoticons/${emoji}.png`, emoji));
     }
     flattenKniggySets(controller);
@@ -361,51 +392,20 @@ img.limited { max-height: 27px}`);
     return sets;
   }
   
-  function extend(onto, offof) {
-    Object.keys(offof).forEach(key => onto[key] = offof[key]);
-    return onto;
-  }
-
   function flattenKniggySets(controller) {
     const elements = controller.emojiElements;
     elements.length = 0;
-    const sets = extend({}, controller.extraEmotes);
+    const sets = ExtraEmotesRegistry.cats(controller.emotes);
     
-    const keys = ExtraEmojiSets.map(i => i.category);
-    keys.push.apply(keys, Object.keys(sets).filter(a => a != 'Ponies'));
-    ExtraEmojiSets.forEach(i => sets[i.category] = i);
-    keys.unshift('Ponies');
-    
-    keys.forEach(set => {
-      elements.push(sets[set]);
-      elements.push.apply(elements, sets[set].emojis);
+    sets.keys.forEach(set => {
+      elements.push(sets.values[set]);
+      elements.push.apply(elements, sets.values[set].emojis);
     });
+    controller.elements.tabs.innerHTML = sets.keys.map(i => sets.values[i].button).join('');
     
-    controller.elements.tabs.innerHTML = keys.map(i => sets[i].button).join('');
     return elements;
   }
   
-  function EmojiSet(id, name, title, emotes, normalize, buttonImage) {
-    buttonImage = buttonImage || emoteUrlFor(emotes[0]);
-    return {
-      element: newEl(`<li class="emoji-selector__header" data-category="${name}">${title}</li>`),
-      button: `<li data-click="jumpTo" data-category="${name}"><img src="${buttonImage}"></img></li>`,
-      category: name,
-      normalize: normalize,
-      emojis: emotes.map(emote => Emoticon(emoteUrlFor(emote), emoteNameFor(emote), `:${id}:${emoteNameFor(emote)}:`, true))
-    };
-  }
-  
-  function TextSet(id, name, title, emotes, buttonImage) {
-    return {
-      element: newEl(`<li class="emoji-selector__header" data-category="${name}">${title}</li>`),
-      button: `<li data-click="jumpTo" data-category="${name}"><img src="${buttonImage}"></img></li>`,
-      category: name,
-      normalize: false,
-      emojis: emotes.map(emote => Emoticon(emote, emoteNameFor(emote), code, false))
-    };
-  }
-
   function Emoticon(url, name, code, img) {
     img = img || !code;
     code = code || `:${name}:`;
@@ -443,11 +443,11 @@ img.limited { max-height: 27px}`);
     //Adds a collection of image emoticons
     //Optional: buttonImage
     addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {
-      ExtraEmojiSets.push(EmojiSet(id, name, title, emotes, normalize, buttonImage));
+      ExtraEmotesRegistry.EmojiSet(id, name, title, emotes, normalize, buttonImage);
     },
     //Adds a collection of text emoticons
     addRaw: function (id, name, title, emotes, buttonImage) {
-      ExtraEmojiSets.push(TextSet(id, name, title, emotes, buttonImage));
+      ExtraEmotesRegistry.TextSet(id, name, title, emotes, buttonImage);
     },
     //Adds a matching function to identify emoticon images by url
     addUrlMatcher: function(matcher) {
