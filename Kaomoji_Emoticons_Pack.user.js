@@ -3,16 +3,14 @@
 // @description Adds all japanese smilies as emoticons
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.3.1
+// @version     3
 // @icon        https://github.com/Sollace/Extra-Emoticons/raw/master/kaomoji.png
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
+// @include     /^http?[s]://www.fimfiction.net/.*/
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
+// @run-at      document-start
 // @nocompat    Chrome
 // ==/UserScript==
 
@@ -452,4 +450,4 @@ ExtraEmotes.addRaw("jp", "Japan", "Kaomoji", ([
 "(っ˘ڡ˘ς)|Yummy",
 "(V) (°,,,,°) (V)|Zoidberg",
 "[¬º-°]¬|Zombie"
-]).reverse(), "//github.com/Sollace/Extra-Emoticons/raw/master/kaomoji.png", false);
+]), "//github.com/Sollace/Extra-Emoticons/raw/master/kaomoji.png", false);

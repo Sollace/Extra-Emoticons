@@ -3,29 +3,27 @@
 // @description Adds all emoticons from Twitch.tv to FimFiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.3.1
+// @version     3
 // @icon        http://sollace.github.io/emoticons/twitch/twitch.png
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
+// @include     /^http?[s]://www.fimfiction.net/.*/
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
+// @run-at      document-start
 // ==/UserScript==
 
 function twitchify(emotes) {
-  for (var i = 0; i < emotes.length; i++) {
-    if (emotes[i].indexOf('http') != 0) {
-      emotes[i] = 'http://sollace.github.io/emoticons/twitch/' + emotes[i];
+  return emotes.map(i => {
+    if (i.indexOf('http') != 0) {
+      return `http://sollace.github.io/emoticons/twitch/${i}`;
     }
-  }
-  return emotes;
+    return i;
+  });
 }
 
 ExtraEmotes.addUrlMatcher(function(url, match) {
-  if (url.indexOf('www.chatslang.com') != -1) {
+  if (url.indexOf('www.chatslang.com') > -1) {
     url = url.split('/').reverse()[0].split('.')[0];
     match = match.split('/').reverse()[0].split('.')[0];
     return url == match;
@@ -88,4 +86,4 @@ ExtraEmotes.addEmoticons("tt", "Twitch", "Twitch", twitchify([
 "monkey/smoking.png|:m:smoking",
 
 "twitch.png"
-]).reverse());
+]));

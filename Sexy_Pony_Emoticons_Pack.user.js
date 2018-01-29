@@ -3,16 +3,14 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1
+// @version     2
 // @icon        http://i453.photobucket.com/albums/qq260/spacewings/EmoteTwilightWet_zps61ffef2a.png
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
+// @include     /^http?[s]://www.fimfiction.net/.*/
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
+// @run-at      document-start
 // ==/UserScript==
 
 ExtraEmotes.addEmoticons("s", "Sexy", "Sexy Pony", [
@@ -44,4 +42,4 @@ ExtraEmotes.addEmoticons("s", "Sexy", "Sexy Pony", [
 "http://i453.photobucket.com/albums/qq260/spacewings/ShiningAWet_zps2369479a.png|shining",
 "http://i453.photobucket.com/albums/qq260/spacewings/RumbleWet_zps6564ca82.png|rumble",
 "http://i453.photobucket.com/albums/qq260/spacewings/SpikeWet_zps1fb14f95.png|spike"
-].reverse(), false);
+], false);

@@ -3,16 +3,14 @@
 // @description Adds DeviantArt emoticons
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     3.3.1
+// @version     4
 // @icon        http://s.deviantart.net/emoticons/d/dalogo1.gif
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
+// @include     /^http?[s]://www.fimfiction.net/.*/
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
+// @run-at      document-start
 // ==/UserScript==
 
 ExtraEmotes.addEmoticons("da", "DeviantArt", "DeviantArt Official", [

@@ -3,16 +3,14 @@
 // @description Adds Pony themed emoticons to FimFiction.net.
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.8
+// @version     3
 // @icon        http://sollace.github.io/emoticons/default/rainbowexcited.png
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Logger.js
+// @include     /^http?[s]://www.fimfiction.net/.*/
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
+// @run-at      document-start
 // ==/UserScript==
 
 const dead_links = {
@@ -153,50 +151,50 @@ ExtraEmotes.addEmoticons("x", "Default", "Extra", ([
   "http://sollace.github.io/emoticons/default/zecora.png",
   "http://sollace.github.io/emoticons/extended/tom.png",
   "http://sollace.github.io/emoticons/extended/mandy.png"
-]).reverse());
+]));
 
 ExtraEmotes.addEmoticons("c", "Clap", "Clap", [
-"http://sollace.github.io/emoticons/clap/sollace-d6ymjq8.gif|sollace",
-"http://sollace.github.io/emoticons/clap/twiscepter-d6ymjpx.gif|twicane",
-"http://sollace.github.io/emoticons/clap/applejewel-d76qgay.gif|applejewel",
-"http://sollace.github.io/emoticons/clap/flutterbat-d76qgbd.gif|flutterbat",
-"http://sollace.github.io/emoticons/clap/nyx-d6y1o60.gif|nyx",
-"http://sollace.github.io/emoticons/clap/bat_pony-d6xnck7.gif|bat_pony",
-"http://orig08.deviantart.net/6e4a/f/2013/056/a/3/clapping_pony_icon___braeburn_by_taritoons-d5w65tv.gif",
-"http://orig09.deviantart.net/07cd/f/2012/364/d/1/clapping_pony_icon___time_turner_by_travispony-d5pob3v.gif|dr_hooves",
-"http://orig14.deviantart.net/8add/f/2013/177/c/d/flash_sentry__2__by_jamaythemunker-d6arwlb.gif|flash_sentry",
-"http://orig08.deviantart.net/dcb0/f/2013/343/1/d/z_by_blknblupanther-d6xef1w.gif|zecora",
-"http://orig06.deviantart.net/89bf/f/2013/336/5/7/13860064636854_by_blknblupanther-d6whl0i.gif|sunset_shimmer",
-"http://orig11.deviantart.net/be54/f/2013/002/3/a/clapping_pony_icon___minuette_by_travispony-d5q5x0z.gif|colgate",
-"http://orig05.deviantart.net/c65c/f/2013/308/0/6/daring_do_clap_clap___by_xingyaru-d6t0c4f.gif|daring_do",
-"http://orig02.deviantart.net/6711/f/2012/365/e/0/clapping_pony_icon___queen_chrysalis_by_taritoons-d5pshyl.gif",
-"http://orig02.deviantart.net/3507/f/2012/365/c/a/clapping_pony_icon___changeling_by_taritoons-d5ps0kg.gif",
-"http://orig12.deviantart.net/0d99/f/2013/002/0/3/clapping_pony_icon___spitfire___wonderbolt_uniform_by_taritoons-d5q5mj8.gif",
-"http://orig05.deviantart.net/3778/f/2013/002/7/b/clapping_pony_icon___soarin___wonderbolt_uniform_by_taritoons-d5q6w8j.gif",
-"http://orig13.deviantart.net/b456/f/2013/001/7/e/clapping_pony_icon___nightmare_moon_by_taritoons-d5prx8v.gif",
-"http://orig00.deviantart.net/1686/f/2012/364/3/a/clapping_pony_icon___princess_cadence_by_taritoons-d5pon2h.gif",
-"http://orig06.deviantart.net/cfa6/f/2013/001/b/5/clapping_pony_icon___princess_luna_by_taritoons-d5prurt.gif",
-"http://orig03.deviantart.net/5c7c/f/2013/001/c/9/clapping_pony_icon___princess_celestia_by_taritoons-d5pozf0.gif",
-"http://orig00.deviantart.net/2b9e/f/2013/056/1/8/clapping_pony_icon___babs_seed_by_taritoons-d5w61z0.gif",
-"http://sollace.github.io/emoticons/clap/dinky-d6ymjpt.gif|dinky",
-"http://sollace.github.io/emoticons/clap/snowdrop-d6xkrjj.gif|snowdrop",
-"http://orig07.deviantart.net/90f7/f/2013/056/7/f/clapping_pony_icon___sweetie_belle_by_taritoons-d5w5zt5.gif",
-"http://orig10.deviantart.net/8c00/f/2013/056/8/9/clapping_pony_icon___scootaloo_by_taritoons-d5w610a.gif",
-"http://orig14.deviantart.net/0d00/f/2013/003/7/8/clapping_pony_icon___applebloom_by_taritoons-d5q9yfg.gif",
-"http://sollace.github.io/emoticons/clap/octavia-d6yq9am.gif|octavia",
-"http://orig11.deviantart.net/fa66/f/2012/366/d/5/clapping_pony_icon___vinyl_scratch_by_taritoons-d5pw0yp.gif",
-"http://orig06.deviantart.net/7231/f/2012/363/0/9/clapping_pony_icon___sweetie_drops_bonbon_by_travispony-d5pll1i.gif",
-"http://orig06.deviantart.net/d00a/f/2012/363/4/3/clapping_pony_icon___lyra_heartstrings_by_travispony-d5pl0kc.gif",
-"http://orig03.deviantart.net/49c6/f/2012/363/d/4/clapping_derpy_hooves_icon_by_shroomehtehponeh-d5pm8c9.gif",
-"http://orig08.deviantart.net/4237/f/2012/366/8/8/clapping_pony_icon___trixie_by_taritoons-d5pw36r.gif",
-"http://sollace.github.io/emoticons/clap/fancy_pants-d8drj8h.gif|fancy_pants",
-"http://orig03.deviantart.net/341c/f/2013/056/f/4/clapping_pony_icon___shining_armor_by_taritoons-d5w67ti.gif",
-"http://sollace.github.io/emoticons/clap/maud-d7ee4tv.gif|maud",
-"http://sollace.github.io/emoticons/clap/discord-d8vpbw9.gif|discord",
-"http://orig03.deviantart.net/e7f9/f/2012/363/f/6/clapping_pony_icon___pinkie_pie_by_taritoons-d5pkuzy.gif",
-"http://orig08.deviantart.net/e8b4/f/2012/363/c/3/clapping_pony_icon___fluttershy_by_taritoons-d5pl2gh.gif",
-"http://orig10.deviantart.net/39db/f/2012/363/2/f/clapping_pony_icon___rainbow_dash_by_taritoons-d5pkzrg.gif",
-"http://orig09.deviantart.net/e3f6/f/2012/363/c/f/clapping_pony_icon___applejack_by_taritoons-d5pkxsu.gif",
-"http://orig07.deviantart.net/0145/f/2012/363/7/9/clapping_pony_icon___rarity_by_taritoons-d5pksh9.gif",
-"http://orig04.deviantart.net/3db3/f/2012/363/1/e/clapping_pony_icon___twilight_sparkle_by_taritoons-d5pkpl8.gif"
+  "http://orig04.deviantart.net/3db3/f/2012/363/1/e/clapping_pony_icon___twilight_sparkle_by_taritoons-d5pkpl8.gif",
+  "http://orig07.deviantart.net/0145/f/2012/363/7/9/clapping_pony_icon___rarity_by_taritoons-d5pksh9.gif",
+  "http://orig09.deviantart.net/e3f6/f/2012/363/c/f/clapping_pony_icon___applejack_by_taritoons-d5pkxsu.gif",
+  "http://orig10.deviantart.net/39db/f/2012/363/2/f/clapping_pony_icon___rainbow_dash_by_taritoons-d5pkzrg.gif",
+  "http://orig08.deviantart.net/e8b4/f/2012/363/c/3/clapping_pony_icon___fluttershy_by_taritoons-d5pl2gh.gif",
+  "http://orig03.deviantart.net/e7f9/f/2012/363/f/6/clapping_pony_icon___pinkie_pie_by_taritoons-d5pkuzy.gif",
+  "http://sollace.github.io/emoticons/clap/discord-d8vpbw9.gif|discord",
+  "http://sollace.github.io/emoticons/clap/maud-d7ee4tv.gif|maud",
+  "http://orig03.deviantart.net/341c/f/2013/056/f/4/clapping_pony_icon___shining_armor_by_taritoons-d5w67ti.gif",
+  "http://sollace.github.io/emoticons/clap/fancy_pants-d8drj8h.gif|fancy_pants",
+  "http://orig08.deviantart.net/4237/f/2012/366/8/8/clapping_pony_icon___trixie_by_taritoons-d5pw36r.gif",
+  "http://orig03.deviantart.net/49c6/f/2012/363/d/4/clapping_derpy_hooves_icon_by_shroomehtehponeh-d5pm8c9.gif",
+  "http://orig06.deviantart.net/d00a/f/2012/363/4/3/clapping_pony_icon___lyra_heartstrings_by_travispony-d5pl0kc.gif",
+  "http://orig06.deviantart.net/7231/f/2012/363/0/9/clapping_pony_icon___sweetie_drops_bonbon_by_travispony-d5pll1i.gif",
+  "http://orig11.deviantart.net/fa66/f/2012/366/d/5/clapping_pony_icon___vinyl_scratch_by_taritoons-d5pw0yp.gif",
+  "http://sollace.github.io/emoticons/clap/octavia-d6yq9am.gif|octavia",
+  "http://orig14.deviantart.net/0d00/f/2013/003/7/8/clapping_pony_icon___applebloom_by_taritoons-d5q9yfg.gif",
+  "http://orig10.deviantart.net/8c00/f/2013/056/8/9/clapping_pony_icon___scootaloo_by_taritoons-d5w610a.gif",
+  "http://orig07.deviantart.net/90f7/f/2013/056/7/f/clapping_pony_icon___sweetie_belle_by_taritoons-d5w5zt5.gif",
+  "http://sollace.github.io/emoticons/clap/snowdrop-d6xkrjj.gif|snowdrop",
+  "http://sollace.github.io/emoticons/clap/dinky-d6ymjpt.gif|dinky",
+  "http://orig00.deviantart.net/2b9e/f/2013/056/1/8/clapping_pony_icon___babs_seed_by_taritoons-d5w61z0.gif",
+  "http://orig03.deviantart.net/5c7c/f/2013/001/c/9/clapping_pony_icon___princess_celestia_by_taritoons-d5pozf0.gif",
+  "http://orig06.deviantart.net/cfa6/f/2013/001/b/5/clapping_pony_icon___princess_luna_by_taritoons-d5prurt.gif",
+  "http://orig00.deviantart.net/1686/f/2012/364/3/a/clapping_pony_icon___princess_cadence_by_taritoons-d5pon2h.gif",
+  "http://orig13.deviantart.net/b456/f/2013/001/7/e/clapping_pony_icon___nightmare_moon_by_taritoons-d5prx8v.gif",
+  "http://orig05.deviantart.net/3778/f/2013/002/7/b/clapping_pony_icon___soarin___wonderbolt_uniform_by_taritoons-d5q6w8j.gif",
+  "http://orig12.deviantart.net/0d99/f/2013/002/0/3/clapping_pony_icon___spitfire___wonderbolt_uniform_by_taritoons-d5q5mj8.gif",
+  "http://orig02.deviantart.net/3507/f/2012/365/c/a/clapping_pony_icon___changeling_by_taritoons-d5ps0kg.gif",
+  "http://orig02.deviantart.net/6711/f/2012/365/e/0/clapping_pony_icon___queen_chrysalis_by_taritoons-d5pshyl.gif",
+  "http://orig05.deviantart.net/c65c/f/2013/308/0/6/daring_do_clap_clap___by_xingyaru-d6t0c4f.gif|daring_do",
+  "http://orig11.deviantart.net/be54/f/2013/002/3/a/clapping_pony_icon___minuette_by_travispony-d5q5x0z.gif|colgate",
+  "http://orig06.deviantart.net/89bf/f/2013/336/5/7/13860064636854_by_blknblupanther-d6whl0i.gif|sunset_shimmer",
+  "http://orig08.deviantart.net/dcb0/f/2013/343/1/d/z_by_blknblupanther-d6xef1w.gif|zecora",
+  "http://orig14.deviantart.net/8add/f/2013/177/c/d/flash_sentry__2__by_jamaythemunker-d6arwlb.gif|flash_sentry",
+  "http://orig09.deviantart.net/07cd/f/2012/364/d/1/clapping_pony_icon___time_turner_by_travispony-d5pob3v.gif|dr_hooves",
+  "http://orig08.deviantart.net/6e4a/f/2013/056/a/3/clapping_pony_icon___braeburn_by_taritoons-d5w65tv.gif",
+  "http://sollace.github.io/emoticons/clap/bat_pony-d6xnck7.gif|bat_pony",
+  "http://sollace.github.io/emoticons/clap/nyx-d6y1o60.gif|nyx",
+  "http://sollace.github.io/emoticons/clap/flutterbat-d76qgbd.gif|flutterbat",
+  "http://sollace.github.io/emoticons/clap/applejewel-d76qgay.gif|applejewel",
+  "http://sollace.github.io/emoticons/clap/twiscepter-d6ymjpx.gif|twicane",
+  "http://sollace.github.io/emoticons/clap/sollace-d6ymjq8.gif|sollace"
 ], false);
