@@ -3,24 +3,20 @@
 // @description Allows additional emoticons to be added to FimFiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
+// @icon        http://sollace.github.io/emoticons/default/rainbowexcited.png
 // @include     /^http?[s]://www.fimfiction.net/.*/
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
+// @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Events.user.js
+// @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
 
-const ExtraEmotes = tryRun(ExtraEmoticons);
+const tryRun = func => function() {
+  try {return func.apply(this, arguments);
+      } catch (e) {console.error(e);}
+};
 
-function tryRun(func) {
-  try {
-    return func();
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-function ExtraEmoticons() {
+const ExtraEmotes = tryRun(_ => {
   const version = 6;
   const wind = win();
   
@@ -28,34 +24,15 @@ function ExtraEmoticons() {
     return wind.ExtraEmotes;
   }
   
-  const defaultEmojis = 'ajbemused;ajsleepy;ajsmug;applejackconfused;applejackunsure;applecry;eeyup;fluttercry;flutterrage;fluttershbad;fluttershyouch;fluttershysad;yay;heart;pinkiecrazy;pinkiegasp;pinkiehappy;pinkiesad2;pinkiesmile;pinkiesick;twistnerd;rainbowderp;rainbowdetermined2;rainbowhuh;rainbowkiss;rainbowlaugh;rainbowwild;scootangel;raritycry;raritydespair;raritystarry;raritywink;duck;unsuresweetie;coolphoto;twilightangry2;twilightoops;twilightblush;twilightsheepish;twilightsmile;facehoof;moustache;trixieshiftleft;trixieshiftright;derpyderp1;derpyderp2;derpytongue2;trollestia'.split(';');
-
-  function cutProto(url) {
-    return url.replace(/^http?[s]:/,'');
-  }
-
-  function debooru(url) {
-    return url.indexOf('camo.derpicdn') > -1 ? decodeURIComponent(url.split('url=')[1].split('&')[0]) : url;
-  }
-
-  function replaceAll(find, replace, str) {
-    return str.replace(new RegExp(find.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'g'), replace);
-  }
-
+  const some = a => a;
+  const cutProto = url => url.replace(/^http?[s]:/,'');
+  const debooru = url => url.indexOf('camo.derpicdn') > -1 ? decodeURIComponent(url.split('url=')[1].split('&')[0]) : url;
+  const replaceAll = (find, replace, str) => str.replace(new RegExp(find.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'g'), replace);
+  const collide = (func, args) => args.forEach(arg => func.apply(this, arg));
+  
   function override(obj, member, new_func) {
     new_func.super = obj[member].super || obj[member];
     obj[member] = new_func;
-  }
-
-  function search(array, func, result) {
-    array.find((a, i, ar) => !!(result = func(a, i, ar)));
-    return result;
-  }
-  
-  function newEl(html) {
-    const div = document.createElement('DIV');
-    div.innerHTML = html;
-    return div.firstChild;
   }
   
   function extend(onto, offof) {
@@ -63,51 +40,82 @@ function ExtraEmoticons() {
     return onto;
   }
   
+  function Emoticon(norm, url, name, code, img) {
+    img = img || !code;
+    code = code || `:${name}:`;
+    return {
+      code: code,
+      name: name,
+      normalize: norm,
+      url: cutProto(url),
+      element: newEl(`<li data-name="${name}"><a title="${name}" data-click="addEmoticon" data-emoticon="${code}">${img ? `<img src="${cutProto(url)}"></img>` : code}</a></li>`),
+      keywords: [ name ]
+    };
+  }
+  
   const ExtraEmotesRegistry = (_ => {
-    const sets = [], imgs = [], setsObj = {};
+    const sets = [], imgs = [], emojis = [], setsObj = {};
     
     function registerSet(set, emoji) {
       setsObj[set.category] = set;
       sets.push(set);
-      if (emoji) imgs.push(set);
+      if (emoji) {
+        imgs.push(set);
+        emojis.push.apply(emojis, set.emojis);
+      }
       return set;
     }
     
+    function emoteUrl(url) {
+      return cutProto(debooru(url)).split('|')[0];
+    }
+    
+    function emoteName(url) {
+      const bar = url.indexOf('|');
+      if (bar > -1) return url.substring(bar + 1, url.length);
+
+      url = url.split('/').reverse()[0].split('.')[0].replace(/ /g, '_').replace('clapping_pony_icon_', '');
+
+      if (url.indexOf('_by_') > -1) {
+        url = url.split('_by_')[0];
+      }
+      while (url.indexOf('__') > -1) {
+        url = url.replace(/__/g, '_');
+      }
+      return url;
+    }
+    
     return {
+      emojis: _ => emojis,
       imgs: _ => imgs,
-      cats: setsin => sets.length ? {
+      cats: setsin => (sets.length ? {
         keys: ['Ponies'].concat(sets.map(i => i.category), Object.keys(setsin).filter(a => a != 'Ponies')),
         values: extend(extend({}, setsin), setsObj)
       } : {
         keys: Object.keys(setsin),
         values: extend({}, setsin)
-      },
+      }),
       EmojiSet: (id, name, title, emotes, normalize, buttonImage) => registerSet({
         element: newEl(`<li class="emoji-selector__header" data-category="${name}">${title}</li>`),
-        button: `<li data-click="jumpTo" data-category="${name}"><img src="${buttonImage || emoteUrlFor(emotes[0])}"></img></li>`,
+        button: `<li data-click="jumpTo" data-category="${name}"><img src="${buttonImage || emoteUrl(emotes[0])}"></img></li>`,
         category: name,
-        normalize: normalize,
-        emojis: emotes.map(emote => Emoticon(emoteUrlFor(emote), emoteNameFor(emote), `:${id}:${emoteNameFor(emote)}:`, true))
+        emojis: emotes.map(emote => Emoticon(normalize, emoteUrl(emote), emoteName(emote), `:${id}:${emoteName(emote)}:`, true))
       }, true),
       TextSet: (id, name, title, emotes, buttonImage) => registerSet({
         element: newEl(`<li class="emoji-selector__header" data-category="${name}">${title}</li>`),
         button: `<li data-click="jumpTo" data-category="${name}"><img src="${buttonImage}"></img></li>`,
         category: name,
-        normalize: false,
-        emojis: emotes.map(emote => Emoticon(emote, emoteNameFor(emote), code, false))
-      });
+        emojis: emotes.map(emote => Emoticon(false, emote, emoteName(emote), code, false))
+      })
     };
   })();
   
   const urlMatcher = (root => {
     return {
-      match: (one, two) => one == two || (root ? root(one, two) : false),
+      match: (one, two) => one == two || root(one, two),
       add: (matcher) => {
         const parent = root;
-        if (parent) {
-          return root = (one, two) => matcher(one, two) || parent(one, two);
-        }
-        return root = matcher;
+        root = (one, two) => matcher(one, two) || parent(one, two);
       }
     };
   })((url, match) => {
@@ -121,125 +129,91 @@ function ExtraEmoticons() {
 
   const unspoiler = (_ => {
     function emotify(me) {
-      const url = cutProto(debooru(me.getAttribute('src')));
-      const type = emoteType(url);
+      const type = emoteType(cutProto(debooru(me.getAttribute('src'))));
       if (type.result == 1) {
-        me.src = type.url;
-        me.alt = me.title = type.name;
-        me.classList.add('emoticon');
-        me.classList.remove('user_image');
-        if (type.lim) {
-          me.classList.add('limited');
-        }
+        me.insertAdjacentHTML('afterend', emojiImg(type));
+        me.parentNode.removeChild(me);
+      } else {
+        me.classList.add('done');
       }
-      me.classList.add('done');
     }
-
+    
+    function emojiImg(type) {
+      return type.result == 2 ?
+        `<img class="user_image" data-lightbox src="${type.emoji.url}"></img>` : 
+        `<img class="emoticon${type.emoji.normalize ? ' limited' : ''}" alt="${type.emoji.name}" src="${type.emoji.url}"></img>`
+    }
+    
     function unspoilerSibling(me) {
-      const url = cutProto(debooru(me.getAttribute('href')));
-      const type = emoteType(url);
-
-      if (type.result == 0) {
-        me.classList.add('dontUnspoiler');
-        me.parentNode.insertAdjacentHTML('afterend', '<br />');
-        return;
-      }
-      if (type.result == 2) {
-        me.parentNode.insertAdjacentHTML('afterend', `<img class="user_image" src="${type.url}"></img>`);
-        me.parentNode.parentNode.removeChild(me.parentNode);
-        return;
-      }
-
-      me.parentNode.normalize();
-
-      let p = me.parentNode.previousSibling;
-      const after = me.parentNode.nextSibling;
-
-      if (p.tagName == 'BR') {
-        p = p.previousSibling;
-        p.parentNode.removeChild(p.nextSibling);
-      }
-
-      const wrap = type.wrap || !p.length || p.tagName != 'P';
-
-      me.insertAdjacentHtml(wrap ? 'afterend' : 'beforeend', `<img class="emoticon${type.lim ? ' limited' : ''}" alt="${type.name}" title="${type.name}" src="${type.url}"></img>`);
-      if (wrap) me.parentNode.style.display = 'inline';
+      const type = emoteType(cutProto(debooru(me.getAttribute('href'))));
       
-      me.parentNode.parentNode.removeChild(me.parentNode);
-      if (after && after.nodeType == 3) {
-        const img = wrap ? me.nextSibling : p.lastChild;
-        img.parentNode.insertBefore(after, img.nextSibling);
+      if (type.result == 0) {
+        me.classList.add('done');
+      } else {
+        let next = me.parentNode.nextSibling;
+        if (type.result > 1 && next && next.tagName != 'BR') {
+          me.parentNode.insertAdjacentHTML('afterend', '<br>');
+        }
+        let prev = me.parentNode.previousSibling;
+        if (prev) {
+          if (type.wrap && prev.tagName != 'BR') {
+            me.parentNode.insertAdjacentHTML('beforebegin', '<br>');
+          } else if (prev.tagName == 'BR') {
+            prev.parentNode.removeChild(prev);
+          }
+        }
+        me.parentNode.insertAdjacentHTML('afterend', emojiImg(type));
+        me.parentNode.parentNode.removeChild(me.parentNode);
       }
+    }
+    
+    function search(array, func, result) {
+      array.find((a, i, ar) => !!(result = func(a, i, ar)));
+      return result;
     }
 
     function emoteType(url) {
-      let mustWrap = false;
-
-      if (url) {
-        let questionStart = url.indexOf('?');
-        if (questionStart > -1) {
-          let splitten = url.substring(questionStart + 1, url.length);
-          musWrap = splitten.indexOf('wrap=true') > -1;
-          if (splitten.indexOf('isEmote') > -1) {
-            return { result: 2, url: cutProto(url), lim: true, wrap: mustWrap, name: emoteNameFor(url) };
-          }
-          if (mustWrap) url = url.split('?')[0];
-        }
-        
-        return search(ExtraEmotesRegistry.imgs(), category => {
-          return search(category.emojis, emoji => {
-            if (urlMatcher.match(url, emoji.url)) return {
-              result: 1,
-              url: emoji.url,
-              name: emoji.name,
-              lim: category.normalize,
-              wrap: mustWrap
-            };
-          });
-        }, { result: 0, lim: true, wrap: mustWrap });
+      if (!url || !url.length) return { result: 0 };
+      
+      const mustWrap = /\?.*wrap=true/.test(url);
+      if (/\?.*isEmote/.test(url)) {
+        return { result: 2, emoji: { url: cutProto(url) }, wrap: mustWrap };
+      }
+      url = url.split('?')[0];
+      
+      return search(ExtraEmotesRegistry.emojis(), emoji => {
+        if (urlMatcher.match(url, emoji.url)) return { result: 1, emoji: emoji, wrap: mustWrap};
+      }, { result: 0 });
     }
     
     return _ => {
-      all('.comment_data .user_image_link:not(.dontUnspoiler)', unspoilerSibling);
+      all('.comment_data .user_image_link:not(.done)', unspoilerSibling);
       all('.comment_data img.user_image:not(.done)', emotify);
     };
   })();
-
+  
   const aliases = (_ => {
     function getUrls(txt) {
       txt = txt.match(/\[img\]([^\s]+)\[\/img\]/ig);
       if (!txt) return [];
-      return txt.map(i => {
-        return {
-          thin: i.replace(/\[[\/]?img\](http[s]?:)?/ig,''),
-          thick: i
-        };
-      });
+      return txt.map(i => some({thick: i, thin: i.replace(/\[[\/]?img\](http[s]?:)?/ig,'')}));
     }
 
     function restore(txt) {
       txt = txt.replace(/\?wrap\=true/g, '');
       const urls = getUrls(txt);
-      ExtrEmojiSets.forEach(category => {
-        if (category.raw) return;
-        category.emojis.forEach(emoji => {
-          urls.forEach(item => {
-            if (urlMatcher.match(item.thin, emoji.url)) {
-              txt = replaceAll(item.thick, emoji.code, txt);
-            }
-          });
+      ExtraEmotesRegistry.emojis().forEach(emoji => {
+        urls.filter(item => urlMatcher.match(item.thin, emoji.url)).forEach(item => {
+            txt = replaceAll(item.thick, emoji.code, txt);
         });
       });
       return txt;
     }
 
     function remove(txt) {
-      ExtrEmojiSets.forEach(category => {
-        if (category.raw) return;
-        category.emojis.forEach(emoji => {
-          txt = replaceAll(`\n ${emoji.code}`, `\n [img]http:${emoji.url}?wrap=true[/img]`, txt);
-          txt = replaceAll(emoji.code, `[img]http:${emoji.url}[/img]`, txt);
-        });
+      ExtraEmotesRegistry.emojis().forEach(emoji => {
+        txt = replaceAll(`\n ${emoji.code}`, `\n [img]http:${emoji.url}?wrap=true[/img]`, txt);
+        txt = replaceAll(emoji.code, `[img]http:${emoji.url}[/img]`, txt);
       });
       return txt;
     }
@@ -251,6 +225,7 @@ function ExtraEmoticons() {
         textarea.scrollTop = scrollTop;
         textarea.focus();
       },
+      doRemove: remove,
       remove: function(textarea) {
         this.swap(textarea, remove);
       },
@@ -258,38 +233,125 @@ function ExtraEmoticons() {
         swap(textarea, restore);
       }
     };
-  });
+  })();
 
-  const submitHandler = (_ => {
-    function swap(from, to) {
-      to.setAttribute('style', from.getAttribute('style'));
-      to.setAttribute('class', from.getAttribute('class'));
-      to.width = from.width;
-      to.height = from.height;
-      to.value = from.value;
-      to.scrollTop = from.scrollTop;
-      to.scrollLeft = from.scrollLeft;
-      to.focus();
+  const submitHandler = (textarea, callback) => {
+    const backup = textarea.value;
+    aliases.remove(textarea);
+    callback(() => aliases.swap(textarea, () => backup));
+  };
+  const saveHandler = (controller, callback) => {
+    const last = [];
+    all('textarea', controller.element, area => submitHandler(area, next => last.push(next)));
+    const result = callback.apply(controller, arguments);
+    last.forEach(l => l());
+    return result;
+  };
+  
+  const kniggySets = {
+    parse: controller => {
+      let currentCategory = null;
+      const sets = [];
+      controller.emojiElements.forEach(e => {
+        const cat = e.element.dataset.category;
+        if (cat) {
+          currentCategory = cat;
+          sets[cat] = {
+            element: e.element,
+            button: `<li data-click="jumpTo" data-category="${cat}">${controller.getEmojiForCategory(cat)}</li>`,
+            category: cat, 
+            emojis: []
+          };
+        } else {
+          sets[currentCategory].emojis.push({
+            code: e.element.querySelector('[data-emoticon]').dataset.emoticon,
+            name: e.element.dataset.name,
+            element: e.element,
+            keywords: e.keywords
+          });
+        }
+      });
+      return sets;
+    },
+    flatten: controller => {
+      const elements = controller.emojiElements;
+      elements.length = 0;
+      const sets = ExtraEmotesRegistry.cats(controller.emotes);
+
+      sets.keys.forEach(set => {
+        elements.push(sets.values[set]);
+        elements.push.apply(elements, sets.values[set].emojis);
+      });
+      controller.elements.tabs.innerHTML = sets.keys.map(i => sets.values[i].button).join('');
+
+      return elements;
     }
+  };
+  
+  const addCss = _ => {
+    const light = currentTheme() == 'light';
+    const container_border_base = light ? '#bebab5' : '#333d4f',
+          emoji_input_background = light ? '#fff' : '#252c39',
+          emoji_input_foreground = light ? '#333' : '#a3abc3',
+          emoji_input_shadow = 'rgba(0,0,0,0.1)',
+          emoji_input_border = light ? '#aaa' : '#333d4f',
+          emoji_header_background_min = light ? '#f8f8f8' : '#232a36',
+          emoji_header_background_max = light ? '#f2f2f2' : '#333a46',
+          emoji_header_border = light ? '#ddd' : container_border_base,
+          emoji_focus_background = light ? '#eee' : '#336';
+    updateStyle(`
+.emoji-selector img, img.limited { max-height: 27px}
 
-    return function(textarea, callback) {
-      if (textarea.style.display != 'none') {
-        textarea.insertAdjacentHTML('<textarea />');
-        const backup = textarea.nextSibling;
-        swap(textarea, backup);
-        textarea.style.display = 'none';
+/*Make the emoticon picker not look like plot*/
+.format-toolbar .emoji-selector .emoji-selector__search {
+  background: none !important;
+  padding: 3px !important;
+  box-shadow: none;}
+.emoji-selector__search input {
+  width: 100%;
+  margin: 0;
+  padding: 5px;
+  border-radius: 4px;
+  background: ${emoji_input_background};
+  color: ${emoji_input_foreground};
+  box-shadow: inset 0 0 5px 3px ${emoji_input_shadow};
+  border: solid 1px ${emoji_input_border};}
+.format-toolbar .emoji-selector .emoji-selector__tabs,
+.format-toolbar .emoji-selector .emoji-selector__list > li.emoji-selector__header {
+  border-bottom: 1px solid ${emoji_header_border};
+  border-top: 1px solid ${emoji_header_border};
+  background: ${emoji_header_background_min} !important;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, ${emoji_header_background_min}), color-stop(100%, ${emoji_header_background_max})) !important;
+  background: -webkit-linear-gradient(top, ${emoji_header_background_min} 0%, ${emoji_header_background_max} 100%) !important;
+  background: linear-gradient(to bottom, ${emoji_header_background_min} 0%, ${emoji_header_background_max} 100%) !important;}
+.format-toolbar .emoji-selector .emoji-selector__tabs li {
+  background: none !important;
+  box-shadow: none;}
+.format-toolbar .emoji-selector .emoji-selector__tabs li:hover,
+.format-toolbar .emoji-selector .emoji-selector__tabs li.selected {
+  background: rgba(0,0,0,0.1) !important;}
+.format-toolbar .emoji-selector .emoji-selector__list > li:hover {
+    background: ${emoji_focus_background};
+    border-radius: 4px;
+    box-shadow: 0 0 0 3px ${emoji_focus_background};
+}
 
-        aliases.remove(textarea);
-        callback(() => {
-          swap(backup, textarea);
-          textarea.style.display = '';
-          backup.parentNode.removeChild(parent);
-        });
-      }
-    };
-  });
+.format-toolbar .emoji-selector .emoji-selector__list > li {
+  margin: 4px;
+  vertical-align: middle;}
+.format-toolbar .emoji-selector .emoji-selector__list > li:hover {
+  border-radius: 100% !important;}
+.format-toolbar .emoji-selector .emoji-selector__list > li.emoji-selector__header:hover {
+  border-radius: 0 !important;}
+/*Center pony emoticon images vertically*/
+.format-toolbar .emoji-selector .emoji-selector__list > li a {height: 36px;}
+.format-toolbar .emoji-selector .emoji-selector__list > li img {margin-top: 5px;}
+`, 'Extra_Emotes_Stylesheet');
+  };
+  
+  document.addEventListener("DOMContentLoaded", tryRun(() => {
+    if (!document.querySelector('.body_container')) return;
 
-  function run() {
     if (document.location.href.indexOf('/manage_user/messages/') < 0) {
       if (isMyPage()) FimFicEvents.on('aftereditmodule', () => {
         all('.module_editing_form textarea', aliases.restore);
@@ -298,160 +360,68 @@ function ExtraEmoticons() {
     }
 
     FimFicEvents.on('beforepreviewcontent', e => {
-      e.event.data.bbcode = aliases.remove(e.event.data.bbcode);
+      e.event.data.bbcode = aliases.doRemove(e.event.data.bbcode);
     });
 
-    document.addEventListener("DOMContentLoaded", () => tryRun(initOverrides));
+    addCss();
     
-    makeStyle(`
-.emoji-selector img,
-img.limited { max-height: 27px}`);
+    window.addEventListener('darkmodechange', addCss);
+    window.addEventListener('storage', c => {
+      if (c.key == 'stylesheet') addCss();
+    });
     
+    function rebuildEmojiSets(controller) {
+      if (!controller.emotes) controller.emotes = kniggySets.parse(controller);
+      kniggySets.flatten(controller);
+    }
     
-    function initOverrides() {
-      console.log('initOverrides');
-      if (!document.querySelector('.body_container')) return;
-      console.log(EmojiController.prototype);
-      override(EmojiController.prototype, 'render', function() {
-        try {
+    collide(override, [
+      [NightModeController.prototype, 'update', function() {
+        NightModeController.prototype.update.super.apply(this, arguments);
+        window.dispatchEvent(new Event('darkmodechange'));
+      }],
+      [EmojiController.prototype, 'render', function() {
         rebuildEmojiSets(this);
-        } catch (e) {console.error(e);}
-        EmojiController.prototype.render.super.apply(this, arguments);
-      });
-      override(EmojiController.prototype, 'search', function() {
+        return EmojiController.prototype.render.super.apply(this, arguments);
+      }],
+      [EmojiController.prototype, 'search', function() {
         rebuildEmojiSets(this);
         EmojiController.prototype.search.super.apply(this, arguments);
-      });
-      override(NewCommentController.prototype, 'saveComment', function() {
+      }],
+      [NewCommentController.prototype, 'saveComment', function() {
+        let result;
         submitHandler(this.element.querySelector('textarea'), n => {
-          NewCommentController.prototype.saveComment.super.apply(this, arguments);
+          result = NewCommentController.prototype.saveComment.super.apply(this, arguments);
           n();
         });
-      });
-      override(ComposePmController.prototype, 'send', function() {
+        return result;
+      }],
+      [ComposePmController.prototype, 'send', function() {
+        let result;
         submitHandler(this.element.querySelector('textarea'), n => {
-          ComposePmController.prototype.send.super.apply(this, arguments);
+          result = ComposePmController.prototype.send.super.apply(this, arguments);
           n();
         });
-      });
-      function saveHandler(controller, callback) {
-        const last = [];
-        all(controller.element, 'textarea', area => submitHandler(area, next => last.push(next)));
-        callback.apply(controller, arguments);
-        last.forEach(l => l());
-      }
-
-      override(UserPageController.prototype, 'saveModule', function() {
-        saveHandler(this, UserPageController.prototype.saveModule.super);
-      });
-      override(ChapterController.prototype, 'toggleEdit', function() {
-        ChapterController.prototype.toggleEdit.super.apply(this, arguments);
-        if (this.editing) {
-          all(this.element, 'textarea', area => aliases.restore);
-        } else {
-          all(this.element, 'textarea', area => aliases.remove);
-        }
-      });
-      override(ChapterController.prototype, 'save', function() {
-        saveHandler(this, ChapterController.prototype.save.super);
-      });
-    }
-  }
+        return result;
+      }],
+      [UserPageController.prototype, 'saveModule', function() {
+        return saveHandler(this, UserPageController.prototype.saveModule.super);
+      }],
+      [ChapterController.prototype, 'save', function() {
+        return saveHandler(this, ChapterController.prototype.save.super);
+      }],
+      [ChapterController.prototype, 'toggleEdit', function() {
+        const res = ChapterController.prototype.toggleEdit.super.apply(this, arguments);
+        all('textarea', this.element, this.editing ? aliases.restore : aliases.remove);
+        return res;
+      }]
+    ]);
+  }));
   
-  
-  function rebuildEmojiSets(controller) {
-    if (!controller.emotes) {
-      controller.emotes = parseKniggySets(controller);
-     // controller.extraEmotes['Ponies'].emojis = defaultEmojis.map(emoji => Emoticon(`//static.fimfiction.net/images/emoticons/${emoji}.png`, emoji));
-    }
-    flattenKniggySets(controller);
-  }
-  
-  function parseKniggySets(controller) {
-    let currentCategory = null;
-    const sets = [];
-    controller.emojiElements.forEach(e => {
-      const cat = e.element.dataset.category;
-      if (cat) {
-        currentCategory = cat;
-        sets[cat] = {
-          element: e.element,
-          button: `<li data-click="jumpTo" data-category="${cat}">${controller.getEmojiForCategory(cat)}</li>`,
-          category: cat, 
-          emojis: []
-        };
-      } else {
-        sets[currentCategory].emojis.push({
-          code: e.element.querySelector('[data-emoticon]').dataset.emoticon,
-          name: e.element.dataset.name,
-          element: e.element,
-          keywords: e.keywords
-        });
-      }
-    });
-    return sets;
-  }
-  
-  function flattenKniggySets(controller) {
-    const elements = controller.emojiElements;
-    elements.length = 0;
-    const sets = ExtraEmotesRegistry.cats(controller.emotes);
-    
-    sets.keys.forEach(set => {
-      elements.push(sets.values[set]);
-      elements.push.apply(elements, sets.values[set].emojis);
-    });
-    controller.elements.tabs.innerHTML = sets.keys.map(i => sets.values[i].button).join('');
-    
-    return elements;
-  }
-  
-  function Emoticon(url, name, code, img) {
-    img = img || !code;
-    code = code || `:${name}:`;
-    return {
-      code: code,
-      name: name,
-      url: cutProto(url),
-      element: newEl(`<li data-name="${name}"><a title="${name}" data-click="addEmoticon" data-emoticon="${code}">${img ? `<img src="${cutProto(url)}"></img>` : code}</a></li>`),
-      keywords: [ name ]
-    };
-  }
-  
-  function emoteUrlFor(url) {
-    return cutProto(debooru(url)).split('|')[0];
-  }
-
-  function emoteNameFor(url) {
-    const bar = url.indexOf('|');
-    if (bar > -1) return url.substring(bar + 1, url.length);
-
-    url = url.split('/').reverse()[0].split('.')[0].replace(/ /g, '_').replace('clapping_pony_icon_', '');
-
-    if (url.indexOf('_by_') > -1) {
-      url = url.split('_by_')[0];
-    }
-    while (url.indexOf('__') > -1) {
-      url = url.replace(/__/g, '_');
-    }
-    return url;
-  }
-  
-  run();
-  
-  return {
-    //Adds a collection of image emoticons
-    //Optional: buttonImage
-    addEmoticons: function (id, name, title, emotes, normalize, buttonImage) {
-      ExtraEmotesRegistry.EmojiSet(id, name, title, emotes, normalize, buttonImage);
-    },
-    //Adds a collection of text emoticons
-    addRaw: function (id, name, title, emotes, buttonImage) {
-      ExtraEmotesRegistry.TextSet(id, name, title, emotes, buttonImage);
-    },
-    //Adds a matching function to identify emoticon images by url
-    addUrlMatcher: function(matcher) {
-      urlMatcher.add(matcher);
-    }
+  return wind.ExtraEmotes = {
+    getVersion: _ => version,
+    addEmoticons: ExtraEmotesRegistry.EmojiSet, //Adds a collection of image emoticons
+    addRaw: ExtraEmotesRegistry,                //Adds a collection of text emoticons
+    addUrlMatcher: urlMatcher.add               //Adds a matching function to identify emoticon images by url
   };
-}
+})();
