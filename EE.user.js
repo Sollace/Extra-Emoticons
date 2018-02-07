@@ -11,11 +11,6 @@
 // @run-at      document-start
 // ==/UserScript==
 
-const tryRun = func => function() {
-  try {return func.apply(this, arguments);
-      } catch (e) {console.error(e);}
-};
-
 const ExtraEmotes = tryRun(_ => {
   const version = 6;
   const wind = win();
@@ -25,7 +20,7 @@ const ExtraEmotes = tryRun(_ => {
   }
   
   const some = a => a;
-  const cutProto = url => url.replace(/^http?[s]:/,'');
+  const cutProto = url => url.replace(/^https?:/,'');
   const debooru = url => url.indexOf('camo.derpicdn') > -1 ? decodeURIComponent(url.split('url=')[1].split('&')[0]) : url;
   const replaceAll = (find, replace, str) => str.replace(new RegExp(find.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'g'), replace);
   const collide = (func, args) => args.forEach(arg => func.apply(this, arg));
@@ -48,7 +43,7 @@ const ExtraEmotes = tryRun(_ => {
       name: name,
       normalize: norm,
       url: cutProto(url),
-      element: newEl(`<li data-name="${name}"><a title="${name}" data-click="addEmoticon" data-emoticon="${code}">${img ? `<img src="${cutProto(url)}"></img>` : code}</a></li>`),
+      element: `<li data-name="${name}"><a title="${name}" data-click="addEmoticon" data-emoticon="${code}">${img ? `<img src="${cutProto(url)}"></img>` : code}</a></li>`,
       keywords: [ name ]
     };
   }
@@ -96,13 +91,13 @@ const ExtraEmotes = tryRun(_ => {
         values: extend({}, setsin)
       }),
       EmojiSet: (id, name, title, emotes, normalize, buttonImage) => registerSet({
-        element: newEl(`<li class="emoji-selector__header" data-category="${name}">${title}</li>`),
+        element: `<li class="emoji-selector__header" data-category="${name}">${title}</li>`,
         button: `<li data-click="jumpTo" data-category="${name}"><img src="${buttonImage || emoteUrl(emotes[0])}"></img></li>`,
         category: name,
         emojis: emotes.map(emote => Emoticon(normalize, emoteUrl(emote), emoteName(emote), `:${id}:${emoteName(emote)}:`, true))
       }, true),
       TextSet: (id, name, title, emotes, buttonImage) => registerSet({
-        element: newEl(`<li class="emoji-selector__header" data-category="${name}">${title}</li>`),
+        element: `<li class="emoji-selector__header" data-category="${name}">${title}</li>`,
         button: `<li data-click="jumpTo" data-category="${name}"><img src="${buttonImage}"></img></li>`,
         category: name,
         emojis: emotes.map(emote => Emoticon(false, emote, emoteName(emote), code, false))
@@ -186,7 +181,7 @@ const ExtraEmotes = tryRun(_ => {
       }, { result: 0 });
     }
     
-    return _ => {
+    return e => {
       all('.comment_data .user_image_link:not(.done)', unspoilerSibling);
       all('.comment_data img.user_image:not(.done)', emotify);
     };
@@ -200,6 +195,8 @@ const ExtraEmotes = tryRun(_ => {
     }
 
     function restore(txt) {
+      console.log('aliases.restore');
+      console.log(txt);
       txt = txt.replace(/\?wrap\=true/g, '');
       const urls = getUrls(txt);
       ExtraEmotesRegistry.emojis().forEach(emoji => {
@@ -207,14 +204,18 @@ const ExtraEmotes = tryRun(_ => {
             txt = replaceAll(item.thick, emoji.code, txt);
         });
       });
+      console.log(txt);
       return txt;
     }
 
     function remove(txt) {
+      console.log('aliases.remove');
+      console.log(txt);
       ExtraEmotesRegistry.emojis().forEach(emoji => {
         txt = replaceAll(`\n ${emoji.code}`, `\n [img]http:${emoji.url}?wrap=true[/img]`, txt);
         txt = replaceAll(emoji.code, `[img]http:${emoji.url}[/img]`, txt);
       });
+      console.log(txt);
       return txt;
     }
 
@@ -226,67 +227,68 @@ const ExtraEmotes = tryRun(_ => {
         textarea.focus();
       },
       doRemove: remove,
-      remove: function(textarea) {
-        this.swap(textarea, remove);
-      },
-      restore: function(textarea) {
-        swap(textarea, restore);
-      }
+      remove: textarea => aliases.swap(textarea, remove),
+      restore: textarea => aliases.swap(textarea, restore)
     };
   })();
-
+  
+  const formHandler = e => all('textarea', e.target || e, aliases.remove);
   const submitHandler = (textarea, callback) => {
     const backup = textarea.value;
     aliases.remove(textarea);
     callback(() => aliases.swap(textarea, () => backup));
   };
-  const saveHandler = (controller, callback) => {
+  const saveHandler = (controller, callback, args) => {
     const last = [];
     all('textarea', controller.element, area => submitHandler(area, next => last.push(next)));
-    const result = callback.apply(controller, arguments);
+    const result = callback.apply(controller, args);
     last.forEach(l => l());
     return result;
   };
   
-  const kniggySets = {
-    parse: controller => {
-      let currentCategory = null;
-      const sets = [];
-      controller.emojiElements.forEach(e => {
-        const cat = e.element.dataset.category;
-        if (cat) {
-          currentCategory = cat;
-          sets[cat] = {
-            element: e.element,
-            button: `<li data-click="jumpTo" data-category="${cat}">${controller.getEmojiForCategory(cat)}</li>`,
-            category: cat, 
-            emojis: []
-          };
-        } else {
-          sets[currentCategory].emojis.push({
-            code: e.element.querySelector('[data-emoticon]').dataset.emoticon,
-            name: e.element.dataset.name,
-            element: e.element,
-            keywords: e.keywords
-          });
-        }
-      });
-      return sets;
-    },
-    flatten: controller => {
-      const elements = controller.emojiElements;
-      elements.length = 0;
-      const sets = ExtraEmotesRegistry.cats(controller.emotes);
+  const kniggySets = (_ => {
+    let cachedSets;
+    return {
+      ready: _ => !!cachedSets,
+      parse: controller => {
+        if (cachedSets) return cachedSets; 
+        let currentCategory = null;
+        const sets = [];
+        controller.emojiElements.forEach(e => {
+          const cat = e.element.dataset.category;
+          if (cat) {
+            currentCategory = cat;
+            sets[cat] = {
+              element: e.element.outerHTML,
+              button: `<li data-click="jumpTo" data-category="${cat}">${controller.getEmojiForCategory(cat)}</li>`,
+              category: cat, 
+              emojis: []
+            };
+          } else {
+            sets[currentCategory].emojis.push({
+              code: e.element.querySelector('[data-emoticon]').dataset.emoticon,
+              name: e.element.dataset.name,
+              element: e.element.outerHTML,
+              keywords: e.keywords
+            });
+          }
+        });
+        return cachedSets = sets;
+      },
+      flatten: controller => {
+        const elements = controller.emojiElements;
+        elements.length = 0;
+        const sets = ExtraEmotesRegistry.cats(cachedSets);
+        sets.keys.forEach(set => {
+          elements.push(sets.values[set]);
+          elements.push.apply(elements, sets.values[set].emojis);
+        });
+        controller.elements.tabs.innerHTML = sets.keys.map(i => sets.values[i].button).join('');
 
-      sets.keys.forEach(set => {
-        elements.push(sets.values[set]);
-        elements.push.apply(elements, sets.values[set].emojis);
-      });
-      controller.elements.tabs.innerHTML = sets.keys.map(i => sets.values[i].button).join('');
-
-      return elements;
+        return elements;
+      }
     }
-  };
+  })();
   
   const addCss = _ => {
     const light = currentTheme() == 'light';
@@ -358,11 +360,14 @@ const ExtraEmotes = tryRun(_ => {
       });
       FimFicEvents.on('afterpagechange aftereditcomment afteraddcomment', unspoiler);
     }
-
-    FimFicEvents.on('beforepreviewcontent', e => {
-      e.event.data.bbcode = aliases.doRemove(e.event.data.bbcode);
+    
+    FimFicEvents.on('earlylistemoticons', e => {
+      if (kniggySets.ready()) {
+        console.log('cancelled bbcode ajax because we already have them.');
+        e.event.preventDefault();
+      }
     });
-
+    
     addCss();
     
     window.addEventListener('darkmodechange', addCss);
@@ -371,7 +376,7 @@ const ExtraEmotes = tryRun(_ => {
     });
     
     function rebuildEmojiSets(controller) {
-      if (!controller.emotes) controller.emotes = kniggySets.parse(controller);
+      if (!kniggySets.ready()) kniggySets.parse(controller);
       kniggySets.flatten(controller);
     }
     
@@ -380,35 +385,54 @@ const ExtraEmotes = tryRun(_ => {
         NightModeController.prototype.update.super.apply(this, arguments);
         window.dispatchEvent(new Event('darkmodechange'));
       }],
+      [EmojiController.prototype, 'bind', function() {
+        EmojiController.prototype.bind.super.apply(this, arguments);
+        if (kniggySets.ready()) {
+          this.searchedElements = this.emojiElements;
+          this.render();
+          App.BindAll(this.element);
+        }
+      }],
       [EmojiController.prototype, 'render', function() {
         rebuildEmojiSets(this);
-        return EmojiController.prototype.render.super.apply(this, arguments);
+        this.elements.list.innerHTML = this.searchedElements.map(a => a.element).join(''); // use html instead of dom nodes
       }],
-      [EmojiController.prototype, 'search', function() {
+      [EmojiController.prototype, 'search', function(term) {
         rebuildEmojiSets(this);
+        if (!term) {
+          this.searchedElements = this.emojiElements;
+          return this.render(); //short-circuit unneccessary search (kniggy pls)
+        }
         EmojiController.prototype.search.super.apply(this, arguments);
       }],
+      [BBCodeEditorController.prototype, 'togglePreview', function() {
+        return saveHandler(this, BBCodeEditorController.prototype.togglePreview.super, arguments);
+      }],
       [NewCommentController.prototype, 'saveComment', function() {
-        let result;
-        submitHandler(this.element.querySelector('textarea'), n => {
-          result = NewCommentController.prototype.saveComment.super.apply(this, arguments);
-          n();
-        });
-        return result;
+        return saveHandler(this, NewCommentController.prototype.saveComment.super, arguments);
       }],
       [ComposePmController.prototype, 'send', function() {
-        let result;
-        submitHandler(this.element.querySelector('textarea'), n => {
-          result = ComposePmController.prototype.send.super.apply(this, arguments);
-          n();
-        });
-        return result;
+        return saveHandler(this, ComposePmController.prototype.send.super, arguments);
       }],
       [UserPageController.prototype, 'saveModule', function() {
-        return saveHandler(this, UserPageController.prototype.saveModule.super);
+        return saveHandler(this, UserPageController.prototype.saveModule.super, arguments);
       }],
       [ChapterController.prototype, 'save', function() {
-        return saveHandler(this, ChapterController.prototype.save.super);
+        return saveHandler(this, ChapterController.prototype.save.super, arguments);
+      }],
+      [CommentListController.prototype, 'toggleEditComment', function(sender) {
+        const com = sender.closest('.comment');
+        let rem = null;
+        if (!com.querySelector('textarea')) {
+          rem = FimFicEvents.on('afterpagechange', () => {
+            all('textarea', com, aliases.restore);
+            com.querySelector('.form-edit-comment').addEventListener('submit', () => all('textarea', com, aliases.remove));
+            FimFicEvents.off('afterpagechange', rem);
+          });
+        }
+        const res = CommentListController.prototype.toggleEditComment.super.apply(this, arguments);
+        if (!rem) all('textarea', com, com.querySelector('.comment-edit.hidden') ? aliases.remove : aliases.restore);
+        return res;
       }],
       [ChapterController.prototype, 'toggleEdit', function() {
         const res = ChapterController.prototype.toggleEdit.super.apply(this, arguments);
