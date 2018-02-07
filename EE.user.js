@@ -2,6 +2,7 @@
 // @name        Extra Emoticons Redux
 // @description Allows additional emoticons to be added to FimFiction.net
 // @author      Sollace
+// @version     6
 // @namespace   fimfiction-sollace
 // @icon        http://sollace.github.io/emoticons/default/rainbowexcited.png
 // @include     /^http?[s]://www.fimfiction.net/.*/
