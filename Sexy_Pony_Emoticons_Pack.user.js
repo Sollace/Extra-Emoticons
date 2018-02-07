@@ -6,8 +6,6 @@
 // @version     2
 // @icon        http://i453.photobucket.com/albums/qq260/spacewings/EmoteTwilightWet_zps61ffef2a.png
 // @include     /^http?[s]://www.fimfiction.net/.*/
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
 // @run-at      document-start

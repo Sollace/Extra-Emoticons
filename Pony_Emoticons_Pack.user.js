@@ -6,8 +6,6 @@
 // @version     3
 // @icon        http://sollace.github.io/emoticons/default/rainbowexcited.png
 // @include     /^http?[s]://www.fimfiction.net/.*/
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
 // @run-at      document-start

@@ -6,8 +6,6 @@
 // @version     4
 // @icon        http://s.deviantart.net/emoticons/d/dalogo1.gif
 // @include     /^http?[s]://www.fimfiction.net/.*/
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
 // @run-at      document-start
