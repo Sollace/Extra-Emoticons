@@ -4,29 +4,20 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^http?[s]://(derpi|trixie)booru\.org.*/
-// @version     1.2.3
+// @version     1.3
 // @grant       none
 // ==/UserScript==
 
-const version = '1.2.3';
+const version = '1.3';
 const taken = [];
 const emoticons = [];
 
-const make = (function() {
-  const div = document.createElement('DIV');
-  return function make(htm, context) {
-    context = context || div;
-    context.innerHTML = htm;
-    htm = [].slice.apply(context.childNodes);
-    context.innerhHTMl = '';
-    return htm;
-  }
-})();
-function each(arr, func) {
-  return [].forEach.call(arr, func);
-}
 function all(selector, func) {
-  return each(document.querySelectorAll(selector), func);
+  return [].forEach.call(document.querySelectorAll(selector), func);
+}
+
+function typeOf(obj) {
+  return Object.prototype.toString.apply(obj).split(' ')[1].split(']')[0].toLowerCase();
 }
 
 function Emoticon(htm, item, name, id) {
@@ -39,7 +30,7 @@ function Emoticon(htm, item, name, id) {
   htm.push(this.html);
   emoticons.push(this);
 }
-Emoticon.resolve = function(name_d) {
+Emoticon.resolve = (name_d) => {
   if (taken.indexOf(name_d) > -1) {
     let mix = 1;
     while (taken.indexOf(`${name_d}_${mix}`) > -1) mix++;
@@ -54,40 +45,38 @@ Emoticon.prototype = {
   replaceAlias: function(s) {
     return s.replace(new RegExp(this.from, 'gi'), this.to);
   }
-}
+};
 
 function transformText(text, func) {
   let mode = false;
-  return text.split(/(==|@)/).map((a, index, arr) => {
-    if (!mode) {
-      if (a == '==' || a == '@') {
-        mode = a.toString();
-        return a;
-      }
-      return func(a);
-    } else {
+  const escapes = ['"','==','@'];
+  return text.split(new RegExp(`(${escapes.join('|')})`)).map(a => {
+    if (mode) {
       if (a == mode) mode = false;
+    } else {
+      if (escapes.indexOf(a) < 0) return func(a);
+      mode = a;
     }
     return a;
   }).join('');
 }
 
-function emotesOf(obj) {
-  return obj.emotes || (typeof obj === 'string' || Object.prototype.toString.apply(obj) === '[object String]' ? [obj] : obj);
+function emotesOf(obj, func) {
+  const cas = obj.case || false;
+  return (obj.emotes || (typeOf(obj) === 'string' ? [obj] : obj)).forEach(a => func(cas, a));
+}
+
+function casesOf(group, func) {
+  const url = group.url || '{name}';
+  return (group.cases || [group]).forEach(a => func(url, a));
 }
 
 function complexConfigToHtm(config) {
-  var htm = [];
-  config.forEach(group => {
-    const url = group.url || '{name}';
-    (group.cases || [group]).forEach(cases => {
-      const cas = cases.case || false;
-      emotesOf(cases).forEach(item => {
-        const splitten = (item.emote || item).split('|');
-        new Emoticon(htm, url.replace('{name}', splitten[0]), splitten.reverse()[0], item.case || cas);
-      });
-    });
-  });
+  const htm = [];
+  config.forEach(group => casesOf(group, (url, cases) => emotesOf(cases, (cas, item) => {
+    const splitten = (item.emote || item).split('|');
+    new Emoticon(htm, url.replace('{name}', splitten[0]), splitten.reverse()[0], item.case || cas);
+  })));
   return htm.join('');
 }
 
@@ -101,23 +90,21 @@ function dragStart(event) {
   event.dataTransfer.setData('Text/plain', data);
 }
 
-function insertTags(textarea, open, close) {
-  var start = textarea.selectionStart;
-  if (start || start == 0) {
-    var end = textarea.selectionEnd;
-    var before = textarea.value.substring(0, start);
-    var after = textarea.value.substring(end, textarea.value.length);
-    var selected = end - start > 0 ? textarea.value.substring(start, end) : '';
-    if (selected.indexOf(open) != -1 || (selected.indexOf(close) != -1 && close)) {
-      selected = selected.replace(open, '').replace(close, '');
-    } else {
-      selected = open + selected + close;
-    }
-    textarea.value = before + selected + after;
-    textarea.selectionStart = start;
-    textarea.selectionEnd = start + selected.length;
-    textarea.focus();
-  }
+function insertEmote(textarea, open) {
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  
+  let before = textarea.value.substring(0, start);
+  let after = textarea.value.substring(end, textarea.value.length);
+
+  let selected = end > start ? textarea.value.substring(start, end) : '';
+
+  selected = selected.indexOf(open) > -1 ? selected.replace(open, '') : (open + selected);
+
+  textarea.value = before + selected + after;
+  textarea.selectionStart = start;
+  textarea.selectionEnd = start + selected.length;
+  textarea.focus();
 }
 
 let focused_el = null;
@@ -147,19 +134,18 @@ function focusable(el) {
   return el;
 }
 
-function swap(from, to) {
+function swap(from, to, v) {
   to.style.width = from.style.width;
   to.style.height = from.style.height;
   to.selectionStart = from.selectionStart;
   to.selectionEnd = from.selectionEnd;
+  to.value = v;
+  to.scrollTop = from.scrollTop;
+  to.scrollLeft = from.scrollLeft;
   if (from.hasFocus()) {
     from.blur();
     to.focus();
   }
-}
-function readscroll(sender, reciever) {
-  reciever.scrollTop = sender.scrollTop;
-  reciever.scrollLeft = sender.scrollLeft;
 }
 
 function clearSelection() {
@@ -178,114 +164,119 @@ function updateSelection() {
   }
 }
 
+const handle = () => {
+  document.removeEventListener('mouseup', handle);
+  document.removeEventListener('mousemove', updateSelection);
+};
+
+document.addEventListener('mousedown', e => {
+  if (e.target.closest('.comment_emotes')) {
+    document.addEventListener('mouseup', handle);
+    document.addEventListener('mousemove', updateSelection);
+  }
+});
+document.addEventListener('dragstart', e => {
+  if (e.target.closest('.emote')) dragStart(e);
+});
+document.addEventListener('mousedown',e => {
+  clearSelection();
+  const target = e.target.closest('.post-reply-quote');
+  if (target) target.dataset.post = returnAliases(target.dataset.post);
+});
+
 function CommentBox(element) {
   this.dom = focusable(element);
-  this.dum = focusable(make(`<textarea class="dummy ${this.dom.getAttribute('class').replace(' js-preview-input', '')}" placeholder="${this.dom.getAttribute('placeholder')}" />`)[0]);
-  this.dom.parentNode.appendChild(this.dum);
-  if (!this.dom) return;
-  this.dom.className += ' comment_box';
-  this.dom.parentNode.className += ' comment_box_parent';
-  requestAnimationFrame(() => this.returnAliases(this.dom));
-  this.ready = true;
-  var me = this;
   this.form = this.dom.form;
-  this.form.addEventListener('submit', e => me.submit());
-  readscroll(this.dom, this);
-  this.dum.addEventListener('mouseenter', () => me.unsubmit());
-  this.pane = make('<div id="comment_emotes"></div>')[0];
-  this.dom.parentNode.appendChild(this.pane);
-  this.pane.addEventListener('mousedown', function(e) {
-    function handle() {
-      this.removeEventListener('mouseup', handle);
-      this.removeEventListener('mousemove', updateSelection);
-    }
-    this.addEventListener('mouseup', handle);
-    this.addEventListener('mousemove', updateSelection);
-  });
-  this.pane.addEventListener('click', function(e) {
-    var target = e.target || e.srcElement;
-    if (target.tagName == 'IMG') target = target.parentNode;
-    if (target.className.indexOf('emote') != -1) {
-      insertTags(me.dom, target.getAttribute('title'), '');
-      e.preventDefault();
-    }
-  });
-  this.preview = document.querySelector('a[data-click-tab="preview"]');
+  
+  this.dom.insertAdjacentHTML('afterend', `
+    <textarea class="dummy ${this.dom.getAttribute('class').replace(' js-preview-input', '')}" placeholder="${this.dom.getAttribute('placeholder')}"></textarea>
+    <div class="comment_emotes" id="comment_emotes"></div>`);
+  
+  this.dum = focusable(this.dom.parentNode.querySelector('.dummy'));
+  this.pane = this.dom.parentNode.querySelector('#comment_emotes');
+  this.preview = this.form.querySelector('a[data-click-tab="preview"]');
+  
+  this.dom.classList.add('comment_box');
+  this.dom.parentNode.classList.add('comment_box_parent');
+  
+  requestAnimationFrame(() => this.dom.value = returnAliases(this.dom.value));
+  
+  this.ready = true;
+  this.editing = false;
+  
+  const on = () => this.switchAreas(true);
+  const off = () => this.switchAreas(false);
+  
+  this.form.addEventListener('submit', on);
+  
+  this.dum.addEventListener('mouseenter', off);
   if (this.preview) {
-    this.preview.addEventListener('mouseenter', () => me.submit());
-    this.preview.addEventListener('mouseleave', () => me.unsubmit());
+    this.preview.addEventListener('mouseenter', on);
+    this.preview.addEventListener('mouseleave', off);
   }
-  document.addEventListener('mousedown',e => {
-    clearSelection();
-    const target = e.target.closest('.post-reply-quote');
-    if (!target) return;
-    let string = target.dataset.post;
-    emoticons.forEach(emoticon => {
-      string = emoticon.returnAlias(string);
-    });
-    target.dataset.post = string;
+  
+  this.pane.addEventListener('click', e => {
+    const target = e.target.closest('.emote');
+    if (target) {
+      e.preventDefault();
+      insertEmote(this.getActiveArea(), target.getAttribute('title'));
+    }
   });
 }
 CommentBox.prototype = {
-  submit: function() {
-    if (this.form.dataset.submitting !== 'true') {
-      readscroll(this.dom, this);
-      this.dum.value = this.replaceAliases(this.dom);
-      this.form.dataset.submitting = 'true';
-      swap(this.dom, this.dum);
-      this.returnAliases(this.dum);
-      readscroll(this, this.dum);
-      return false;
-    }
-    return true;
+  switchAreas: function(to) {
+    this.form.classList.toggle('submitting', to);
+    if (this.editing == to) return;
+    const active = this.getActiveArea();
+    const inactive = this.getInactiveArea();
+
+    const aliased = returnAliases(active.value);
+    const unaliased = replaceAliases(aliased);
+    
+    console.log(aliased);
+    console.log(unaliased);
+    
+    swap(active, inactive, aliased);
+    active.value = unaliased;
+    console.log(this.dom.value);
+    console.log(this.dum.value);
+    
+    this.editing = to;
   },
-  unsubmit: function() {
-    if (this.dum.value) {
-      readscroll(this.dum, this);
-      this.dom.value = this.returnAliases(this.dum);
-      this.form.dataset.submitting = 'false';
-      swap(this.dum, this.dom);
-      readscroll(this, this.dom);
-    }
+  getActiveArea: function() {
+    return this.editing ? this.dum : this.dom;
   },
-  replaceAliases: function(dom) {
-    let string = dom.value;
-    if (string) {
-      string = transformText(string, part => {
-        emoticons.forEach(emote => part = emote.replaceAlias(part));
-        return part;
-      });
-      dom.value = string;
-    }
-    return dom.value || '';
-  },
-  returnAliases: function(dom) {
-    let string = dom.value;
-    if (string) {
-      string = transformText(string, part => {
-        emoticons.forEach(a => part = a.returnAlias(part));
-        return part;
-      });
-      dom.value = string;
-    }
-    return dom.value || '';
+  getInactiveArea: function() {
+    return this.editing ? this.dom : this.dum;
   },
   addEmoticons: function(htm) {
     this.pane.innerHTML = htm;
-    each(this.pane.children, a => {
-      a.childNodes[0].addEventListener('dragstart', dragStart);
-    });
   }
 };
 
-const ExtraEmotes = (function(win) {
-  var modules = [];
+function replaceAliases(string) {
+  return string ? transformText(string, part => {
+    emoticons.forEach(a => part = a.replaceAlias(part));
+    return part;
+  }) : '';
+}
+
+function returnAliases(string) {
+  return string ? transformText(string, part => {
+    emoticons.forEach(a => part = a.returnAlias(part));
+    return part;
+  }) : '';
+}
+
+const ExtraEmotes = (win => {
+  const modules = [];
+  const configs = [];
   try {
     all('#comment_body, #post_body, #description, #image_description, #message_body, #topic_posts_attributes_0_body, textarea#body', a => {
       modules.push(new CommentBox(a));
     });
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
   return win.ExtraEmotes = {
     addEmoticons: function(id, name, _title_, emotes) {
@@ -293,15 +284,12 @@ const ExtraEmotes = (function(win) {
     },
     load: function(config) {
       if (!this.ready()) return;
-      const htm = complexConfigToHtm(config);
+      configs.push.apply(configs, config);
+      const htm = complexConfigToHtm(configs);
       modules.forEach(module => module.addEmoticons(htm));
     },
-    ready: function() {
-      return modules.length > 0;
-    },
-    getVersion: function() {
-      return version;
-    }
+    ready: _ => modules.length > 0,
+    getVersion: _ => version
   };
 })(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);
 
@@ -322,9 +310,9 @@ if (ExtraEmotes.ready()) {
   display: inline-block;
   max-width: 60%;
   min-height: 330px;}
-form[data-submitting="true"] .comment_box,
+form.submitting .comment_box,
 .comment_box + textarea {display: none;}
-form[data-submitting="true"] .comment_box + textarea { display: inline-block;}
+form.submitting .comment_box + textarea { display: inline-block;}
 a.emote, a.emote img {
   -webkit-backface-visibility: hidden;
   -webkit-transform: translateZ(0) scale(1.0, 1.0);
@@ -393,7 +381,7 @@ ExtraEmotes.load([
       '1295738|rainbowkiss',
       '1295739|rainbowlaugh',
       '1295741|rainbowwild'
-      ]
+    ]
   },
   {
     url: '//derpicdn.net/img/view/2016/12/11/{name}.png',
