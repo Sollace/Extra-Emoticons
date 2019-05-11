@@ -4,7 +4,7 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^http?[s]://(derpi|trixie)booru\.org.*/
-// @version     1.3
+// @version     1.3.1
 // @grant       none
 // ==/UserScript==
 
@@ -232,15 +232,10 @@ CommentBox.prototype = {
 
     const aliased = returnAliases(active.value);
     const unaliased = replaceAliases(aliased);
-    
-    console.log(aliased);
-    console.log(unaliased);
-    
+
     swap(active, inactive, aliased);
     active.value = unaliased;
-    console.log(this.dom.value);
-    console.log(this.dum.value);
-    
+
     this.editing = to;
   },
   getActiveArea: function() {
