@@ -4,7 +4,7 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^http?[s]://(derpi|trixie)booru\.org.*/
-// @version     1.4
+// @version     1.4.1
 // @grant       none
 // ==/UserScript==
 
@@ -85,8 +85,9 @@ function dragStart(event) {
   if (data && data.trim().indexOf('[') == 0) {
     data = data.split(/\n| /g).map(a => a.trim().replace(/\[/g, '').replace(/\]/g, '')).join('');
   } else {
-    data = e.target.getAttribute('title');
+    data = event.target.getAttribute('title');
   }
+  
   event.dataTransfer.setData('Text/plain', data);
 }
 
