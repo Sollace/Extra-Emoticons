@@ -4,7 +4,7 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^http?[s]://(derpi|trixie)booru\.org.*/
-// @version     1.3.1
+// @version     1.4
 // @grant       none
 // ==/UserScript==
 
@@ -85,7 +85,7 @@ function dragStart(event) {
   if (data && data.trim().indexOf('[') == 0) {
     data = data.split(/\n| /g).map(a => a.trim().replace(/\[/g, '').replace(/\]/g, '')).join('');
   } else {
-    data = this.getAttribute('title');
+    data = e.target.getAttribute('title');
   }
   event.dataTransfer.setData('Text/plain', data);
 }
@@ -188,6 +188,9 @@ function CommentBox(element) {
   this.dom = focusable(element);
   this.form = this.dom.form;
   
+  this.dom.insertAdjacentHTML('afterend', `<div class="comment_box_flex"></div>`);
+  this.dom.nextSibling.appendChild(this.dom);
+
   this.dom.insertAdjacentHTML('afterend', `
     <textarea class="dummy ${this.dom.getAttribute('class').replace(' js-preview-input', '')}" placeholder="${this.dom.getAttribute('placeholder')}"></textarea>
     <div class="comment_emotes" id="comment_emotes"></div>`);
@@ -197,8 +200,7 @@ function CommentBox(element) {
   this.preview = this.form.querySelector('a[data-click-tab="preview"]');
   
   this.dom.classList.add('comment_box');
-  this.dom.parentNode.classList.add('comment_box_parent');
-  
+
   requestAnimationFrame(() => this.dom.value = returnAliases(this.dom.value));
   
   this.ready = true;
@@ -290,21 +292,21 @@ const ExtraEmotes = (win => {
 
 if (ExtraEmotes.ready()) {
   document.head.insertAdjacentHTML('beforeend', `<style type="text/css">
+.comment_box_flex {
+  display: flex;}
 #comment_emotes {
-  box-sizing: border-box;
-  display: inline-block;
   overflow-y: auto;
-  width: 36.666%;
-  height: 330px;
-  vertical-align: top;
   border: 1px solid #cdcdcd;
   border-left: none;
   text-align: center;
-  padding: 5px;}
+  padding: 5px;
+  flex-grow: 1;}
 .comment_box, .comment_box + textarea {
   display: inline-block;
-  max-width: 60%;
-  min-height: 330px;}
+  max-width: calc(200%/3 - 10px);
+  min-width: calc(200%/3 - 10px);
+  min-height: 330px;
+  resize: vertical;}
 form.submitting .comment_box,
 .comment_box + textarea {display: none;}
 form.submitting .comment_box + textarea { display: inline-block;}
