@@ -3,7 +3,7 @@
 // @name        Derpibooru Emoticons
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
-// @include     /^http?[s]://(derpi|trixie)booru\.org.*/
+// @include     /^http?[s]://(www\.|)(derpi|trixie)booru\.org.*/
 // @version     1.4.1
 // @grant       none
 // ==/UserScript==
