@@ -4,11 +4,11 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^https*://(www\.)*(derpi|trixie)booru\.org.*/
-// @version     1.4.2
+// @version     1.5
 // @grant       none
 // ==/UserScript==
 
-const version = '1.4.2';
+const version = '1.5';
 const taken = [];
 const emoticons = [];
 
@@ -292,7 +292,9 @@ const ExtraEmotes = (win => {
 })(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);
 
 if (ExtraEmotes.ready()) {
-  document.head.insertAdjacentHTML('beforeend', `<style type="text/css">
+  const element = document.createElement('STYLE');
+  element.setAttribute('type', 'text/css');
+  element.innerHTML = `
 .comment_box_flex {
   display: flex;}
 #comment_emotes {
@@ -302,6 +304,8 @@ if (ExtraEmotes.ready()) {
   text-align: center;
   padding: 5px;
   flex-grow: 1;}
+#comment_emotes img::selection {color: transparent;}
+#comment_emotes img::-moz-selection {color: transparent;}
 .comment_box, .comment_box + textarea {
   display: inline-block;
   max-width: calc(200%/3 - 10px);
@@ -315,7 +319,6 @@ a.emote, a.emote img {
   -webkit-backface-visibility: hidden;
   -webkit-transform: translateZ(0) scale(1.0, 1.0);
   transform: translateZ(0);}
-a.emote img {opacity: 0;}
 a.emote {
   vertical-align: top;
   display: inline-block;
@@ -326,8 +329,9 @@ a.emote {
   transition: background 0.2s ease, transform 0.1s ease;
   background: no-repeat center;
   transform: scale(1,1) rotate(0) translateZ(0);}
-a.emote:hover img {
-  opacity: 0.7 !important;
+#comment_emotes:hover a.emote img {opacity: 0.7;}
+#comment_emotes:hover a.emote:hover img {
+  opacity: 1 !important;
   filter: blur(0.3px);}
 a.emote:hover, a.emote.selection-start, a.emote.selection-start ~ a {
   background-color: rgba(220,220,220,0.4);
@@ -338,8 +342,8 @@ a.emote.selection-end ~ a, a.emote.selection-end ~ a:nth-child(odd) {
   background-color: transparent;
   transform: scale(1,1) rotate(0) translateZ(0);}
 a.emote:active {transform: scale(1,1) rotate(10deg) translateZ(0);}
-a.emote:nth-child(odd):active {transform: scale(1,1) rotate(-10deg) translateZ(0);}
-</style>`);
+a.emote:nth-child(odd):active {transform: scale(1,1) rotate(-10deg) translateZ(0);}`;
+  document.body.insertAdjacentElement('afterend', element);
 }
 
 ExtraEmotes.load([
