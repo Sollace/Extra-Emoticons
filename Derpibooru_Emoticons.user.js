@@ -3,12 +3,12 @@
 // @name        Derpibooru Emoticons
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
-// @include     /^https*://(www\.)*(derpi|trixie)booru\.org.*/
-// @version     1.5
+// @include     /^https*://(philomena\.|www\.)*(derpi|trixie)booru\.org.*/
+// @version     1.5.1
 // @grant       none
 // ==/UserScript==
 
-const version = '1.5';
+const version = '1.5.1';
 const taken = [];
 const emoticons = [];
 
