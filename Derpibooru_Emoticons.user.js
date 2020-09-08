@@ -4,12 +4,12 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^https*://(philomena\.|www\.)*(derpi|trixie)booru\.org.*/
-// @version     1.5.2
+// @version     1.5.3
 // @inject-into content
 // @grant       none
 // ==/UserScript==
 
-const version = '1.5.2';
+const version = '1.5.3';
 const taken = [];
 const emoticons = [];
 
@@ -271,7 +271,7 @@ const ExtraEmotes = (win => {
   const modules = [];
   const configs = [];
   try {
-    all('#comment_body, #post_body, #description, #image_description, #message_body, #topic_posts_attributes_0_body, textarea#body', a => {
+    all('#comment_body, #js-comment-form_body, #post_body, #description, #image_description, #message_body, #topic_posts_attributes_0_body, textarea#body', a => {
       modules.push(new CommentBox(a));
     });
   } catch (e) {
