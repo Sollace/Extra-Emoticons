@@ -4,7 +4,7 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^https*://(philomena\.|www\.)*(derpi|trixie)booru\.org.*/
-// @version     1.5.3
+// @version     1.5.4
 // @inject-into content
 // @grant       none
 // ==/UserScript==
@@ -24,10 +24,10 @@ function typeOf(obj) {
 function Emoticon(htm, item, name, id) {
   let name_d = `:${Emoticon.resolve(name)}:`;
   taken.push(name_d);
-  this.html = `<a class="emote" title="${name_d}" style="background-image:url(${item.split('|')[0]});" ><img title=":${name}:" src="${item.split('|')[0]}"></img></a>`;
+  this.html = `<a class="emote" title="${name_d}" style="background-image:url(https:${item.split('|')[0]});" ><img title=":${name}:" src="${item.split('|')[0]}"></img></a>`;
   this.category = id;
   this.from = name_d;
-  this.to = `!${item.split('|')[0]}!`;
+  this.to = `!https:${item.split('|')[0]}!`;
   htm.push(this.html);
   emoticons.push(this);
 }
@@ -50,7 +50,7 @@ Emoticon.prototype = {
 
 function transformText(text, func) {
   let mode = false;
-  const escapes = ['"','==','@'];
+  const escapes = ['"','==','@','`'];
   return text.split(new RegExp(`(${escapes.join('|')})`)).map(a => {
     if (mode) {
       if (a == mode) mode = false;
