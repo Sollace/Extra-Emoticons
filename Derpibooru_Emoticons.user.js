@@ -4,12 +4,12 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^https*://(philomena\.|www\.)*(derpi|trixie)booru\.org.*/
-// @version     1.5.4
+// @version     1.5.5
 // @inject-into content
 // @grant       none
 // ==/UserScript==
 
-const version = '1.5.3';
+const version = '1.5.5';
 const taken = [];
 const emoticons = [];
 
@@ -21,13 +21,13 @@ function typeOf(obj) {
   return Object.prototype.toString.apply(obj).split(' ')[1].split(']')[0].toLowerCase();
 }
 
-function Emoticon(htm, item, name, id) {
+function Emoticon(htm, key, item, name, category) {
   let name_d = `:${Emoticon.resolve(name)}:`;
   taken.push(name_d);
   this.html = `<a class="emote" title="${name_d}" style="background-image:url(https:${item.split('|')[0]});" ><img title=":${name}:" src="${item.split('|')[0]}"></img></a>`;
-  this.category = id;
+  this.category = category;
   this.from = name_d;
-  this.to = `!https:${item.split('|')[0]}!`;
+  this.to = `![${name_d}](https:${item.split('|')[0]})`;
   htm.push(this.html);
   emoticons.push(this);
 }
@@ -40,10 +40,10 @@ Emoticon.resolve = (name_d) => {
   return name_d;
 };
 Emoticon.prototype = {
-  returnAlias: function(s) {
+  returnAlias(s) {
     return s.replace(new RegExp(this.to, 'gi'), this.from);
   },
-  replaceAlias: function(s) {
+  replaceAlias(s) {
     return s.replace(new RegExp(this.from, 'gi'), this.to);
   }
 };
@@ -76,7 +76,7 @@ function complexConfigToHtm(config) {
   const htm = [];
   config.forEach(group => casesOf(group, (url, cases) => emotesOf(cases, (cas, item) => {
     const splitten = (item.emote || item).split('|');
-    new Emoticon(htm, url.replace('{name}', splitten[0]), splitten.reverse()[0], item.case || cas);
+    new Emoticon(htm, splitten[0], url.replace('{name}', splitten[0]), splitten.reverse()[0], item.case || cas);
   })));
   return htm.join('');
 }
@@ -228,7 +228,7 @@ function CommentBox(element) {
   });
 }
 CommentBox.prototype = {
-  switchAreas: function(to) {
+  switchAreas(to) {
     this.form.classList.toggle('submitting', to);
     if (this.editing == to) return;
     const active = this.getActiveArea();
@@ -242,13 +242,13 @@ CommentBox.prototype = {
 
     this.editing = to;
   },
-  getActiveArea: function() {
+  getActiveArea() {
     return this.editing ? this.dum : this.dom;
   },
-  getInactiveArea: function() {
+  getInactiveArea() {
     return this.editing ? this.dom : this.dum;
   },
-  addEmoticons: function(htm) {
+  addEmoticons(htm) {
     this.pane.innerHTML = htm;
   }
 };
@@ -278,10 +278,10 @@ const ExtraEmotes = (win => {
     console.error(e);
   }
   return win.ExtraEmotes = {
-    addEmoticons: function(id, name, _title_, emotes) {
+    addEmoticons(id, name, _title_, emotes) {
       this.load(name ? { id: id, emotes: emotes } : id);
     },
-    load: function(config) {
+    load(config) {
       if (!this.ready()) return;
       configs.push.apply(configs, config);
       const htm = complexConfigToHtm(configs);
@@ -438,6 +438,11 @@ ExtraEmotes.load([
       '1296271|zecora'
     ]
   },
-  '//derpicdn.net/img/view/2016/7/7/1195553.png|quack',
+  {
+    url: '//derpicdn.net/img/view/2016/7/7/{name}.png',
+    emotes: [
+      '1195553|quack',
+    ]
+  },
   '//derpicdn.net/media/2015/07/06/23_34_55_336_squirrelbadge2.png|squirrel'
 ]);
