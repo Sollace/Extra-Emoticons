@@ -50,12 +50,14 @@ Emoticon.prototype = {
 
 function transformText(text, func) {
   let mode = false;
-  const escapes = ['"','`'];
 
   const converted = [];
   let toConvert = [];
 
-  text.split(new RegExp(`(${escapes.join('|')})`)).forEach(part => {
+  const escapes = ['"', '`'];
+
+  text.split(new RegExp('(\\\\*["`])')).forEach(part => {
+
     if (mode) {
       toConvert.push(part);
 
@@ -105,14 +107,14 @@ function dragStart(event) {
   } else {
     data = event.target.getAttribute('title');
   }
-  
+
   event.dataTransfer.setData('Text/plain', data);
 }
 
 function insertEmote(textarea, open) {
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
-  
+
   let before = textarea.value.substring(0, start);
   let after = textarea.value.substring(end, textarea.value.length);
 
@@ -206,36 +208,36 @@ document.addEventListener('mousedown',e => {
 function CommentBox(element) {
   this.dom = focusable(element);
   this.form = this.dom.form;
-  
+
   this.dom.insertAdjacentHTML('afterend', `<div class="comment_box_flex"></div>`);
   this.dom.nextSibling.appendChild(this.dom);
 
   this.dom.insertAdjacentHTML('afterend', `
     <textarea class="dummy ${this.dom.getAttribute('class').replace(' js-preview-input', '')}" placeholder="${this.dom.getAttribute('placeholder')}"></textarea>
     <div class="comment_emotes" id="comment_emotes"></div>`);
-  
+
   this.dum = focusable(this.dom.parentNode.querySelector('.dummy'));
   this.pane = this.dom.parentNode.querySelector('#comment_emotes');
   this.preview = this.form.querySelector('a[data-click-tab="preview"]');
-  
+
   this.dom.classList.add('comment_box');
 
   requestAnimationFrame(() => this.dom.value = returnAliases(this.dom.value));
-  
+
   this.ready = true;
   this.editing = false;
-  
+
   const on = () => this.switchAreas(true);
   const off = () => this.switchAreas(false);
-  
+
   this.form.addEventListener('submit', on);
-  
+
   this.dum.addEventListener('mouseenter', off);
   if (this.preview) {
     this.preview.addEventListener('mouseenter', on);
     this.preview.addEventListener('mouseleave', off);
   }
-  
+
   this.pane.addEventListener('click', e => {
     const target = e.target.closest('.emote');
     if (target) {
