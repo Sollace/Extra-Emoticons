@@ -4,12 +4,12 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^https*://(philomena\.|www\.)*(derpi|trixie)booru\.org.*/
-// @version     1.5.5
+// @version     1.5.6
 // @inject-into content
 // @grant       none
 // ==/UserScript==
 
-const version = '1.5.5';
+const version = '1.5.6';
 const taken = [];
 const emoticons = [];
 
@@ -50,7 +50,7 @@ Emoticon.prototype = {
 
 function transformText(text, func) {
   let mode = false;
-  const escapes = ['"','==','@','`'];
+  const escapes = ['"','`'];
   return text.split(new RegExp(`(${escapes.join('|')})`)).map(a => {
     if (mode) {
       if (a == mode) mode = false;
