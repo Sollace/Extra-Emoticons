@@ -27,7 +27,7 @@ function Emoticon(htm, key, item, name, category) {
   this.html = `<a class="emote" title="${name_d}" style="background-image:url(https:${item.split('|')[0]});" ><img title=":${name}:" src="${item.split('|')[0]}"></img></a>`;
   this.category = category;
   this.from = name_d;
-  this.to = `![${name_d}](https:${item.split('|')[0]})`;
+  this.to = `![${name_d.replaceAll(':', '')}](https:${item.split('|')[0]})`;
   htm.push(this.html);
   emoticons.push(this);
 }
@@ -41,10 +41,10 @@ Emoticon.resolve = (name_d) => {
 };
 Emoticon.prototype = {
   returnAlias(s) {
-    return s.replace(new RegExp(this.to, 'gi'), this.from);
+    return s.replaceAll(this.to, this.from);
   },
   replaceAlias(s) {
-    return s.replace(new RegExp(this.from, 'gi'), this.to);
+    return s.replaceAll(this.from, this.to);
   }
 };
 
