@@ -51,15 +51,32 @@ Emoticon.prototype = {
 function transformText(text, func) {
   let mode = false;
   const escapes = ['"','`'];
-  return text.split(new RegExp(`(${escapes.join('|')})`)).map(a => {
+
+  const converted = [];
+  let toConvert = [];
+
+  text.split(new RegExp(`(${escapes.join('|')})`)).forEach(part => {
     if (mode) {
-      if (a == mode) mode = false;
+      toConvert.push(part);
+
+      if (part == mode) {
+        mode = false;
+        converted.push(toConvert.join(''));
+        toConvert = [];
+      }
+    } else if (escapes.indexOf(part) < 0) {
+        converted.push(func(part));
     } else {
-      if (escapes.indexOf(a) < 0) return func(a);
-      mode = a;
+      mode = part;
+      toConvert.push(part);
     }
-    return a;
-  }).join('');
+  });
+
+  if (toConvert.length) {
+    converted.push(func(toConvert.join('')));
+  }
+
+  return converted.join('');
 }
 
 function emotesOf(obj, func) {
