@@ -3,11 +3,12 @@
 // @description Adds all japanese smilies as emoticons
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     3
+// @version     4
 // @icon        https://github.com/Sollace/Extra-Emoticons/raw/master/kaomoji.png
 // @include     /^http?[s]://www.fimfiction.net/.*/
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
+// @inject-into page
 // @run-at      document-start
 // @nocompat    Chrome
 // ==/UserScript==

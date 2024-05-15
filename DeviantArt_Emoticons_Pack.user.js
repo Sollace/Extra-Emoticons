@@ -3,11 +3,12 @@
 // @description Adds DeviantArt emoticons
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     4
+// @version     5
 // @icon        http://s.deviantart.net/emoticons/d/dalogo1.gif
 // @include     /^http?[s]://www.fimfiction.net/.*/
 // @require     https://github.com/Sollace/Extra-Emoticons/raw/master/Core.user.js
 // @grant       none
+// @inject-into page
 // @run-at      document-start
 // ==/UserScript==
 

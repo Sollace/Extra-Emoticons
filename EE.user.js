@@ -2,40 +2,41 @@
 // @name        Extra Emoticons Redux
 // @description Allows additional emoticons to be added to FimFiction.net
 // @author      Sollace
-// @version     6
+// @version     7
 // @namespace   fimfiction-sollace
 // @icon        http://sollace.github.io/emoticons/default/rainbowexcited.png
 // @include     /^http?[s]://www.fimfiction.net/.*/
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Events.user.js
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @grant       none
+// @inject-into page
 // @run-at      document-start
 // ==/UserScript==
 
 const ExtraEmotes = tryRun(_ => {
   const version = 6;
   const wind = win();
-  
+
   if (wind.ExtraEmotes && wind.ExtraEmotes.getVersion() >= version) {
     return wind.ExtraEmotes;
   }
-  
+
   const some = a => a;
   const cutProto = url => url.replace(/^https?:/,'');
   const debooru = url => url.indexOf('camo.derpicdn') > -1 ? decodeURIComponent(url.split('url=')[1].split('&')[0]) : url;
   const replaceAll = (find, replace, str) => str.replace(new RegExp(find.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'g'), replace);
   const collide = (func, args) => args.forEach(arg => func.apply(this, arg));
-  
+
   function override(obj, member, new_func) {
     new_func.super = obj[member].super || obj[member];
     obj[member] = new_func;
   }
-  
+
   function extend(onto, offof) {
     Object.keys(offof).forEach(key => onto[key] = offof[key]);
     return onto;
   }
-  
+
   function Emoticon(norm, url, name, code, img) {
     img = img || !code;
     code = code || `:${name}:`;
@@ -48,10 +49,10 @@ const ExtraEmotes = tryRun(_ => {
       keywords: [ name ]
     };
   }
-  
+
   const ExtraEmotesRegistry = (_ => {
     const sets = [], imgs = [], emojis = [], setsObj = {};
-    
+
     function registerSet(set, emoji) {
       setsObj[set.category] = set;
       sets.push(set);
@@ -61,11 +62,11 @@ const ExtraEmotes = tryRun(_ => {
       }
       return set;
     }
-    
+
     function emoteUrl(url) {
       return cutProto(debooru(url)).split('|')[0];
     }
-    
+
     function emoteName(url) {
       const bar = url.indexOf('|');
       if (bar > -1) return url.substring(bar + 1, url.length);
@@ -80,7 +81,7 @@ const ExtraEmotes = tryRun(_ => {
       }
       return url;
     }
-    
+
     return {
       emojis: _ => emojis,
       imgs: _ => imgs,
@@ -105,7 +106,7 @@ const ExtraEmotes = tryRun(_ => {
       })
     };
   })();
-  
+
   const urlMatcher = (root => {
     return {
       match: (one, two) => one == two || root(one, two),
@@ -133,16 +134,16 @@ const ExtraEmotes = tryRun(_ => {
         me.classList.add('done');
       }
     }
-    
+
     function emojiImg(type) {
       return type.result == 2 ?
-        `<img class="user_image" data-lightbox src="${type.emoji.url}"></img>` : 
+        `<img class="user_image" data-lightbox src="${type.emoji.url}"></img>` :
         `<img class="emoticon${type.emoji.normalize ? ' limited' : ''}" alt="${type.emoji.name}" src="${type.emoji.url}"></img>`
     }
-    
+
     function unspoilerSibling(me) {
       const type = emoteType(cutProto(debooru(me.getAttribute('href'))));
-      
+
       if (type.result == 0) {
         me.classList.add('done');
       } else {
@@ -162,7 +163,7 @@ const ExtraEmotes = tryRun(_ => {
         me.parentNode.parentNode.removeChild(me.parentNode);
       }
     }
-    
+
     function search(array, func, result) {
       array.find((a, i, ar) => !!(result = func(a, i, ar)));
       return result;
@@ -170,24 +171,24 @@ const ExtraEmotes = tryRun(_ => {
 
     function emoteType(url) {
       if (!url || !url.length) return { result: 0 };
-      
+
       const mustWrap = /\?.*wrap=true/.test(url);
       if (/\?.*isEmote/.test(url)) {
         return { result: 2, emoji: { url: cutProto(url) }, wrap: mustWrap };
       }
       url = url.split('?')[0];
-      
+
       return search(ExtraEmotesRegistry.emojis(), emoji => {
         if (urlMatcher.match(url, emoji.url)) return { result: 1, emoji: emoji, wrap: mustWrap};
       }, { result: 0 });
     }
-    
+
     return e => {
       all('.comment_data .user_image_link:not(.done)', unspoilerSibling);
       all('.comment_data img.user_image:not(.done)', emotify);
     };
   })();
-  
+
   const aliases = (_ => {
     function getUrls(txt) {
       txt = txt.match(/\[img\]([^\s]+)\[\/img\]/ig);
@@ -232,7 +233,7 @@ const ExtraEmotes = tryRun(_ => {
       restore: textarea => aliases.swap(textarea, restore)
     };
   })();
-  
+
   const formHandler = e => all('textarea', e.target || e, aliases.remove);
   const submitHandler = (textarea, callback) => {
     const backup = textarea.value;
@@ -246,13 +247,13 @@ const ExtraEmotes = tryRun(_ => {
     last.forEach(l => l());
     return result;
   };
-  
+
   const kniggySets = (_ => {
     let cachedSets;
     return {
       ready: _ => !!cachedSets,
       parse: controller => {
-        if (cachedSets) return cachedSets; 
+        if (cachedSets) return cachedSets;
         let currentCategory = null;
         const sets = [];
         controller.emojiElements.forEach(e => {
@@ -262,7 +263,7 @@ const ExtraEmotes = tryRun(_ => {
             sets[cat] = {
               element: e.element.outerHTML,
               button: `<li data-click="jumpTo" data-category="${cat}">${controller.getEmojiForCategory(cat)}</li>`,
-              category: cat, 
+              category: cat,
               emojis: []
             };
           } else {
@@ -290,7 +291,7 @@ const ExtraEmotes = tryRun(_ => {
       }
     }
   })();
-  
+
   const addCss = _ => {
     const light = currentTheme() == 'light';
     const container_border_base = light ? '#bebab5' : '#333d4f',
@@ -351,7 +352,7 @@ const ExtraEmotes = tryRun(_ => {
 .format-toolbar .emoji-selector .emoji-selector__list > li img {margin-top: 5px;}
 `, 'Extra_Emotes_Stylesheet');
   };
-  
+
   document.addEventListener("DOMContentLoaded", tryRun(() => {
     if (!document.querySelector('.body_container')) return;
 
@@ -361,26 +362,26 @@ const ExtraEmotes = tryRun(_ => {
       });
       FimFicEvents.on('afterpagechange aftereditcomment afteraddcomment', unspoiler);
     }
-    
+
     FimFicEvents.on('earlylistemoticons', e => {
       if (kniggySets.ready()) {
         console.log('cancelled bbcode ajax because we already have them.');
         e.event.preventDefault();
       }
     });
-    
+
     addCss();
-    
+
     window.addEventListener('darkmodechange', addCss);
     window.addEventListener('storage', c => {
       if (c.key == 'stylesheet') addCss();
     });
-    
+
     function rebuildEmojiSets(controller) {
       if (!kniggySets.ready()) kniggySets.parse(controller);
       kniggySets.flatten(controller);
     }
-    
+
     collide(override, [
       [NightModeController.prototype, 'update', function() {
         NightModeController.prototype.update.super.apply(this, arguments);
@@ -442,7 +443,7 @@ const ExtraEmotes = tryRun(_ => {
       }]
     ]);
   }));
-  
+
   return wind.ExtraEmotes = {
     getVersion: _ => version,
     addEmoticons: ExtraEmotesRegistry.EmojiSet, //Adds a collection of image emoticons
