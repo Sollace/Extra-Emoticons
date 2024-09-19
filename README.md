@@ -20,7 +20,7 @@ Need a convenient picker to paste emoticons from here into other sites? [I've go
 
 Pack containing the original pony emojis from iloveportalz0r's original extra emoticons script, plus a few additional ones.
 
-### [Contributors](https://www.deviantart.com/users/outgoing?https://github.com/Sollace/Extra-Emoticons/wiki/Pony-Emoticons-Pack-Contributors)
+### [Contributors](https://github.com/Sollace/Extra-Emoticons/wiki/Pony-Emoticons-Pack-Contributors)
  - Shadow Stars  for the Nyx icons
  - iloveportalz0r for Most Extra Emoticons
 
