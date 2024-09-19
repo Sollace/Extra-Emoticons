@@ -10,6 +10,10 @@ Extra Emoticons is a script that allows users to add many more emoticons to FimF
 
 To get started simply install the core script with the link below, and then select any content packs you'd like to include from the sections after. Just make sure that the packs are executed after the main script otherwise they may not work.
 
+# Picker
+
+Need a convenient picker to paste emoticons from here into other sites? [I've got you covered](https://sollace.github.io/emoticons/)
+
 # Emoji Packs
 
 ## iloveportalz0r's pony emojis
@@ -30,7 +34,7 @@ Extension of the Pony Pack, this pack adds a set of wetmane ponies.
 
 ## Round Stables
 
-This pack adds many of the pony themed emoticons found in [[roundstable.com]]
+This pack adds many of the pony themed emoticons found in [roundstable.com](https://roundstable.com)
 
 [Install](https://github.com/Sollace/Extra-Emoticons/raw/master/Round_Stables_Pony_Pack.user.js)
 
@@ -42,7 +46,7 @@ Adds all of the official emoticons from DeviantArt, as well as a few unofficial 
 
 ## Twitch Emojis
 
-Adds all official emoticons that can be used in the chat at [[twitch.tv]]
+Adds all official emoticons that can be used in the chat at [twitch.tv](https://twitch.tv)
 
 [Install](https://github.com/Sollace/Extra-Emoticons/raw/master/TwitchTV_Emoticons_Pack.user.js)
 
