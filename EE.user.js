@@ -2,7 +2,7 @@
 // @name        Extra Emoticons Redux
 // @description Allows additional emoticons to be added to FimFiction.net
 // @author      Sollace
-// @version     7
+// @version     8
 // @namespace   fimfiction-sollace
 // @icon        http://sollace.github.io/emoticons/default/rainbowexcited.png
 // @include     /^http?[s]://www.fimfiction.net/.*/
@@ -14,7 +14,7 @@
 // ==/UserScript==
 
 const ExtraEmotes = tryRun(_ => {
-  const version = 6;
+  const version = 8;
   const wind = win();
 
   if (wind.ExtraEmotes && wind.ExtraEmotes.getVersion() >= version) {
@@ -197,8 +197,6 @@ const ExtraEmotes = tryRun(_ => {
     }
 
     function restore(txt) {
-      console.log('aliases.restore');
-      console.log(txt);
       txt = txt.replace(/\?wrap\=true/g, '');
       const urls = getUrls(txt);
       ExtraEmotesRegistry.emojis().forEach(emoji => {
@@ -206,18 +204,14 @@ const ExtraEmotes = tryRun(_ => {
             txt = replaceAll(item.thick, emoji.code, txt);
         });
       });
-      console.log(txt);
       return txt;
     }
 
     function remove(txt) {
-      console.log('aliases.remove');
-      console.log(txt);
       ExtraEmotesRegistry.emojis().forEach(emoji => {
         txt = replaceAll(`\n ${emoji.code}`, `\n [img]http:${emoji.url}?wrap=true[/img]`, txt);
         txt = replaceAll(emoji.code, `[img]http:${emoji.url}[/img]`, txt);
       });
-      console.log(txt);
       return txt;
     }
 
@@ -242,7 +236,7 @@ const ExtraEmotes = tryRun(_ => {
   };
   const saveHandler = (controller, callback, args) => {
     const last = [];
-    all('textarea', controller.element, area => submitHandler(area, next => last.push(next)));
+    all('textarea', args[0] && args[0].querySelectorAll ? args[0] : controller.element, area => submitHandler(area, next => last.push(next)));
     const result = callback.apply(controller, args);
     last.forEach(l => l());
     return result;
