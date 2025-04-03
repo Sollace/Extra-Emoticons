@@ -3,13 +3,13 @@
 // @name        Derpibooru Emoticons
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
-// @include     /^https*://(philomena\.|www\.)*(derpi|trixie)booru\.org.*/
-// @version     1.5.6
+// @include     /^https*://(philomena\.|www\.)*((derpi|trixie|pony)booru|tantabus|ponerpics)\.(org|ai).*/
+// @version     1.5.7
 // @inject-into content
 // @grant       none
 // ==/UserScript==
 
-const version = '1.5.6';
+const version = '1.5.7';
 const taken = [];
 const emoticons = [];
 
@@ -346,21 +346,19 @@ a.emote {
   border-radius: 100%;
   width: 27px;
   height: 27px;
-  transition: background 0.2s ease, transform 0.1s ease;
+  transition: background 0.2s ease, transform 0.1s ease, opacity 0.1s ease;
   background: no-repeat center;
   transform: scale(1,1) rotate(0) translateZ(0);}
-#comment_emotes:hover a.emote img {opacity: 0.7;}
-#comment_emotes:hover a.emote:hover img {
-  opacity: 1 !important;
-  filter: blur(0.3px);}
+a.emote img {opacity:0;}
+#comment_emotes:hover a.emote:not(:hover), #comment_emotes:has(.selection-start) a.emote:not(:hover) {opacity: 0.5;}
 a.emote:hover, a.emote.selection-start, a.emote.selection-start ~ a {
   background-color: rgba(220,220,220,0.4);
   transform: scale(1.1,1.1) rotate(10deg) translateZ(0);}
 a.emote:nth-child(odd):hover, a.emote:nth-child(odd).selection-start, a.emote.selection-start ~ a:nth-child(odd) {
-  transform: scale(1.1,1.1) rotate(-10deg) translateZ(0);}
+  transform: scale(1.1,1.1) rotate(-10deg) translateZ(0);opacity:1 !important;}
 a.emote.selection-end ~ a, a.emote.selection-end ~ a:nth-child(odd) {
   background-color: transparent;
-  transform: scale(1,1) rotate(0) translateZ(0);}
+  transform: scale(1,1) rotate(0) translateZ(0);opacity:0.3 !important;}
 a.emote:active {transform: scale(1,1) rotate(10deg) translateZ(0);}
 a.emote:nth-child(odd):active {transform: scale(1,1) rotate(-10deg) translateZ(0);}`;
   document.body.insertAdjacentElement('afterend', element);
@@ -463,5 +461,5 @@ ExtraEmotes.load([
       '1195553|quack',
     ]
   },
-  '//derpicdn.net/media/2015/07/06/23_34_55_336_squirrelbadge2.png|squirrel'
+  '//derpicdn.net/badges/2015/07/06/23_34_55_336_squirrelbadge2.png|squirrel'
 ]);
