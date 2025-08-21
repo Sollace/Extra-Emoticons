@@ -4,12 +4,12 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^https*://(philomena\.|www\.)*((derpi|trixie|pony)booru|tantabus|ponerpics)\.(org|ai).*/
-// @version     1.5.7
+// @version     1.5.8
 // @inject-into content
 // @grant       none
 // ==/UserScript==
 
-const version = '1.5.7';
+const version = '1.5.8';
 const taken = [];
 const emoticons = [];
 
@@ -349,7 +349,7 @@ a.emote {
   transition: background 0.2s ease, transform 0.1s ease, opacity 0.1s ease;
   background: no-repeat center;
   transform: scale(1,1) rotate(0) translateZ(0);}
-a.emote img {opacity:0;}
+a.emote:not([style=""]) img {opacity:0;}
 #comment_emotes:hover a.emote:not(:hover), #comment_emotes:has(.selection-start) a.emote:not(:hover) {opacity: 0.5;}
 a.emote:hover, a.emote.selection-start, a.emote.selection-start ~ a {
   background-color: rgba(220,220,220,0.4);
