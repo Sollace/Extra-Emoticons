@@ -4,12 +4,12 @@
 // @description Adds emoticons to derpibooru.org.
 // @namespace   sollace
 // @include     /^https*://(philomena\.|www\.)*((derpi|trixie|pony)booru|tantabus|ponerpics)\.(org|ai).*/
-// @version     1.5.8
+// @version     1.5.9
 // @inject-into content
 // @grant       none
 // ==/UserScript==
 
-const version = '1.5.8';
+const version = '1.5.9';
 const taken = [];
 const emoticons = [];
 
@@ -323,7 +323,8 @@ if (ExtraEmotes.ready()) {
   border-left: none;
   text-align: center;
   padding: 5px;
-  flex-grow: 1;}
+  flex-grow: 1;
+  max-height: 320px;}
 #comment_emotes img::selection {color: transparent;}
 #comment_emotes img::-moz-selection {color: transparent;}
 .comment_box, .comment_box + textarea {
